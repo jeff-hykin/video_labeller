@@ -9,7 +9,7 @@
     <main>
         <!-- <input id="myFile" @change="openFolder" type="file" webkitdirectory /> -->
         <input id="myFile" @change="openFile" type="file" />
-        <b-button v-if="showNextButton +'ad' " class="next-button" @click="nextImage" >Next</b-button>
+        <b-button v-if="showNextButton" class="next-button" @click="nextImage" >Next</b-button>
         <b-button v-if="showBackButton" class="back-button" @click="prevImage" >Back</b-button>
     </main>
   </div>
