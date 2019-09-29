@@ -11,6 +11,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 
+import GoodVue from 'good-vue'
+Vue.use(GoodVue)
+
 import 'css-baseline/css/4.css'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))

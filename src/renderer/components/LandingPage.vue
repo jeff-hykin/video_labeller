@@ -1,10 +1,10 @@
 <template>
-<div>
-  <img v-on:mousemove="updateImageCoordinates" class="image" v-bind:src="image" alt="">
-  <div id="wrapper">
+<v-box align-items="left">
+  <img class="image" v-bind:src="imageSource" alt=""  style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;">
+  <div id="wrapper" :style="{height: `calc(100vh - ${imageData.height || 0}px)`}">
     <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
-    <div v-for="point in points" >
-        <point :x="point.x" :y="point.y"></point>
+    <div v-for="point in points" v-bind:key="point.uniqueName" >
+        <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
     </div>
     <main>
         <!-- <input id="myFile" @change="openFolder" type="file" webkitdirectory /> -->
@@ -13,7 +13,7 @@
         <b-button v-if="showBackButton" class="back-button" @click="prevImage" >Back</b-button>
     </main>
   </div>
-</div>
+</v-box>
 </template>
 <script>
 import Point from "./LandingPage/Draggable"
@@ -30,7 +30,7 @@ export default {
     components: { Point },
     data: function() {
         return {
-            image: "",
+            imageSource: "",
             imagePaths: [],
             currentIndex: null,
             points: []
@@ -38,28 +38,59 @@ export default {
     },
     computed: {
         showNextButton() {
-            return this.currentIndex >= 0 && this.currentIndex+1 < this.numberOfImages
+            return this.currentIndex >= 0 && this.currentIndex+1 < this.imagePaths.length
         },
         showBackButton() {
             return this.currentIndex > 0
+        },
+        currentImagePath() {
+            return this.imagePaths[this.currentIndex]
+        },
+        imageData() {
+            if (this.currentImagePath && this.data[this.currentImagePath]) {
+                return this.data[this.currentImagePath]
+            } else {
+                return {}
+            }
+        },
+    },
+    watch: {
+        // whenever the index changes, load the new image
+        currentIndex(newValue, oldValue) {
+            // open the new image
+            this.imageSource = `data:image/png;base64,${fs.readFileSync(this.currentImagePath).toString("base64")}`
+            let img = new Image()
+            img.onload = ()=>{
+                // get the image dimensions
+                this.imageData.height = img.height
+                this.imageData.width = img.width
+                
+                // extract all the points after the dimensions are retrieved
+                this.points = this.imageData.overlays.filter(each => each.type == 'point')
+                
+                // give unique names to all the points that don't have unique names
+                for (let index in this.points) {
+                    if (this.points[index].uniqueName == null) {
+                        this.points[index].uniqueName = Math.random()
+                    }
+                }
+            }
+            img.src = this.imageSource
         }
     },
     methods: {
-        updateImageCoordinates(e) {
-            let position = { x:e.clientX, y:e.clientY }
-        },
         nextImage(e) {
             // if there is a next image
-            if (++this.currentIndex < this.numberOfImages) {
-                let filepath = Object.keys(this.data)[this.currentIndex]
-                this.displayImage(filepath)
+            if (this.currentIndex+1 < this.imagePaths.length) {
+                // then go to it
+                ++this.currentIndex
             }
         },
         prevImage(e) {
-            // if there is a next image
+            // if there is a previous image
             if (this.currentIndex > 0) {
-                let filepath = Object.keys(this.data)[--this.currentIndex]
-                this.displayImage(filepath)
+                // then go to it
+                --this.currentIndex
             }
         },
         open(link) {
@@ -69,12 +100,9 @@ export default {
             let filepath = e.target.files[0].path
             let file = fs.readFileSync(filepath).toString()
             this.data = JSON.parse(file)
-            
-            let keys = Object.keys(this.data)
-            // open the initial picture
-            this.numberOfImages = keys.length
+            this.imagePaths = Object.keys(this.data)
+            // set (or reset) the index so that the image is loaded
             this.currentIndex = 0
-            this.displayImage(keys[0])
         },
         async openFolder(e) {
             let folderPath = e.target.files[0].path
@@ -87,22 +115,11 @@ export default {
             }
             this.imagePaths = imagePaths
         },
-        displayImage(filepath) {
-            this.image = `data:image/png;base64,${fs.readFileSync(filepath).toString("base64")}`
-            let imageData = this.data[filepath]
-            // record the image dimensions
-            let img = new Image()
-            img.onload = ()=>{
-                let height = img.height
-                let width = img.width
-                imageData.height = height
-                imageData.width = width
-                this.points = imageData.overlays.filter(each => each.type == 'point')
-            }
-            img.src = this.image
-        },
-        getPoints() {
-            
+        pointWasMoved({x, y, uniqueName}) {
+            // update the value of the point
+            let point = this.points.filter(each => each.uniqueName == uniqueName)[0]
+            point.x = x
+            point.y = y
         }
     },
 }
@@ -115,12 +132,12 @@ export default {
 }
 .next-button {
     position: fixed;
-    top: 3rem;
+    bottom: 3rem;
     right: 3rem;
 }
 .back-button {
     position: fixed;
-    top: 3rem;
+    bottom: 3rem;
     left: 3rem;
 }
 
@@ -137,7 +154,6 @@ body {
 
 #wrapper {
     background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
-    height: 100vh;
     padding: 60px 80px;
     width: 100vw;
 }
