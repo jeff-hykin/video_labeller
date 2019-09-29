@@ -12,7 +12,12 @@
                 Back
             </b-button>
             <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-            <input class=file-picker type="file" @change="openFile" />
+            <row>
+                <input class=file-picker type="file" @change="openFile" />
+                <b-button class="save-button" @click="saveData" :style="{paddingLeft: '2rem'}">
+                    Save
+                </b-button>
+            </row>
             
             <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
                 Next
@@ -43,6 +48,7 @@ export default {
             imagePaths: [],
             currentIndex: null,
             points: [],
+            jsonFilePath: '',
             currenImageWidth: '100vh',
             bottomBarHeight: '6.5rem',
         }
@@ -72,6 +78,7 @@ export default {
     watch: {
         // whenever the index changes, load the new image
         currentIndex(newValue, oldValue) {
+            this.saveData()
             // open the new image
             this.imageSource = `data:image/png;base64,${fs.readFileSync(this.currentImagePath).toString("base64")}`
             let img = new Image()
@@ -97,6 +104,13 @@ export default {
         }
     },
     methods: {
+        saveData() {
+            // if not the first load
+            if (this.currentIndex != null) {
+                // save the new point values
+                fs.writeFile(this.jsonFilePath+'.new.json', JSON.stringify(this.data), _=>console.log('data written'))
+            }
+        },
         nextImage(e) {
             // if there is a next image
             if (this.currentIndex+1 < this.imagePaths.length) {
@@ -115,8 +129,8 @@ export default {
             this.$electron.shell.openExternal(link)
         },
         openFile(e) {
-            let filepath = e.target.files[0].path
-            let file = fs.readFileSync(filepath).toString()
+            this.jsonFilePath = e.target.files[0].path
+            let file = fs.readFileSync(this.jsonFilePath).toString()
             this.data = JSON.parse(file)
             this.imagePaths = Object.keys(this.data)
             // set (or reset) the index so that the image is loaded
@@ -154,17 +168,6 @@ export default {
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
-/* 
-.next-button {
-    position: absolute;
-    bottom: 3rem;
-    right: 3rem;
-}
-.back-button {
-    position: absolute;
-    bottom: 3rem;
-    left: 3rem;
-} */
 
 .wrapper {
     background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
