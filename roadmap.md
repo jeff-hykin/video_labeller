@@ -1,7 +1,2 @@
-- json spec
-  - json has keys for each image path
-  - value for each key is a list of objects
-  - each object has a type and location data
-- upon import, display the first image
-- get the image dimensions
-- display the points 
+- get a sufficient amount of space for the back/next buttons
+- save to the new JSON file on pressing next/back
