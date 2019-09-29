@@ -1,24 +1,33 @@
 <template>
-<v-box align-items="left">
-  <img class="image" v-bind:src="imageSource" alt=""  style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;">
-  <div id="wrapper" :style="{height: `calc(100vh - ${imageData.height || 0}px)`}">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
-    <div v-for="point in points" v-bind:key="point.uniqueName" >
-        <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
-    </div>
-    <main>
-        <!-- <input id="myFile" @change="openFolder" type="file" webkitdirectory /> -->
-        <input id="myFile" @change="openFile" type="file" />
-        <b-button v-if="showNextButton" class="next-button" @click="nextImage" >Next</b-button>
-        <b-button v-if="showBackButton" class="back-button" @click="prevImage" >Back</b-button>
-    </main>
-  </div>
-</v-box>
+<column class=wrapper align-h=left align-v=space-between min-height=100vh :min-width='imageWidth'>
+    <column align-h=left :max-height='`calc(100vh - ${bottomBarHeight})`' max-width='100vw' overflow=auto position='relative'>
+        <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;">
+        <div v-for="point in points" v-bind:key="point.uniqueName" >
+            <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
+        </div>
+    </column>
+    <row align-h=left :width='imageWidth' :height='bottomBarHeight' shadow=2 background-color=var(--teal)>
+        <row align-h=space-between align-v='center' width=100vw padding="2rem 3rem">
+            <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
+                Back
+            </b-button>
+            <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
+            <input class=file-picker type="file" @change="openFile" />
+            
+            <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
+                Next
+            </b-button>
+            
+        </row>
+    </row>
+</column>
 </template>
 <script>
 import Point from "./LandingPage/Draggable"
 import fs from "fs"
 import { remote } from "electron"
+import Column from './LandingPage/column'
+import Row from './LandingPage/row'
 
 let util = require("util")
 let path = require("path")
@@ -27,13 +36,15 @@ const stat = util.promisify(fs.stat)
 
 export default {
     name: "landing-page",
-    components: { Point },
+    components: { Point, Column, Row },
     data: function() {
         return {
             imageSource: "",
             imagePaths: [],
             currentIndex: null,
-            points: []
+            points: [],
+            currenImageWidth: '100vh',
+            bottomBarHeight: '6.5rem',
         }
     },
     computed: {
@@ -53,6 +64,10 @@ export default {
                 return {}
             }
         },
+        imageWidth() {
+            let value = this.imageData && this.imageData.width && `${this.imageData.width}px`
+            return value || '100vw'
+        }
     },
     watch: {
         // whenever the index changes, load the new image
@@ -74,6 +89,9 @@ export default {
                         this.points[index].uniqueName = Math.random()
                     }
                 }
+                // change the indexes to cause a re-compute of imageData (because imageData changed)
+                this.currentIndex++
+                this.currentIndex--
             }
             img.src = this.imageSource
         }
@@ -125,22 +143,7 @@ export default {
 }
 
 </script>
-<style>
-
-.image {
-    
-}
-.next-button {
-    position: fixed;
-    bottom: 3rem;
-    right: 3rem;
-}
-.back-button {
-    position: fixed;
-    bottom: 3rem;
-    left: 3rem;
-}
-
+<style scoped>
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 * {
     box-sizing: border-box;
@@ -151,21 +154,28 @@ export default {
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
+/* 
+.next-button {
+    position: absolute;
+    bottom: 3rem;
+    right: 3rem;
+}
+.back-button {
+    position: absolute;
+    bottom: 3rem;
+    left: 3rem;
+} */
 
-#wrapper {
+.wrapper {
     background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
-    padding: 60px 80px;
     width: 100vw;
 }
-
-#logo {
-    height: auto;
-    margin-bottom: 20px;
-    width: 420px;
+.file-picker {
+    background-color: whitesmoke;
+    border: 1rem solid whitesmoke !important;
+    border-radius: 100vh;
 }
-
-main {
-    display: flex;
-    justify-content: space-between;
+button {
+    height: min-content;
 }
 </style>

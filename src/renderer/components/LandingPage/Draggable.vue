@@ -1,5 +1,5 @@
 <template>
-    <div class="point" :style="{ left: `${this.newX}px`, top: `${this.newY}px` }" @click="toggleDrag">X</div>
+    <div class="point" :style="{ left: `${this.newX}px`, top: `${this.newY}px` }" @click="toggleDrag"></div>
 </template>
 <script>
     export default {
@@ -23,8 +23,8 @@
             toggleDrag(e) {
                 if (!this.eventListener) {
                     this.eventListener = e => {
-                        this.newX = e.clientX - 10;
-                        this.newY = e.clientY - 10;
+                        this.newX += e.movementX;
+                        this.newY += e.movementY;
                         this.$emit('moved',{x: this.newX, y: this.newY, uniqueName: this.$props.uniqueName})
                     }
                     window.addEventListener('mousemove', this.eventListener)
@@ -40,8 +40,9 @@
     .point {
         cursor: move;
         position: absolute;
-        color: red;
-        width: 20px;
-        height: 20px;
+        transform: translate(-50%, -50%);
+        background-color: red;
+        height: 15px;
+        width: 15px;
     }
 </style>

@@ -1,2 +1,2 @@
-- get a sufficient amount of space for the back/next buttons
+- fix the relative positioning.
 - save to the new JSON file on pressing next/back
