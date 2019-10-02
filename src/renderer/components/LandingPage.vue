@@ -166,6 +166,7 @@ export default {
             }
             // open the new image
             let failed = false
+            this.points = []
             try {
                 this.imageSource = `data:image/png;base64,${fs.readFileSync(imagePath).toString("base64")}`
             } catch (e) {
