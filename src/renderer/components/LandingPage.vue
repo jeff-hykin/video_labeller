@@ -1,20 +1,20 @@
 <template>
-<column class=wrapper align-h=left align-v=space-between min-height=100vh :min-width='imageWidth'>
-    <column align-h=left :max-height='`calc(100vh - ${bottomBarHeight})`' max-width='100vw' overflow=auto position='relative'>
+<column class=wrapper align-h=left align-v=space-between min-height=100vh>
+    <column align-h=left :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;">
         <div v-for="point in points" v-bind:key="point.uniqueName" >
             <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
         </div>
     </column>
-    <row align-h=left :width='imageWidth' :height='bottomBarHeight' shadow=2 background-color=var(--teal)>
-        <row align-h=space-between align-v='center' width=100vw padding="2rem 3rem">
+    <row ref=bottomBar width=100vw max-width=100vw shadow=2 background-color=var(--teal) padding='2rem 3rem'>
+        <row align-h=space-between width=100vw min-width=min-content>
             <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
                 Back
             </b-button>
             <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
             <row>
                 <input class=file-picker type="file" @change="openFile" />
-                <b-button class="save-button" @click="saveData" :style="{paddingLeft: '2rem'}">
+                <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
                     Save
                 </b-button>
             </row>
@@ -22,7 +22,6 @@
             <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
                 Next
             </b-button>
-            
         </row>
     </row>
 </column>
@@ -50,7 +49,7 @@ export default {
             points: [],
             jsonFilePath: '',
             currenImageWidth: '100vh',
-            bottomBarHeight: '6.5rem',
+            data: null,
         }
     },
     computed: {
@@ -104,6 +103,13 @@ export default {
         }
     },
     methods: {
+        bottomBarHeight() {
+            let output = '0'
+            if (this.$refs.bottomBar) {
+                output = `${this.$refs.bottomBar.$el.clientHeight}px`
+            }
+            return output
+        },
         saveData() {
             // if not the first load
             if (this.currentIndex != null) {
@@ -160,7 +166,6 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
