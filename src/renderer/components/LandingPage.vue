@@ -5,6 +5,74 @@
         <div v-for="point in points" v-bind:key="point.uniqueName" >
             <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
         </div>
+        <column v-if="jsonFilePath.length == 0" align-h=left align-v='top' padding-top=2rem padding-left=2rem>
+            <h5>How do I use this?</h5>
+            <br>
+            <p>
+                If you have some image files, for example<br>
+                <pre>image1.png</pre>
+                <pre>image2.png</pre>
+                <br>
+                And you have some points (ex: facial landmarks) for those items<br>
+                <pre>image1: point1(x=1, y=2), point2(x=2, y=3), etc</pre>
+                <pre>image2: point1(x=1, y=2), point2(x=2, y=3), etc</pre>
+                (units are in pixels)
+                <br>
+                <br>
+                Place all of that info in a json file, in this format<br>
+                </p>
+                <pre>
+{
+    "image1.png" : {
+        "overlays": [
+            {
+                "type": "point",
+                "uniqueName": "point1",
+                "x": 1,
+                "y": 2,
+            },
+            {
+                "type": "point",
+                "uniqueName": "point2",
+                "x": 2,
+                "y": 3
+            }
+        ]
+    },
+    "image2.png": {
+        "overlays": [
+            {
+                "type": "point",
+                "uniqueName": "point1",
+                "x": 1,
+                "y": 2,
+            },
+            {
+                "type": "point",
+                "uniqueName": "point2",
+                "x": 2,
+                "y": 3
+            }
+        ]
+    }
+}
+                </pre>
+                <p>
+                    You can then open that json file (using "choose file" below)<br>
+                    And you will be able to cycle through images and edit their points
+                </p>
+                <br>
+                <br>
+                <h5>Where is the information saved?</h5>
+                <p>
+                    Right now the edited info is saved in
+                    <pre>*name-of-your-json-file*.updated.json</pre>
+                    <br>
+                    <br>
+                    <br>
+                </p>
+                    <div style="height:"></div>
+        </column>
     </column>
     <row ref=bottomBar width=100vw max-width=100vw shadow=2 background-color=var(--teal) padding='2rem 3rem'>
         <row align-h=space-between width=100vw min-width=min-content>
@@ -50,6 +118,7 @@ export default {
             jsonFilePath: '',
             currenImageWidth: '100vh',
             data: null,
+            triggerUpdate: 0,
         }
     },
     computed: {
@@ -118,8 +187,11 @@ export default {
     methods: {
         bottomBarHeight() {
             let output = '0'
+            console.log(`this.$refs.bottomBar is:`,this.$refs.bottomBar)
             if (this.$refs.bottomBar) {
                 output = `${this.$refs.bottomBar.$el.clientHeight}px`
+            } else {
+                setTimeout(_=>this.$forceUpdate(),0)
             }
             return output
         },
