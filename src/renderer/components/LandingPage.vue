@@ -12,7 +12,7 @@
                 Back
             </b-button>
             <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-            <row>
+            <row padding='0 1rem'>
                 <input class=file-picker type="file" @change="openFile" />
                 <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
                     Save
@@ -32,9 +32,9 @@ import fs from "fs"
 import { remote } from "electron"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
+import path from 'path'
 
 let util = require("util")
-let path = require("path")
 const readdir = util.promisify(fs.readdir)
 const stat = util.promisify(fs.stat)
 
@@ -78,28 +78,41 @@ export default {
         // whenever the index changes, load the new image
         currentIndex(newValue, oldValue) {
             this.saveData()
-            // open the new image
-            this.imageSource = `data:image/png;base64,${fs.readFileSync(this.currentImagePath).toString("base64")}`
-            let img = new Image()
-            img.onload = ()=>{
-                // get the image dimensions
-                this.imageData.height = img.height
-                this.imageData.width = img.width
-                
-                // extract all the points after the dimensions are retrieved
-                this.points = this.imageData.overlays.filter(each => each.type == 'point')
-                
-                // give unique names to all the points that don't have unique names
-                for (let index in this.points) {
-                    if (this.points[index].uniqueName == null) {
-                        this.points[index].uniqueName = Math.random()
-                    }
-                }
-                // change the indexes to cause a re-compute of imageData (because imageData changed)
-                this.currentIndex++
-                this.currentIndex--
+            let imagePath = this.currentImagePath
+            // if its not an absolute path, then assume it is a relative path from the json file
+            if (!path.isAbsolute(imagePath)) {
+                imagePath = path.join( path.dirname(this.jsonFilePath), imagePath)
             }
-            img.src = this.imageSource
+            // open the new image
+            let failed = false
+            try {
+                this.imageSource = `data:image/png;base64,${fs.readFileSync(imagePath).toString("base64")}`
+            } catch (e) {
+                alert(`Unable to load the image at '${imagePath}'\nDoes the image exist and is in png/jpeg format?`)
+                failed = true
+            }
+            if (!failed) {
+                let img = new Image()
+                img.onload = ()=>{
+                    // get the image dimensions
+                    this.imageData.height = img.height
+                    this.imageData.width = img.width
+                    
+                    // extract all the points after the dimensions are retrieved
+                    this.points = this.imageData.overlays.filter(each => each.type == 'point')
+                    
+                    // give unique names to all the points that don't have unique names
+                    for (let index in this.points) {
+                        if (this.points[index].uniqueName == null) {
+                            this.points[index].uniqueName = Math.random()
+                        }
+                    }
+                    // change the indexes to cause a re-compute of imageData (because imageData changed)
+                    this.currentIndex++
+                    this.currentIndex--
+                }
+                img.src = this.imageSource
+            }
         }
     },
     methods: {
@@ -114,7 +127,9 @@ export default {
             // if not the first load
             if (this.currentIndex != null) {
                 // save the new point values
-                fs.writeFile(this.jsonFilePath+'.new.json', JSON.stringify(this.data), _=>console.log('data written'))
+                let lengthOfJsonExtension = 5 // '.json'
+                let baseJsonFilePath = this.jsonFilePath.substring(0, this.jsonFilePath.length - lengthOfJsonExtension)
+                fs.writeFile(baseJsonFilePath+'.updated.json', JSON.stringify(this.data), _=>console.log('data written'))
             }
         },
         nextImage(e) {
@@ -179,6 +194,7 @@ body {
     width: 100vw;
 }
 .file-picker {
+    width: 16rem;
     background-color: whitesmoke;
     border: 1rem solid whitesmoke !important;
     border-radius: 100vh;
