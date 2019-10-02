@@ -1,7 +1,7 @@
 <template>
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
     <column align-h=left :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
-        <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;">
+        <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;" >
         <div v-for="point in points" v-bind:key="point.uniqueName" >
             <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
         </div>
@@ -21,6 +21,7 @@
                 <br>
                 Place all of that info in a json file, in this format<br>
                 </p>
+                <p>
                 <pre>
 {
     "image1.png" : {
@@ -56,7 +57,7 @@
         ]
     }
 }
-                </pre>
+                </pre></p>
                 <p>
                     You can then open that json file (using "choose file" below)<br>
                     And you will be able to cycle through images and edit their points
@@ -120,6 +121,17 @@ export default {
             data: null,
             triggerUpdate: 0,
         }
+    },
+    mounted(){
+        window.addEventListener('keydown', (e)=>{
+            if (e.code == 'ArrowLeft') {
+                e.preventDefault()
+                this.prevImage()
+            } else if (e.code == 'ArrowRight') {
+                e.preventDefault()
+                this.nextImage()
+            }
+        })
     },
     computed: {
         showNextButton() {
@@ -187,7 +199,6 @@ export default {
     methods: {
         bottomBarHeight() {
             let output = '0'
-            console.log(`this.$refs.bottomBar is:`,this.$refs.bottomBar)
             if (this.$refs.bottomBar) {
                 output = `${this.$refs.bottomBar.$el.clientHeight}px`
             } else {
