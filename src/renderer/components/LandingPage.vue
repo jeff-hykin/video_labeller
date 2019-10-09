@@ -79,7 +79,7 @@
     <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
         <column width=100%>
             <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
-                <p class=options style='padding: 0.7rem;'>Options</p>
+                <p class=corner-popover style='padding: 0.7rem;'>Options</p>
                 <ui-popover open-on="mouseenter">
                     <column padding='2rem' height=10rem>
                         <ui-switch v-model="showPoints">Show X's</ui-switch>
@@ -105,6 +105,14 @@
                     Next
                 </b-button>
             </row>
+            <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
+                <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
+                <ui-popover class=json-popover open-on="click">
+                    <row width=100vw height=100% align-v=top align-h=left padding=1rem>
+                        <vue-json-pretty :data="frameData" />
+                    </row>
+                </ui-popover>
+            </div>
         </column>
     </row>
 </column>
@@ -115,6 +123,7 @@ import fs from "fs"
 import { remote } from "electron"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
+import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 
 let util = require("util")
@@ -123,7 +132,7 @@ const stat = util.promisify(fs.stat)
 
 export default {
     name: "landing-page",
-    components: { Point, Column, Row },
+    components: { Point, Column, Row, VueJsonPretty },
     data: function() {
         return {
             imageSource: "",
@@ -135,6 +144,7 @@ export default {
             data: null,
             triggerUpdate: 0,
             showPoints: true,
+            frameData: null,
         }
     },
     mounted(){
@@ -205,12 +215,28 @@ export default {
                             this.points[index].uniqueName = Math.random()
                         }
                     }
+                    
+                    // update the frameData variable (for displaying json)
+                    this.frameData = {}
+                    for (let each in this.imageData) {
+                        // don't show overlay data
+                        if (each != 'overlays') {
+                            this.frameData[each] = this.imageData[each]
+                        }
+                    }
+                    // this.frameData = JSON.stringify(this.frameData)
+                    
                     // change the indexes to cause a re-compute of imageData (because imageData changed)
                     this.currentIndex++
                     this.currentIndex--
                 }
                 img.src = this.imageSource
             }
+        },
+        frameData(newValue, oldValue) {
+            // for (let each in this.frameData) {
+            //     each
+            // }
         }
     },
     methods: {
@@ -302,13 +328,22 @@ body {
     border: 1rem solid whitesmoke !important;
     border-radius: 100vh;
 }
-.options {
+.corner-popover {
     font-family: Roboto;
     font-weight: 100;
     font-size: 14pt;
     margin-left: 1rem;
+    margin-right: 1rem;
     color: #eeeeee;
     text-decoration: underline;
+}
+.json-popover {
+    min-height: 7rem;
+    min-width: 30vw;
+    width: 20rem;
+    overflow: auto;
+}
+.json-area {
 }
 button {
     height: min-content;

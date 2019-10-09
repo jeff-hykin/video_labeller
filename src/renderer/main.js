@@ -23,6 +23,10 @@ Vue.use(KeenUI)
 // Baseline
 import 'css-baseline/css/4.css'
 
+// VueJsonPretty
+import VueJsonPretty from 'vue-json-pretty'
+
+
 
 // in renderer process
 import { webFrame } from 'electron'
@@ -34,7 +38,7 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  components: { App },
+  components: { App, VueJsonPretty },
   router,
   store,
   template: '<App/>'

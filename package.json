@@ -1,9 +1,9 @@
 {
   "name": "video_labeller",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Jeff Hykin <jeff.hykin@gmail.com>",
   "description": "An electron-vue project",
-  "license": null,
+  "license": "",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -63,6 +63,7 @@
     "lesshat": "^4.1.0",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
+    "vue-json-pretty": "^1.6.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "vuex-electron": "^1.0.0"
