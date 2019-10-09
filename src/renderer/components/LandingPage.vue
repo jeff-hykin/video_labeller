@@ -78,8 +78,8 @@
     <!-- The bottom bar -->
     <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
         <column width=100%>
-            <div class="popover-trigger options" style="position:absolute; top: 0; left: 0; font-size: 14pt">
-                <p style='padding: 0.7rem; border: none; text-decoration: underline; color: white;'>Options</p>
+            <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
+                <p class=options style='padding: 0.7rem;'>Options</p>
                 <ui-popover open-on="mouseenter">
                     <column padding='2rem' height=10rem>
                         <ui-switch v-model="showPoints">Show X's</ui-switch>
@@ -305,7 +305,10 @@ body {
 .options {
     font-family: Roboto;
     font-weight: 100;
-    color: #f5f5f5;
+    font-size: 14pt;
+    margin-left: 1rem;
+    color: #eeeeee;
+    text-decoration: underline;
 }
 button {
     height: min-content;
