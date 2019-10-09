@@ -1,6 +1,6 @@
 <template>
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
-    <column align-h=left :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
+    <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;" >
         <div v-for="point in points" v-bind:key="point.uniqueName" >
             <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
@@ -75,23 +75,29 @@
                     <div style="height:"></div>
         </column>
     </column>
-    <row ref=bottomBar width=100vw max-width=100vw shadow=2 background-color=var(--teal) padding='2rem 3rem'>
-        <row align-h=space-between width=100vw min-width=min-content>
-            <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
-                Back
-            </b-button>
-            <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-            <row padding='0 1rem'>
-                <input class=file-picker type="file" @change="openFile" />
-                <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
-                    Save
+    <!-- The bottom bar -->
+    <row ref=bottomBar width=100vw max-width=100vw shadow=2 background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
+        <column width=100%>
+            <row padding='0.5rem' position=relative top='-0.5rem'>
+                <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
+            </row>
+            <row align-h=space-between width=100% min-width=min-content>
+                <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
+                    Back
+                </b-button>
+                <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
+                <row padding='0 1rem'>
+                    <input class=file-picker type="file" @change="openFile" />
+                    <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
+                        Save
+                    </b-button>
+                </row>
+                
+                <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
+                    Next
                 </b-button>
             </row>
-            
-            <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
-                Next
-            </b-button>
-        </row>
+        </column>
     </row>
 </column>
 </template>
@@ -168,6 +174,7 @@ export default {
             let failed = false
             this.points = []
             try {
+                console.log(`imagePath is:`,imagePath)
                 this.imageSource = `data:image/png;base64,${fs.readFileSync(imagePath).toString("base64")}`
             } catch (e) {
                 alert(`Unable to load the image at '${imagePath}'\nDoes the image exist and is in png/jpeg format?`)
