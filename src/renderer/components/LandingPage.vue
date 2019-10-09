@@ -224,7 +224,6 @@ export default {
                             this.frameData[each] = this.imageData[each]
                         }
                     }
-                    // this.frameData = JSON.stringify(this.frameData)
                     
                     // change the indexes to cause a re-compute of imageData (because imageData changed)
                     this.currentIndex++
@@ -281,7 +280,8 @@ export default {
             this.data = JSON.parse(file)
             this.imagePaths = Object.keys(this.data)
             // set (or reset) the index so that the image is loaded
-            this.currentIndex = 0
+            this.currentIndex++
+            setTimeout(_=>this.currentIndex = 0)
         },
         async openFolder(e) {
             let folderPath = e.target.files[0].path
