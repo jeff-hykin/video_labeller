@@ -2,7 +2,7 @@
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
     <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <img class="image" v-bind:src="imageSource" alt="" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"  unselectable="on" onselectstart="return false;" >
-        <div v-for="point in points" v-bind:key="point.uniqueName" >
+        <div v-if='showPoints' v-for="point in points" v-bind:key="point.uniqueName" >
             <point :x="point.x" :y="point.y" :uniqueName="point.uniqueName" @moved="pointWasMoved"></point>
         </div>
         <column v-if="jsonFilePath.length == 0" align-h=left align-v='top' padding-top=2rem padding-left=2rem>
@@ -76,8 +76,16 @@
         </column>
     </column>
     <!-- The bottom bar -->
-    <row ref=bottomBar width=100vw max-width=100vw shadow=2 background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
+    <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
         <column width=100%>
+            <div class="popover-trigger options" style="position:absolute; top: 0; left: 0; font-size: 14pt">
+                <p style='padding: 0.7rem; border: none; text-decoration: underline; color: white;'>Options</p>
+                <ui-popover open-on="mouseenter">
+                    <column padding='2rem' height=10rem>
+                        <ui-switch v-model="showPoints">Show X's</ui-switch>
+                    </column>
+                </ui-popover>
+            </div>
             <row padding='0.5rem' position=relative top='-0.5rem'>
                 <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
             </row>
@@ -126,6 +134,7 @@ export default {
             currenImageWidth: '100vh',
             data: null,
             triggerUpdate: 0,
+            showPoints: true,
         }
     },
     mounted(){
@@ -271,6 +280,9 @@ export default {
 </script>
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
+
+
 * {
     margin: 0;
     padding: 0;
@@ -289,6 +301,11 @@ body {
     background-color: whitesmoke;
     border: 1rem solid whitesmoke !important;
     border-radius: 100vh;
+}
+.options {
+    font-family: Roboto;
+    font-weight: 100;
+    color: #f5f5f5;
 }
 button {
     height: min-content;
