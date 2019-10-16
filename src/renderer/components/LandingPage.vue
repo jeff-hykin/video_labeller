@@ -107,7 +107,7 @@
             </row>
             <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
                 <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
-                <ui-popover open-on="mouseenter">
+                <ui-popover open-on="click">
                     <column padding='2rem' min-height=10rem>
                         <graph :jsonData="data" />
                     </column>
