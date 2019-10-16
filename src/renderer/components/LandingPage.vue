@@ -81,7 +81,7 @@
             <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
                 <p class=corner-popover style='padding: 0.7rem;'>Options</p>
                 <ui-popover open-on="mouseenter">
-                    <column padding='2rem' height=10rem>
+                    <column padding='2rem' min-height=10rem>
                         <ui-switch v-model="showPoints">Show X's</ui-switch>
                     </column>
                 </ui-popover>
@@ -105,6 +105,14 @@
                     Next
                 </b-button>
             </row>
+            <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
+                <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
+                <ui-popover open-on="mouseenter">
+                    <column padding='2rem' min-height=10rem>
+                        <graph :jsonData="data" />
+                    </column>
+                </ui-popover>
+            </div>
             <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
                 <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
                 <ui-popover class=json-popover open-on="click">
@@ -118,13 +126,15 @@
 </column>
 </template>
 <script>
-import Point from "./LandingPage/Draggable"
 import fs from "fs"
 import { remote } from "electron"
-import Column from './LandingPage/column'
-import Row from './LandingPage/row'
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
+
+import Graph from "./LandingPage/graph"
+import Point from "./LandingPage/Draggable"
+import Column from './LandingPage/column'
+import Row from './LandingPage/row'
 
 let util = require("util")
 const readdir = util.promisify(fs.readdir)
@@ -132,7 +142,7 @@ const stat = util.promisify(fs.stat)
 
 export default {
     name: "landing-page",
-    components: { Point, Column, Row, VueJsonPretty },
+    components: { Point, Column, Row, VueJsonPretty, Graph },
     data: function() {
         return {
             imageSource: "",

@@ -1,5 +1,6 @@
 <template>
     <div class="point" :style="{ left: `${this.newX}px`, top: `${this.newY}px`, cursor: dragging? 'move':'pointer', color }" @click="activateDrag">
+        <ui-tooltip position="top" animation="fade">{{ $props.uniqueName }}</ui-tooltip>
         <svg width=100% height=100%>
             <line x1="0" y1="0" x2="100%" y2="100%" :style="{strokeWidth, stroke: color}">
                 <rainbow-line-animation />
