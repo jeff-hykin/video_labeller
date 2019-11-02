@@ -2,53 +2,58 @@
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
     <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <!-- Current Video -->
+        <video v-if=this.currentVideoFilePath  controls>
+            <source :src="this.currentVideoFilePath" type="video/mp4">
+        </video>
     </column>
     <!-- The bottom bar -->
     <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
         <column width=100%>
-            <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
+            <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
                 <p class=corner-popover style='padding: 0.7rem;'>Options</p>
                 <ui-popover open-on="mouseenter">
                     <column padding='2rem' min-height=10rem>
                         <ui-switch v-model="showPoints">Show X's</ui-switch>
                     </column>
                 </ui-popover>
-            </div>
-            <row padding='0.5rem' position=relative top='-0.5rem'>
+            </div> -->
+            <!-- <row padding='0.5rem' position=relative top='-0.5rem'>
                 <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
-            </row>
+            </row> -->
             <row align-h=space-between width=100% min-width=min-content>
                 <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
                     Back
                 </b-button>
                 <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                 <row padding='0 1rem'>
-                    <input class=file-picker type="file" @change="openFile" />
-                    <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
+                    <input class=file-picker type="file" @change="chooseFile" />
+                    <!-- <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
                         Save
-                    </b-button>
+                    </b-button> -->
                 </row>
                 
                 <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
                     Next
                 </b-button>
             </row>
-            <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
+            
+            <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
                 <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
                 <ui-popover open-on="click">
                     <column padding='2rem' min-height=10rem>
                         <graph :jsonData="data" />
                     </column>
                 </ui-popover>
-            </div>
-            <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
+            </div> -->
+            
+            <!-- <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
                 <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
                 <ui-popover class=json-popover open-on="click">
                     <row width=100vw height=100% align-v=top align-h=left padding=1rem>
                         <vue-json-pretty :data="frameData" />
                     </row>
                 </ui-popover>
-            </div>
+            </div> -->
         </column>
     </row>
 </column>
@@ -72,7 +77,7 @@ export default {
     name: "main-page",
     components: { Point, Column, Row, VueJsonPretty, Graph },
     data: ()=>({
-        currentVideoFilePath: "",
+        currentVideoFilePath: "/Users/jeffhykin/Desktop/glitch_multicursor.mov",
         currentFeatureName: "",
         currentFeatureValue: 0,
         recordedFeatures:[],
@@ -81,10 +86,10 @@ export default {
         window.addEventListener('keydown', (e)=>{
             if (e.code == 'ArrowLeft') {
                 e.preventDefault()
-                this.prevImage()
+                // TODO
             } else if (e.code == 'ArrowRight') {
                 e.preventDefault()
-                this.nextImage()
+                // TODO
             }
         })
     },
@@ -128,9 +133,9 @@ export default {
         open(link) {
             this.$electron.shell.openExternal(link)
         },
-        openFile(e) {
-            this.jsonFilePath = e.target.files[0].path
-            let file = fs.readFileSync(this.jsonFilePath).toString()
+        chooseFile(e) {
+            this.currentVideoFilePath = e.target.files[0].path
+            // let file = fs.readFileSync(this.jsonFilePath).toString()
         },
         async openFolder(e) {
             let folderPath = e.target.files[0].path

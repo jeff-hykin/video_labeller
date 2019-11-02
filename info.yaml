@@ -1,0 +1,44 @@
+(using_atk_version): 1.0
+(project):
+    name: A Project
+    description: A new project
+    
+    commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
+        dev: node .electron-vue/dev-runner.js
+        package: npx electron-packager . --no-prune --overwrite ; mv video_labeller-darwin-x64 app.nosync
+        gco: git checkout video-image-labeller-stable
+        run_ruby: !language/ruby |
+            puts 'placeholder text'
+    
+    paths: &paths
+        root: ./
+    
+    dependencies: &dependencies
+        atk: 0.0.1
+    
+    (advanced_setup):
+        (put_new_dependencies_under): [ '(project)', 'basic_info', 'dependencies' ]
+        # caveats for a specific OS
+        when(--os is 'mac'):
+            (project_commands):
+                <<: *commands
+            (dependencies):
+                <<: *dependencies
+            (paths):
+                <<: *paths
+                
+        when(--os is 'windows'):
+            (project_commands):
+                <<: *commands
+            (dependencies):
+                <<: *dependencies
+            (paths):
+                <<: *paths
+                
+        when(--os is 'linux'):
+            (project_commands):
+                <<: *commands
+            (dependencies):
+                <<: *dependencies
+            (paths):
+                <<: *paths
