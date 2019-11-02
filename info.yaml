@@ -4,7 +4,7 @@
     description: A new project
     
     commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
-        dev: node .electron-vue/dev-runner.js
+        dev: npm run dev
         package: npx electron-packager . --no-prune --overwrite ; mv video_labeller-darwin-x64 app.nosync
         gco: git checkout video-image-labeller-stable
         run_ruby: !language/ruby |
