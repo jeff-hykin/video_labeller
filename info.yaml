@@ -6,6 +6,7 @@
     todo:
         - Add the ability to import youtube videos
         - have the multiple levels for the feature recording
+        - have the ability to add a list of videos to evaluate in order
         - have a short graph displaying the change
         - clean up the code
     
