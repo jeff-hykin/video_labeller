@@ -1,70 +1,72 @@
 <template>
-<column class=wrapper align-h=left align-v=space-between min-height=100vh>
-    <column style="position: fixed; top:0; left: 0; z-index: 99999999;"> 
-        <div style='height: 20vh; width: 3rem; background: blue;  opacity: 0.5;' ></div>
-        <div style='height: 20vh; width: 3rem; background: green; opacity: 0.5;' ></div>
-        <div style='height: 20vh; width: 3rem; background: gray;  opacity: 0.5;' ></div>
-        <div style='height: 20vh; width: 3rem; background: green; opacity: 0.5;' ></div>
-        <div style='height: 20vh; width: 3rem; background: blue;  opacity: 0.5;' ></div>
-        <div :style="`position: absolute; top: ${prevMousePageYPosition}px; width: 3rem; height: 1rem; background: red;`" ></div>
-    </column>
-    <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
-        <!-- Current Video -->
-        <video ref=video v-if=this.currentVideoFilePath @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
-            <source :src="`file:///${currentVideoFilePath}`" type="video/mp4">
-        </video>
-    </column>
-    <!-- The bottom bar -->
-    <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
-        <column width=100%>
-            <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
-                <p class=corner-popover style='padding: 0.7rem;'>Options</p>
-                <ui-popover open-on="mouseenter">
-                    <column padding='2rem' min-height=10rem>
-                        <ui-switch v-model="showPoints">Show X's</ui-switch>
-                    </column>
-                </ui-popover>
-            </div> -->
-            <!-- <row padding='0.5rem' position=relative top='-0.5rem'>
-                <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
-            </row> -->
-            <row align-h=center width=100% min-width=min-content>
-                <!-- <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
-                    Back
-                </b-button> -->
-                <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-                <row padding='0 1rem'>
-                    <input class=file-picker type="file" @change="chooseFile" />
-                    <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
-                        Save
-                    </b-button>
-                </row>
-                
-                <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
-                    Next
-                </b-button> -->
-            </row>
-            
-            <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
-                <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
-                <ui-popover open-on="click">
-                    <column padding='2rem' min-height=10rem>
-                        <graph :jsonData="data" />
-                    </column>
-                </ui-popover>
-            </div> -->
-            
-            <!-- <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
-                <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
-                <ui-popover class=json-popover open-on="click">
-                    <row width=100vw height=100% align-v=top align-h=left padding=1rem>
-                        <vue-json-pretty :data="frameData" />
+    <row class=wrapper >
+        <column class=bar-measure-container>
+            <div class=bar-measure style='background: blue; ' ></div>
+            <div class=bar-measure style='background: green;' ></div>
+            <div class=bar-measure style='background: gray; ' ></div>
+            <div class=bar-measure style='background: green;' ></div>
+            <div class=bar-measure style='background: blue; ' ></div>
+            <div :style="`position: absolute; top: ${prevMousePageYPosition}px; width: 3rem; height: 1rem; background: red;`" ></div>
+        </column>
+        <column align-h=left align-v=space-between min-height=100vh>
+            <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
+                <!-- Current Video -->
+                <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+                    <source :src="videoFileUrl" type="video/mp4">
+                </video>
+            </column>
+            <!-- The bottom bar -->
+            <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
+                <column width=100%>
+                    <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
+                        <p class=corner-popover style='padding: 0.7rem;'>Options</p>
+                        <ui-popover open-on="mouseenter">
+                            <column padding='2rem' min-height=10rem>
+                                <ui-switch v-model="showPoints">Show X's</ui-switch>
+                            </column>
+                        </ui-popover>
+                    </div> -->
+                    <!-- <row padding='0.5rem' position=relative top='-0.5rem'>
+                        <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
+                    </row> -->
+                    <row align-h=center width=100% min-width=min-content>
+                        <!-- <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
+                            Back
+                        </b-button> -->
+                        <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
+                        <row padding='0 1rem'>
+                            <input class=file-picker type="file" @change="chooseFile" />
+                            <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
+                                Save
+                            </b-button>
+                        </row>
+                        
+                        <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
+                            Next
+                        </b-button> -->
                     </row>
-                </ui-popover>
-            </div> -->
+                    
+                    <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
+                        <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
+                        <ui-popover open-on="click">
+                            <column padding='2rem' min-height=10rem>
+                                <graph :jsonData="data" />
+                            </column>
+                        </ui-popover>
+                    </div> -->
+                    
+                    <!-- <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
+                        <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
+                        <ui-popover class=json-popover open-on="click">
+                            <row width=100vw height=100% align-v=top align-h=left padding=1rem>
+                                <vue-json-pretty :data="frameData" />
+                            </row>
+                        </ui-popover>
+                    </div> -->
+                </column>
+            </row>
         </column>
     </row>
-</column>
 </template>
 <script>
 import fs from "fs"
@@ -131,6 +133,7 @@ export default {
     components: { Point, Column, Row, VueJsonPretty, Graph },
     data: ()=>({
         currentVideoFilePath: null,
+        videoFileUrl: null,
         currentFeatureName: "testFeature1",
         currentFeatureValue: 0,
         verifiedFeatureRecord: null,
@@ -294,6 +297,10 @@ export default {
             chooseFile(e) {
                 
                 this.currentVideoFilePath = e.target.files[0].path
+                this.videoFileUrl = `file:///${this.currentVideoFilePath}`
+                // for some reason the source doesn't update itself so this manually updates it
+                this.$refs.video && (this.$refs.video.src = `file:///${this.currentVideoFilePath}`)
+                
                 this.verifiedFeatureRecord = new FeatureRecord()
                 // let file = fs.readFileSync(this.jsonFilePath).toString()
             },
@@ -314,8 +321,25 @@ export default {
 <style scoped>
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
     @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
-
-
+    
+    
+    .wrapper {
+        background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
+        width: 100vw;
+        --bar-measure-width: 5rem;
+        --blue: #2196F3;
+        --green: #69F0AE;
+    }
+    
+    .wrapper .bar-measure-container {
+        min-width: var(--bar-measure-width);
+    }
+    .wrapper .bar-measure {
+        height: 20vh;
+        width: var(--bar-measure-width);
+        opacity: 0.5;
+    }
+    
     * {
         margin: 0;
         padding: 0;
@@ -325,10 +349,7 @@ export default {
         font-family: 'Source Sans Pro', sans-serif;
     }
 
-    .wrapper {
-        background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
-        width: 100vw;
-    }
+    
     .file-picker {
         width: 16rem;
         background-color: whitesmoke;
