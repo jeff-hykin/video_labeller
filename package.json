@@ -71,7 +71,8 @@
         "vue-router": "^3.0.1",
         "vue-toasted": "^1.1.27",
         "vuex": "^3.0.1",
-        "vuex-electron": "^1.0.0"
+        "vuex-electron": "^1.0.0",
+        "ytdl-core": "^1.0.0"
     },
     "devDependencies": {
         "ajv": "^6.5.0",

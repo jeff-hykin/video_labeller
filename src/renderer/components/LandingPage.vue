@@ -10,6 +10,7 @@
         </column>
         <column align-v=top v-bind:class="['panel', {init}]" shadow=2>
             <ui-textbox label="Feature" placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+            <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" />
         </column>
         <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
@@ -39,9 +40,11 @@
                         <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                         <row padding='0 1rem'>
                             <input class=file-picker type="file" @change="chooseFile" />
+                            <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
                             <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
                                 Save
                             </b-button>
+                            
                         </row>
                         
                         <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
@@ -72,7 +75,7 @@
     </row>
 </template>
 <script>
-import fs from "fs"
+import fs, { write } from "fs"
 import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
@@ -82,6 +85,12 @@ import Graph from "./LandingPage/graph"
 import Point from "./LandingPage/Draggable"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
+import ytdl from 'ytdl-core'
+
+let dialog = remote.dialog
+let app = remote.app
+
+// ytdl('http://www.youtube.com/watch?v=A02s8omM_hI', { filter: (format) => format.container === 'mp4' }).pipe(fs.createWriteStream('video.mp4'))
 
 document.body.style.overflow = 'hidden'
 
@@ -146,6 +155,8 @@ export default {
         prevMousePageYPosition: 0,
         init: true,
         keypressActive: false,
+        videoList: "",
+        youtubeLink: "",
     }),
     mounted(){
         // have an initial value that gets turned to false (for css classes)
@@ -169,6 +180,7 @@ export default {
         window.addEventListener('keydown', (e)=>{
             if (this.keypressActive) {
                 if (e.code == 'Space') {
+                    e.preventDefault()
                     this.togglePlayPause()
                 } else if (e.code == 'ArrowLeft') {
                     e.preventDefault()
@@ -183,6 +195,24 @@ export default {
     computed: {
     },
     watch: {
+        youtubeLink(url) {
+            if (typeof url == 'string') {
+                if (ytdl.validateURL(url)) {
+                    let localPath =  path.resolve(app.getPath("desktop"), path.basename(url))
+                    let videoPath = dialog.showSaveDialog({ defaultPath: localPath })+'.mp4'
+                    let writeStream = fs.createWriteStream(videoPath)
+                    writeStream.on('close', ()=>{
+                        this.$toasted.show(`Finished download`).goAway(2500)
+                        // chop off the first character
+                        this.currentVideoFilePath = videoPath.slice(1,999999999)
+                        this.openVideo()
+                        this.youtubeLink = null
+                    })
+                    this.$toasted.show(`Starting youtube video download`).goAway(2500)
+                    ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
+                }
+            }
+        }
     },
     methods: {
             mouseEnter() {
@@ -310,14 +340,15 @@ export default {
                 this.$electron.shell.openExternal(link)
             },
             chooseFile(e) {
-                
                 this.currentVideoFilePath = e.target.files[0].path
+                this.openVideo()
+            },
+            openVideo() {
                 this.videoFileUrl = `file:///${this.currentVideoFilePath}`
                 // for some reason the source doesn't update itself so this manually updates it
-                this.$refs.video && (this.$refs.video.src = `file:///${this.currentVideoFilePath}`)
+                this.$refs.video && (this.$refs.video.src = this.videoFileUrl)
                 
                 this.verifiedFeatureRecord = new FeatureRecord()
-                // let file = fs.readFileSync(this.jsonFilePath).toString()
             },
             async openFolder(e) {
                 let folderPath = e.target.files[0].path
@@ -423,6 +454,16 @@ export default {
     }
     .panel:hover {
         transform: translateX(0);
+    }
+    
+    .youtube-link-input {
+        margin: 1rem 2rem;
+    }
+    >>>.youtube-link-input input::placeholder {
+        color: white;
+    }
+    >>>.youtube-link-input label {
+        border-bottom: white solid;
     }
     
     button {
