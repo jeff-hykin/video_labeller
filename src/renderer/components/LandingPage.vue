@@ -8,11 +8,11 @@
             <div class=bar-measure style='background: var(--blue); ' ></div>
             <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" ></div>
         </column>
-        <column class=middle-container align-h=left align-v=space-between min-height=100vh flex-grow=1>
-            <column align-v=top class=panel shadow=2>
-                <ui-textbox label="Name" placeholder="Enter your name" v-model="currentFeatureName" />
-            </column>
-            <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
+        <column align-v=top v-bind:class="['panel', {init}]" shadow=2>
+            <ui-textbox label="Feature" placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+        </column>
+        <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
+            <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
                 <!-- Current Video -->
                 <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
                     <source :src="videoFileUrl" type="video/mp4">
@@ -68,7 +68,7 @@
                     </div> -->
                 </column>
             </row>
-        </column>
+        </div>
     </row>
 </template>
 <script>
@@ -82,6 +82,8 @@ import Point from "./LandingPage/Draggable"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
 
+import $ from 'jquery'
+window.$ = $
 
 document.body.style.overflow = 'hidden'
 
@@ -144,8 +146,12 @@ export default {
         currentFeatureValue: 0,
         verifiedFeatureRecord: null,
         prevMousePageYPosition: 0,
+        init: true,
+        keypressActive: false,
     }),
     mounted(){
+        // have an initial value that gets turned to false (for css classes)
+        setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
         document.body.addEventListener('mouseleave', (e)=>{
             this.pauseVideo()
@@ -163,15 +169,16 @@ export default {
             }
         })
         window.addEventListener('keydown', (e)=>{
-            if (e.code == 'Space') {
-                e.preventDefault()
-                this.togglePlayPause()
-            } else if (e.code == 'ArrowLeft') {
-                e.preventDefault()
-                // TODO
-            } else if (e.code == 'ArrowRight') {
-                e.preventDefault()
-                // TODO
+            if (this.keypressActive) {
+                if (e.code == 'Space') {
+                    this.togglePlayPause()
+                } else if (e.code == 'ArrowLeft') {
+                    e.preventDefault()
+                    // TODO
+                } else if (e.code == 'ArrowRight') {
+                    e.preventDefault()
+                    // TODO
+                }
             }
         })
     },
@@ -180,6 +187,14 @@ export default {
     watch: {
     },
     methods: {
+            mouseEnter() {
+                console.log(true);
+                this.keypressActive = true;
+            },
+            mouseExit() {
+                console.log(false);
+                this.keypressActive = false;
+            },
         // 
         // Data recording methods
         // 
@@ -385,18 +400,29 @@ export default {
     }
     .bottom-bar {
         width: -webkit-fill-available;
-        box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px
+        box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
     }
     .middle-container {
-        max-width: calc(100vw - var(--bar-measure-width))
+        max-width: calc(100vw - var(--bar-measure-width));
+        min-height: 100vh;
+        flex-grow: 1;
+        justify-content: space-between;
+        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        margin: 0;
+    }
+    .panel.init {
+        transform: translateX(0);
     }
     .panel {
+        position: fixed;
         min-width: 22rem;
         transform: translateX(-90%);
         transition: all 500ms ease-out;
         background-color: whitesmoke;
         height: 100vh;
-        position: fixed;
         left: 0;
         z-index: 11;
         padding: 2rem;
