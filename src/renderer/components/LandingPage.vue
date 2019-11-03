@@ -1,9 +1,17 @@
 <template>
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
+    <column style="position: fixed; top:0; left: 0; z-index: 99999999;"> 
+        <div style='height: 20vh; width: 3rem; background: blue;  opacity: 0.5;' ></div>
+        <div style='height: 20vh; width: 3rem; background: green; opacity: 0.5;' ></div>
+        <div style='height: 20vh; width: 3rem; background: gray;  opacity: 0.5;' ></div>
+        <div style='height: 20vh; width: 3rem; background: green; opacity: 0.5;' ></div>
+        <div style='height: 20vh; width: 3rem; background: blue;  opacity: 0.5;' ></div>
+        <div :style="`position: absolute; top: ${prevMousePageYPosition}px; width: 3rem; height: 1rem; background: red;`" ></div>
+    </column>
     <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <!-- Current Video -->
         <video ref=video v-if=this.currentVideoFilePath @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
-            <source :src="`file:///${this.currentVideoFilePath}`" type="video/mp4">
+            <source :src="`file:///${currentVideoFilePath}`" type="video/mp4">
         </video>
     </column>
     <!-- The bottom bar -->
@@ -20,7 +28,7 @@
             <!-- <row padding='0.5rem' position=relative top='-0.5rem'>
                 <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
             </row> -->
-            <row align-h=space-between width=100% min-width=min-content>
+            <row align-h=center width=100% min-width=min-content>
                 <!-- <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
                     Back
                 </b-button> -->
@@ -126,6 +134,7 @@ export default {
         currentFeatureName: "testFeature1",
         currentFeatureValue: 0,
         verifiedFeatureRecord: null,
+        prevMousePageYPosition: 0,
     }),
     mounted(){
         // pause the video whenever the mouse goes outside of the frame
@@ -133,7 +142,6 @@ export default {
             this.pauseVideo()
         })
         // record the mouse movements whenever the video is playing
-        this.prevMousePageYPosition = null
         window.addEventListener('mousemove', (e)=>{
             this.prevMousePageYPosition = e.pageY
             this.saveMousePosition(e)
@@ -278,6 +286,7 @@ export default {
                 // Save the file
                 // 
                 fs.writeFile(jsonFilePath, JSON.stringify(dataToSave), _=>console.log(`data written to ${jsonFilePath}`))
+                alert(`Success! Data saved to: '${jsonFilePath}'`)
             },
             open(link) {
                 this.$electron.shell.openExternal(link)
