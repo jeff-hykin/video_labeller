@@ -15,13 +15,13 @@ Vue.use(BootstrapVue)
 import GoodVue from 'good-vue'
 Vue.use(GoodVue)
 
+// Baseline
+// import 'css-baseline/css/4.css'
+
 // KeenUI
 import KeenUI from 'keen-ui'
 import 'keen-ui/dist/keen-ui.css'
 Vue.use(KeenUI)
-
-// Baseline
-import 'css-baseline/css/4.css'
 
 // VueJsonPretty
 import VueJsonPretty from 'vue-json-pretty'

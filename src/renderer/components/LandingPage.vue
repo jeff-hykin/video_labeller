@@ -1,14 +1,17 @@
 <template>
     <row class=wrapper >
-        <column class=bar-measure-container>
-            <div class=bar-measure style='background: blue; ' ></div>
-            <div class=bar-measure style='background: green;' ></div>
+        <column class=bar-measure-container shadow=2 z-index=10>
+            <div class=bar-measure style='background: var(--blue); ' ></div>
+            <div class=bar-measure style='background: var(--green);' ></div>
             <div class=bar-measure style='background: gray; ' ></div>
-            <div class=bar-measure style='background: green;' ></div>
-            <div class=bar-measure style='background: blue; ' ></div>
-            <div :style="`position: absolute; top: ${prevMousePageYPosition}px; width: 3rem; height: 1rem; background: red;`" ></div>
+            <div class=bar-measure style='background: var(--green);' ></div>
+            <div class=bar-measure style='background: var(--blue); ' ></div>
+            <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" ></div>
         </column>
-        <column align-h=left align-v=space-between min-height=100vh>
+        <column class=middle-container align-h=left align-v=space-between min-height=100vh flex-grow=1>
+            <column align-v=top class=panel shadow=2>
+                <ui-textbox label="Name" placeholder="Enter your name" v-model="currentFeatureName" />
+            </column>
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
                 <!-- Current Video -->
                 <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
@@ -16,7 +19,7 @@
                 </video>
             </column>
             <!-- The bottom bar -->
-            <row ref=bottomBar width=100vw max-width=100vw shadow=2 position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
+            <row class=bottom-bar ref=bottomBar max-width=100vw position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
                 <column width=100%>
                     <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
                         <p class=corner-popover style='padding: 0.7rem;'>Options</p>
@@ -78,6 +81,9 @@ import Graph from "./LandingPage/graph"
 import Point from "./LandingPage/Draggable"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
+
+
+document.body.style.overflow = 'hidden'
 
 let util = require("util")
 const readdir = util.promisify(fs.readdir)
@@ -328,27 +334,31 @@ export default {
         width: 100vw;
         --bar-measure-width: 5rem;
         --blue: #2196F3;
-        --green: #69F0AE;
+        --green: #64FFDA;
+        --red: #EF5350;
     }
     
     .wrapper .bar-measure-container {
         min-width: var(--bar-measure-width);
     }
     .wrapper .bar-measure {
-        height: 20vh;
+        height: calc(20vh + 2px);
+        margin-top: -1px;
+        margin-bottom: -1px;
         width: var(--bar-measure-width);
         opacity: 0.5;
+    }
+    .bar-cursor {
+        width: 3rem;
+        height: 1rem;
+        background: var(--red);
+        border-radius: 15px;
     }
     
     * {
         margin: 0;
         padding: 0;
     }
-
-    body {
-        font-family: 'Source Sans Pro', sans-serif;
-    }
-
     
     .file-picker {
         width: 16rem;
@@ -373,6 +383,28 @@ export default {
     }
     .json-area {
     }
+    .bottom-bar {
+        width: -webkit-fill-available;
+        box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px
+    }
+    .middle-container {
+        max-width: calc(100vw - var(--bar-measure-width))
+    }
+    .panel {
+        min-width: 22rem;
+        transform: translateX(-90%);
+        transition: all 500ms ease-out;
+        background-color: whitesmoke;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        z-index: 11;
+        padding: 2rem;
+    }
+    .panel:hover {
+        transform: translateX(0);
+    }
+    
     button {
         height: min-content;
     }

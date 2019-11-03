@@ -4,7 +4,6 @@
     description: An electron app designed to help people quickly label features on videos
     
     todo:
-        - fix the bug with choosing a second video
         - Add a settings panel for the feature
         - Add a good save notifcation
         - Add the ability to import youtube videos
