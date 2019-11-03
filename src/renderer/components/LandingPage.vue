@@ -76,14 +76,12 @@ import fs from "fs"
 import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
+import Vue from 'vue'
 
 import Graph from "./LandingPage/graph"
 import Point from "./LandingPage/Draggable"
 import Column from './LandingPage/column'
 import Row from './LandingPage/row'
-
-import $ from 'jquery'
-window.$ = $
 
 document.body.style.overflow = 'hidden'
 
@@ -188,11 +186,9 @@ export default {
     },
     methods: {
             mouseEnter() {
-                console.log(true);
                 this.keypressActive = true;
             },
             mouseExit() {
-                console.log(false);
                 this.keypressActive = false;
             },
         // 
@@ -244,7 +240,6 @@ export default {
             onPlayVideo(e) {
                 this.startRecordingFeature()
                 this.saveMousePosition(e)
-                // TODO: start a set timeout
             },
             onPauseVideo() {
                 let videoElement = this.$refs.video
@@ -252,7 +247,6 @@ export default {
             },
             onVideoEnd() {
                 this.stopRecoringFeature()
-                // TODO: save the features an show a pop up
             },
             videoClicked(e) {
                 // catch the event and prevent it from going up to the window-clicked event
@@ -310,7 +304,7 @@ export default {
                 // Save the file
                 // 
                 fs.writeFile(jsonFilePath, JSON.stringify(dataToSave), _=>console.log(`data written to ${jsonFilePath}`))
-                alert(`Success! Data saved to: '${jsonFilePath}'`)
+                this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
             },
             open(link) {
                 this.$electron.shell.openExternal(link)

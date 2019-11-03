@@ -37,7 +37,8 @@ Vue.component(NoteWidget.name, NoteWidget)
 Vue.component(LegendWidget.name, LegendWidget)
 Vue.use(VueGraph)
 
-
+import Toasted from 'vue-toasted'
+Vue.use(Toasted)
 
 // in renderer process
 import { webFrame } from 'electron'
