@@ -27,9 +27,9 @@
                 <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                 <row padding='0 1rem'>
                     <input class=file-picker type="file" @change="chooseFile" />
-                    <!-- <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:data!=null?'visible':'hidden'}">
+                    <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
                         Save
-                    </b-button> -->
+                    </b-button>
                 </row>
                 
                 <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
@@ -75,9 +75,9 @@ const stat = util.promisify(fs.stat)
 
 class FeatureRecord {
     constructor() {
-        this.timeChanges = []
+        this.records = []
     }
-    addNewRecord(record) {
+    addNewRecords(record) {
         if (record.length != 0) {
             // extract start and end times
             let oldestRecord = record[0]
@@ -85,16 +85,16 @@ class FeatureRecord {
             let startTime    = oldestRecord[0]
             let endTime      = newestRecord[0]
             // 
-            // remove all of the timeChanges times that are in this record's duration
+            // remove all of the records times that are in this record's duration
             // replace them with the new records
             // 
             let startIndex = null
             let endIndex = null
-            for (let eachIndex in this.timeChanges) {
+            for (let eachIndex in this.records) {
                 // convert to number
                 eachIndex = eachIndex-0
                 
-                let [eachTime, eachValue] = this.timeChanges[eachIndex]
+                let [eachTime, eachValue] = this.records[eachIndex]
                 if (startIndex == null && eachTime >= startTime) {
                     startIndex = eachIndex
                 }
@@ -107,14 +107,14 @@ class FeatureRecord {
                 }
             }
             if (startIndex == null) {
-                startIndex = this.timeChanges.length
+                startIndex = this.records.length
             }
             if (endIndex == null) {
-                endIndex = this.timeChanges.length
+                endIndex = this.records.length
             }
-            let firstPart = this.timeChanges.slice(0, startIndex)
-            let lastPart = this.timeChanges.slice(endIndex, this.timeChanges.length)
-            this.timeChanges = firstPart.concat(record, lastPart)
+            let firstPart = this.records.slice(0, startIndex)
+            let lastPart = this.records.slice(endIndex, this.records.length)
+            this.records = firstPart.concat(record, lastPart)
         }
     }
 }
@@ -123,26 +123,20 @@ export default {
     components: { Point, Column, Row, VueJsonPretty, Graph },
     data: ()=>({
         currentVideoFilePath: null,
-        currentFeatureName: "",
+        currentFeatureName: "testFeature1",
         currentFeatureValue: 0,
+        verifiedFeatureRecord: null,
     }),
     mounted(){
-        this.featureRecord = []
         // pause the video whenever the mouse goes outside of the frame
         document.body.addEventListener('mouseleave', (e)=>{
             this.pauseVideo()
-        }),
+        })
         // record the mouse movements whenever the video is playing
+        this.prevMousePageYPosition = null
         window.addEventListener('mousemove', (e)=>{
-            let videoElement = this.$refs.video
-            if (videoElement && !videoElement.paused){
-                let mouseHeight = 1 - (e.y / window.innerHeight)
-                let time = videoElement.currentTime
-                if (!this.featureRecord) {
-                    this.featureRecord = []
-                }
-                this.featureRecord.push([ time, mouseHeight ])
-            }
+            this.prevMousePageYPosition = e.pageY
+            this.saveMousePosition(e)
         })
         window.addEventListener('click', (e)=>{
             // if video is playing
@@ -173,10 +167,22 @@ export default {
         // Data recording methods
         // 
             startRecordingFeature() {
-                this.featureRecord = []
+                this.recordedFeatures = []
             },
             stopRecoringFeature() {
-                this.verifiedFeatureRecord.addNewRecord(this.featureRecord)
+                this.verifiedFeatureRecord.addNewRecords(this.recordedFeatures)
+            },
+            saveMousePosition(e) {
+                let videoElement = this.$refs.video
+                if (videoElement && !videoElement.paused){
+                    let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
+                    let mouseHeightPercentage = 1 - (yPosition / window.innerHeight)
+                    let time = videoElement.currentTime
+                    if (!this.recordedFeatures) {
+                        this.recordedFeatures = []
+                    }
+                    this.recordedFeatures.push([ time, mouseHeightPercentage ])
+                }
             },
         // 
         // Video Methods
@@ -203,8 +209,9 @@ export default {
                     
                 }
             },
-            onPlayVideo() {
+            onPlayVideo(e) {
                 this.startRecordingFeature()
+                this.saveMousePosition(e)
                 // TODO: start a set timeout
             },
             onPauseVideo() {
@@ -232,13 +239,51 @@ export default {
                 }
                 return output
             },
-            saveData(filePath) {
-                fs.writeFile(filePath, JSON.stringify(this.recordedFeatures), _=>console.log(`data written to ${filePath}`))
+            saveData() {
+                let directory = path.dirname(this.currentVideoFilePath)
+                let basename = path.basename(this.currentVideoFilePath)
+                let jsonFilePath = path.join(directory, basename+".features.json")
+                
+                let dataToSave = {
+                    [this.currentFeatureName]: this.verifiedFeatureRecord.records 
+                }
+                
+                // 
+                // try opening the existing (old) file if it is already there
+                // 
+                let oldData = null
+                try {
+                    oldData = JSON.parse(fs.readFileSync(jsonFilePath))
+                } catch (e) {
+                    
+                }
+                if (oldData) {
+                    // preserve other values
+                    dataToSave = { ...oldData, ...dataToSave }
+                    if (oldData[this.currentFeatureName] instanceof Array) {
+                        // 
+                        // combine the new and old data at the timestamp level (give the new data precedence over the old data in a conflict)
+                        // 
+                        try {
+                            let existingRecord = new FeatureRecord()
+                            existingRecord.addNewRecords(this.verifiedFeatureRecord.records)
+                            dataToSave[this.currentFeatureName] = existingRecord.records
+                        } catch (e) {
+                            // do nothing if the old data is corrupt
+                        }
+                    }
+                }
+                
+                // 
+                // Save the file
+                // 
+                fs.writeFile(jsonFilePath, JSON.stringify(dataToSave), _=>console.log(`data written to ${jsonFilePath}`))
             },
             open(link) {
                 this.$electron.shell.openExternal(link)
             },
             chooseFile(e) {
+                
                 this.currentVideoFilePath = e.target.files[0].path
                 this.verifiedFeatureRecord = new FeatureRecord()
                 // let file = fs.readFileSync(this.jsonFilePath).toString()
@@ -258,50 +303,50 @@ export default {
 
 </script>
 <style scoped>
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+    @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
 
 
-* {
-    margin: 0;
-    padding: 0;
-}
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
-body {
-    font-family: 'Source Sans Pro', sans-serif;
-}
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+    }
 
-.wrapper {
-    background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
-    width: 100vw;
-}
-.file-picker {
-    width: 16rem;
-    background-color: whitesmoke;
-    border: 1rem solid whitesmoke !important;
-    border-radius: 100vh;
-}
-.corner-popover {
-    font-family: Roboto;
-    font-weight: 100;
-    font-size: 14pt;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    color: #eeeeee;
-    text-decoration: underline;
-}
-.json-popover {
-    min-height: 7rem;
-    min-width: 30vw;
-    width: 20rem;
-    overflow: auto;
-}
-.json-area {
-}
-button {
-    height: min-content;
-}
-video {
-    height: -webkit-fill-available;
-}
+    .wrapper {
+        background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
+        width: 100vw;
+    }
+    .file-picker {
+        width: 16rem;
+        background-color: whitesmoke;
+        border: 1rem solid whitesmoke !important;
+        border-radius: 100vh;
+    }
+    .corner-popover {
+        font-family: Roboto;
+        font-weight: 100;
+        font-size: 14pt;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        color: #eeeeee;
+        text-decoration: underline;
+    }
+    .json-popover {
+        min-height: 7rem;
+        min-width: 30vw;
+        width: 20rem;
+        overflow: auto;
+    }
+    .json-area {
+    }
+    button {
+        height: min-content;
+    }
+    video {
+        height: -webkit-fill-available;
+    }
 </style>
