@@ -2,8 +2,8 @@
 <column class=wrapper align-h=left align-v=space-between min-height=100vh>
     <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto position='relative'>
         <!-- Current Video -->
-        <video v-if=this.currentVideoFilePath  controls>
-            <source :src="this.currentVideoFilePath" type="video/mp4">
+        <video ref=video v-if=this.currentVideoFilePath @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+            <source :src="`file:///${this.currentVideoFilePath}`" type="video/mp4">
         </video>
     </column>
     <!-- The bottom bar -->
@@ -21,9 +21,9 @@
                 <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
             </row> -->
             <row align-h=space-between width=100% min-width=min-content>
-                <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
+                <!-- <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
                     Back
-                </b-button>
+                </b-button> -->
                 <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                 <row padding='0 1rem'>
                     <input class=file-picker type="file" @change="chooseFile" />
@@ -32,9 +32,9 @@
                     </b-button> -->
                 </row>
                 
-                <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
+                <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
                     Next
-                </b-button>
+                </b-button> -->
             </row>
             
             <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
@@ -73,18 +73,89 @@ let util = require("util")
 const readdir = util.promisify(fs.readdir)
 const stat = util.promisify(fs.stat)
 
+class FeatureRecord {
+    constructor() {
+        this.timeChanges = []
+    }
+    addNewRecord(record) {
+        if (record.length != 0) {
+            // extract start and end times
+            let oldestRecord = record[0]
+            let newestRecord = record[record.length-1]
+            let startTime    = oldestRecord[0]
+            let endTime      = newestRecord[0]
+            // 
+            // remove all of the timeChanges times that are in this record's duration
+            // replace them with the new records
+            // 
+            let startIndex = null
+            let endIndex = null
+            for (let eachIndex in this.timeChanges) {
+                // convert to number
+                eachIndex = eachIndex-0
+                
+                let [eachTime, eachValue] = this.timeChanges[eachIndex]
+                if (startIndex == null && eachTime >= startTime) {
+                    startIndex = eachIndex
+                }
+                if (endIndex == null && eachTime >= endTime) {
+                    if (eachTime == endTime) {
+                        endIndex = (eachIndex-0)+1
+                    } else {
+                        endIndex = eachIndex
+                    }
+                }
+            }
+            if (startIndex == null) {
+                startIndex = this.timeChanges.length
+            }
+            if (endIndex == null) {
+                endIndex = this.timeChanges.length
+            }
+            let firstPart = this.timeChanges.slice(0, startIndex)
+            let lastPart = this.timeChanges.slice(endIndex, this.timeChanges.length)
+            this.timeChanges = firstPart.concat(record, lastPart)
+        }
+    }
+}
 export default {
     name: "main-page",
     components: { Point, Column, Row, VueJsonPretty, Graph },
     data: ()=>({
-        currentVideoFilePath: "/Users/jeffhykin/Desktop/glitch_multicursor.mov",
+        currentVideoFilePath: null,
         currentFeatureName: "",
         currentFeatureValue: 0,
-        recordedFeatures:[],
     }),
     mounted(){
+        this.featureRecord = []
+        // pause the video whenever the mouse goes outside of the frame
+        document.body.addEventListener('mouseleave', (e)=>{
+            this.pauseVideo()
+        }),
+        // record the mouse movements whenever the video is playing
+        window.addEventListener('mousemove', (e)=>{
+            let videoElement = this.$refs.video
+            if (videoElement && !videoElement.paused){
+                let mouseHeight = 1 - (e.y / window.innerHeight)
+                let time = videoElement.currentTime
+                if (!this.featureRecord) {
+                    this.featureRecord = []
+                }
+                this.featureRecord.push([ time, mouseHeight ])
+            }
+        })
+        window.addEventListener('click', (e)=>{
+            // if video is playing
+            if (!this.isPaused()) {
+                e.preventDefault()
+                this.pauseVideo()
+            }
+        })
         window.addEventListener('keydown', (e)=>{
-            if (e.code == 'ArrowLeft') {
+            if (e.code == 'Space') {
+                e.preventDefault()
+                this.togglePlayPause()
+            } else if (e.code == 'ArrowLeft') {
                 e.preventDefault()
                 // TODO
             } else if (e.code == 'ArrowRight') {
@@ -98,55 +169,90 @@ export default {
     watch: {
     },
     methods: {
-        // Main Video Methods
-        startRecordingFeature() {
-            // TODO
-        },
-        stopRecoringFeature() {
-            // TODO
-        },
-        onPlayVideo() {
-            this.startRecordingFeature()
-            // TODO: start a set timeout
-        },
-        onPauseVideo() {
-            this.stopRecoringFeature()
-            // TODO: cancel the setTimeout that is recording values
-        },
-        onVideoEnd() {
-            this.stopRecoringFeature()
-            // TODO: save the features an show a pop up
-        },
-        // helpers
-        bottomBarHeight() {
-            let output = '0'
-            if (this.$refs.bottomBar) {
-                output = `${this.$refs.bottomBar.$el.clientHeight}px`
-            } else {
-                setTimeout(_=>this.$forceUpdate(),0)
-            }
-            return output
-        },
-        saveData(filePath) {
-            fs.writeFile(filePath, JSON.stringify(this.recordedFeatures), _=>console.log(`data written to ${filePath}`))
-        },
-        open(link) {
-            this.$electron.shell.openExternal(link)
-        },
-        chooseFile(e) {
-            this.currentVideoFilePath = e.target.files[0].path
-            // let file = fs.readFileSync(this.jsonFilePath).toString()
-        },
-        async openFolder(e) {
-            let folderPath = e.target.files[0].path
-            let files = await readdir(folderPath)
-            let imagePaths = []
-            for (let eachFilePath of files) {
-                if (eachFilePath.match(/\.png$/)) {
-                    imagePaths.push(eachFilePath)
+        // 
+        // Data recording methods
+        // 
+            startRecordingFeature() {
+                this.featureRecord = []
+            },
+            stopRecoringFeature() {
+                this.verifiedFeatureRecord.addNewRecord(this.featureRecord)
+            },
+        // 
+        // Video Methods
+        //
+            isPaused() {
+                try {
+                    return this.$refs.video.paused
+                } catch (e) {
+                    return true
                 }
-            }
-        },
+            },
+            togglePlayPause() {
+                let videoElement = this.$refs.video
+                if (videoElement.paused) {
+                    videoElement.play()
+                } else {
+                    videoElement.pause()
+                }
+            },
+            pauseVideo() {
+                try {
+                    this.$refs.video.pause()
+                } catch (e) {
+                    
+                }
+            },
+            onPlayVideo() {
+                this.startRecordingFeature()
+                // TODO: start a set timeout
+            },
+            onPauseVideo() {
+                let videoElement = this.$refs.video
+                this.stopRecoringFeature()
+            },
+            onVideoEnd() {
+                this.stopRecoringFeature()
+                // TODO: save the features an show a pop up
+            },
+            videoClicked(e) {
+                // catch the event and prevent it from going up to the window-clicked event
+                e.stopPropagation()
+                this.togglePlayPause()
+            },
+        // 
+        // other methods
+        // 
+            bottomBarHeight() {
+                let output = '0'
+                if (this.$refs.bottomBar) {
+                    output = `${this.$refs.bottomBar.$el.clientHeight}px`
+                } else {
+                    setTimeout(_=>this.$forceUpdate(),0)
+                }
+                return output
+            },
+            saveData(filePath) {
+                fs.writeFile(filePath, JSON.stringify(this.recordedFeatures), _=>console.log(`data written to ${filePath}`))
+            },
+            open(link) {
+                this.$electron.shell.openExternal(link)
+            },
+            chooseFile(e) {
+                this.currentVideoFilePath = e.target.files[0].path
+                this.verifiedFeatureRecord = new FeatureRecord()
+                // let file = fs.readFileSync(this.jsonFilePath).toString()
+            },
+            async openFolder(e) {
+                let folderPath = e.target.files[0].path
+                let files = await readdir(folderPath)
+                let imagePaths = []
+                for (let eachFilePath of files) {
+                    if (eachFilePath.match(/\.png$/)) {
+                        imagePaths.push(eachFilePath)
+                    }
+                }
+            },
     },
 }
 
@@ -194,5 +300,8 @@ body {
 }
 button {
     height: min-content;
+}
+video {
+    height: -webkit-fill-available;
 }
 </style>
