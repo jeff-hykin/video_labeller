@@ -4,10 +4,15 @@
     description: An electron app designed to help people quickly label features on videos
     
     todo:
+        - ability to go back 5 seconds
+        - add a delay time setting
+        - ability to have a "instant" value or a marker (maybe an M)
         - have the multiple levels for the feature recording
+        - ability to open a folder and recursively get all videos
         - have the ability to add a list of videos to evaluate in order
         - have a short graph displaying the change
         - clean up the code
+        - ability to enter a Null value
     
     commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
         dev: npm run dev
