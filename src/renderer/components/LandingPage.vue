@@ -1,5 +1,6 @@
 <template>
     <row class=wrapper >
+        <!-- Mouse Height-Measure Bar -->
         <column class=bar-measure-container shadow=2 z-index=10>
             <div class=bar-measure style='background: var(--blue); ' ></div>
             <div class=bar-measure style='background: var(--green);' ></div>
@@ -8,13 +9,64 @@
             <div class=bar-measure style='background: var(--blue); ' ></div>
             <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" ></div>
         </column>
+        <!-- Settings Panel -->
         <column align-v=top v-bind:class="['panel', {init}]" shadow=2>
             <ui-textbox label="Feature" placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
-            <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" />
+            <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
+        <!-- Main Section -->
         <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
+            <!-- Current Video -->
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
-                <!-- Current Video -->
+                <column align-h=left align-v=top margin=2rem v-if='!currentVideoFilePath'>
+                    <h2>What does this app do?</h2>
+                    <p>
+                        It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.
+                        For example, you could label a video with mouse movements that corrispond to how happy you think the person in the video is.
+                    </p>
+                    <h2>How exactly do I use it?</h2>
+                    <p>
+                        1. First open up the settings panel all the way over to the &lt;- left (just hover your mouse over it)
+                    </p>
+                    <p>
+                        2. Then add the name of the feature you are labelling
+                    </p>
+                    <p>
+                        3. Open up a video
+                    </p>
+                    <p>
+                        4. Use the spacebar to pause/play the video<br>
+                        (the mouse movements are automatically recorded when the video is playing)
+                    </p>
+                    <p>
+                        5. Press the blue save button to save the data for that video
+                    </p>
+                    <h2>How is the data formatted?</h2>
+                    <p>
+                        The data is in a JSON format like this.
+<pre>
+{
+    "your-feature-name": [
+        // first mouse position
+        [
+            0.0, // the video time (in seconds)
+            0.5  // the mouse position as a percent (this is 50%)
+        ],
+        // the next mouse movement
+        [
+            14.2, // the current video time (in seconds)
+            0.2   // the mouse position (this is 20% above the bottom)
+        ],
+        // the next mouse movement
+        [
+            15.7, // the current video time (in seconds)
+            0.3   // the mouse position (this is 30% above the bottom)
+        ],
+    ]
+}
+</pre>
+                    </p>
+                </column>
                 <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
                     <source :src="videoFileUrl" type="video/mp4">
                 </video>
@@ -44,7 +96,6 @@
                             <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
                                 Save
                             </b-button>
-                            
                         </row>
                         
                         <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
