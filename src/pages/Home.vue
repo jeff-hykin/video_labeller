@@ -2,11 +2,6 @@
     <row class=wrapper >
         <!-- Mouse Height-Measure Bar -->
         <column class=bar-measure-container shadow=2 z-index=10>
-            <div class=bar-measure style='background: var(--blue); ' ></div>
-            <div class=bar-measure style='background: var(--green);' ></div>
-            <div class=bar-measure style='background: gray; ' ></div>
-            <div class=bar-measure style='background: var(--green);' ></div>
-            <div class=bar-measure style='background: var(--blue); ' ></div>
             <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" ></div>
         </column>
         <!-- Settings Panel -->
@@ -72,7 +67,7 @@
                 </video>
             </column>
             <!-- The bottom bar -->
-            <row class=bottom-bar ref=bottomBar max-width=100vw position=relative background-color=var(--teal) padding='2rem 3rem' padding-top='1rem'>
+            <row class=bottom-bar ref=bottomBar >
                 <column width=100%>
                     <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
                         <p class=corner-popover style='padding: 0.7rem;'>Options</p>
@@ -134,6 +129,7 @@ import ytdl from 'ytdl-core'
 let dialog = remote.dialog
 let app = remote.app
 
+// prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
 let util = require("util")
@@ -196,11 +192,12 @@ export default {
         verifiedFeatureRecord: null,
         prevMousePageYPosition: 0,
         init: true,
-        keypressActive: false,
+        allowedToCaptureWindowKeypresses: false,
         videoList: "",
         youtubeLink: "",
+        videoSpeedMultiplier: 1.4,
     }),
-    mounted(){
+    mounted() {
         // have an initial value that gets turned to false (for css classes)
         setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
@@ -220,16 +217,18 @@ export default {
             }
         })
         window.addEventListener('keydown', (e)=>{
-            if (this.keypressActive) {
+            if (this.allowedToCaptureWindowKeypresses) {
                 if (e.code == 'Space') {
                     e.preventDefault()
                     this.togglePlayPause()
                 } else if (e.code == 'ArrowLeft') {
                     e.preventDefault()
-                    // TODO
+                    this.decreaseVideoSpeed()
                 } else if (e.code == 'ArrowRight') {
                     e.preventDefault()
-                    // TODO
+                    this.increaseVideoSpeed()
+                } else if (e.code == 'BracketRight') {
+                } else if (e.code == 'BracketLeft') {
                 }
             }
         })
@@ -258,10 +257,10 @@ export default {
     },
     methods: {
             mouseEnter() {
-                this.keypressActive = true;
+                this.allowedToCaptureWindowKeypresses = true;
             },
             mouseExit() {
-                this.keypressActive = false;
+                this.allowedToCaptureWindowKeypresses = false;
             },
         // 
         // Data recording methods
@@ -324,6 +323,25 @@ export default {
                 // catch the event and prevent it from going up to the window-clicked event
                 e.stopPropagation()
                 this.togglePlayPause()
+            },
+            changeVideoSpeed(multiplier) {
+                let video = this.$refs.video
+                if (video) {
+                    // increase the speed by the videoSpeedMultiplier
+                    let currentRate = video.playbackRate
+                    let newRate = currentRate * multiplier
+                    // if the rate is close to 1, then round it to 1 to prevent weird precision errors
+                    if (newRate+0.05 > 1 && newRate-0.05 < 1) {
+                        newRate = 1
+                    }
+                    video.playbackRate = newRate
+                }
+            },
+            increaseVideoSpeed() {
+                this.changeVideoSpeed(this.videoSpeedMultiplier)
+            },
+            decreaseVideoSpeed() {
+                this.changeVideoSpeed(1/this.videoSpeedMultiplier)
             },
         // 
         // other methods
@@ -439,6 +457,8 @@ export default {
     
     .wrapper .bar-measure-container {
         min-width: var(--bar-measure-width);
+        height: 100vh;
+        background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
     }
     .wrapper .bar-measure {
         height: calc(20vh + 2px);
@@ -451,7 +471,9 @@ export default {
         width: 3rem;
         height: 1rem;
         background: var(--red);
+        border: white 4px solid;
         border-radius: 15px;
+        box-sizing: content-box;
     }
     
     * {
@@ -485,6 +507,11 @@ export default {
     .bottom-bar {
         width: -webkit-fill-available;
         box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
+        max-width: 100vw;
+        position: relative;
+        background-color: var(--teal);
+        padding: 2rem 3rem;
+        padding-top: 1rem;
     }
     .middle-container {
         max-width: calc(100vw - var(--bar-measure-width));

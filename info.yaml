@@ -3,20 +3,16 @@
     name: Video Labeller
     description: An electron app designed to help people quickly label features on videos
     
-    talk to Jiang about:
-        - mouse movement option
-        - how the video is being saved
-    
     todo:
+        - add keybindings for speed changes
+        - add a list of features pulled from JSON to show in the graph
+        - add a way to query the value of the feature for the last/next 5 seconds
         - add "how to use this"
-        - remove video section
         - add a help section
-        - add a way to close the current video
     
     later:
         - ability to slow down video
         - ability to go back 5 seconds
-        - add a delay time setting
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
         - ability to have a "instant" value or a marker (maybe an M)
@@ -25,6 +21,7 @@
         - have a short graph displaying the change
         - clean up the code
         - ability to enter a Null value
+        - use localstorage to save the last-used feature name
     
     commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
         dev: npm run dev
