@@ -6,6 +6,51 @@ let settings = require("../package.json")
 let mainWindow
 let windowUrl
 
+
+// 
+// Main Application Setup
+// 
+let appActions = {
+    // once the electron app is spun up
+    ready: function createWindow() {
+        // 
+        // Window Options
+        // 
+        mainWindow = new BrowserWindow({
+            height: 563,
+            width: 1000,
+            useContentSize: true,
+            webPreferences: {
+                webSecurity: false, // allows opening local files
+            },
+        })
+
+        // Add the default menu items like copy and paste 
+        Menu.setApplicationMenu(Menu.buildFromTemplate(defaultMenu(app, shell)))
+
+        mainWindow.loadURL(windowUrl)
+
+        mainWindow.on("closed", () => {
+            mainWindow = null
+        })
+    },
+    // whenever the app icon is clicked
+    activate: ()=> {
+        if (mainWindow === null) {
+            createWindow()
+        }
+    },
+    // when the last window is closed
+    'windows-all-closed': () => {
+        app.quit()
+    },
+}
+// attach all the actions to the app
+for (let each in appActions) {
+    app.on(each, appActions[each])
+}
+
+
 // 
 // When in Production only
 // 
@@ -41,43 +86,6 @@ if (process.env.NODE_ENV !== "development") {
     })
 }
 
-// 
-// Main Application Setup
-// 
-function createWindow() {
-    // 
-    // Window Options
-    // 
-    mainWindow = new BrowserWindow({
-        height: 563,
-        width: 1000,
-        useContentSize: true,
-        webPreferences: {
-            webSecurity: false, // allows opening local files
-        },
-    })
-
-    // Add the default menu items like copy and paste 
-    Menu.setApplicationMenu(Menu.buildFromTemplate(defaultMenu(app, shell)))
-
-    mainWindow.loadURL(windowUrl)
-
-    mainWindow.on("closed", () => {
-        mainWindow = null
-    })
-}
-
-app.on("ready", createWindow)
-
-app.on("window-all-closed", () => {
-    app.quit()
-})
-
-app.on("activate", () => {
-    if (mainWindow === null) {
-        createWindow()
-    }
-})
 
 /**
  * Auto Updater
