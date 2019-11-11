@@ -13,55 +13,7 @@
         <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <!-- Current Video -->
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
-                <column align-h=left align-v=top margin='1rem 5rem' v-if='!currentVideoFilePath'>
-                    <h4>What does this app do?</h4>
-                    <p>
-                        It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.
-                        For example, you could label a video with mouse movements that corrispond to how happy you think the person in the video is.
-                    </p>
-                    <h4>How exactly do I use it?</h4>
-                    <p>
-                        1. First open up the <code>settings panel</code> all the way over to the &lt;- left (just hover your mouse over it)
-                    </p>
-                    <p>
-                        2. Then add the name of the feature you are labelling
-                    </p>
-                    <p>
-                        3. Open up a video file (bottom bar)
-                    </p>
-                    <p>
-                        4. Use the spacebar to pause/play the video<br>
-                        (the mouse movements are automatically recorded when the video is playing)
-                    </p>
-                    <p>
-                        5. Press the blue save button to save the data for that video
-                    </p>
-                    <h4>How is the data formatted?</h4>
-                    <p>
-                        The data is in a JSON format like this.
-<pre>
-{
-    "your-feature-name": [
-        // first mouse position
-        [
-            0.0, // the video time (in seconds)
-            0.5  // the mouse position as a percent (this is 50%)
-        ],
-        // the next mouse movement
-        [
-            14.2, // the current video time (in seconds)
-            0.2   // the mouse position (this is 20% above the bottom)
-        ],
-        // the next mouse movement
-        [
-            15.7, // the current video time (in seconds)
-            0.3   // the mouse position (this is 30% above the bottom)
-        ],
-    ]
-}
-</pre>
-                    </p>
-                </column>
+                <how-to v-if='!currentVideoFilePath' />
                 <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
                     <source :src="videoFileUrl" type="video/mp4">
                 </video>
@@ -125,6 +77,7 @@ import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 import ytdl from 'ytdl-core'
+import HowTo from '../components/how-to'
 import { onWheelFlick, binSearch } from '../util/all'
 
 let dialog = remote.dialog
@@ -187,7 +140,7 @@ class FeatureRecord {
 }
 export default {
     name: "main-page",
-    components: { VueJsonPretty },
+    components: { VueJsonPretty, HowTo },
     data: ()=>({
         currentVideoFilePath: null,
         videoFileUrl: null,
@@ -234,6 +187,12 @@ export default {
                     this.skipBack()
                 } else if (e.code == 'ArrowRight') {
                     e.preventDefault()
+                } else if (e.code == 'ArrowUp' || e.key == 'w') {
+                    e.preventDefault()
+                    this.increaseVideoSpeed()
+                } else if (e.code == 'ArrowDown' || e.key == 's') {
+                    e.preventDefault()
+                    this.decreaseVideoSpeed()
                 } else if (e.code == 'BracketRight') {
                 } else if (e.code == 'BracketLeft') {
                     
@@ -443,15 +402,6 @@ export default {
 <style scoped>
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
     @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
-    
-    pre, code {
-        color: var(--pink);
-    }
-    
-    h4 {
-        margin-top: 1.8rem;
-        margin-bottom: 0.8rem;
-    }
     
     .ui-button {
         padding: 0.8em 1.7em;
