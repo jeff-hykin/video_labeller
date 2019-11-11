@@ -13,7 +13,7 @@
         <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <!-- Current Video -->
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
-                <column align-h=left align-v=top margin=2rem v-if='!currentVideoFilePath'>
+                <column align-h=left align-v=top margin='1rem 5rem' v-if='!currentVideoFilePath'>
                     <h4>What does this app do?</h4>
                     <p>
                         It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.
@@ -125,6 +125,7 @@ import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 import ytdl from 'ytdl-core'
+import { onWheelFlick } from '../util/all'
 
 let dialog = remote.dialog
 let app = remote.app
@@ -196,6 +197,11 @@ export default {
         videoList: "",
         youtubeLink: "",
         videoSpeedMultiplier: 1.4,
+        skipBackAmount: 5, // seconds
+        scrollSpeeds: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        scrollSpeedTrendIncreasing: null,
+        scrollFlickUpConfirmed: false,
+        scrollFlickDownConfirmed: false,
     }),
     mounted() {
         // have an initial value that gets turned to false (for css classes)
@@ -216,22 +222,26 @@ export default {
                 this.pauseVideo()
             }
         })
+        window.addEventListener('wheel', (e)=>{
+            onWheelFlick(e, ()=>this.increaseVideoSpeed(), ()=>this.decreaseVideoSpeed())
+        })
         window.addEventListener('keydown', (e)=>{
             if (this.allowedToCaptureWindowKeypresses) {
                 if (e.code == 'Space') {
                     e.preventDefault()
                     this.togglePlayPause()
-                } else if (e.code == 'ArrowLeft') {
+                } else if (e.code == 'ArrowLeft' || e.key == 'a') {
                     e.preventDefault()
-                    this.decreaseVideoSpeed()
+                    this.skipBack()
                 } else if (e.code == 'ArrowRight') {
                     e.preventDefault()
-                    this.increaseVideoSpeed()
                 } else if (e.code == 'BracketRight') {
                 } else if (e.code == 'BracketLeft') {
+                    
                 }
             }
         })
+        
     },
     computed: {
     },
@@ -323,6 +333,12 @@ export default {
                 // catch the event and prevent it from going up to the window-clicked event
                 e.stopPropagation()
                 this.togglePlayPause()
+            },
+            skipBack() {
+                let video = this.$refs.video
+                if (video) {
+                    video.currentTime -= this.skipBackAmount
+                }
             },
             changeVideoSpeed(multiplier) {
                 let video = this.$refs.video
