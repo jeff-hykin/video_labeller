@@ -28,6 +28,13 @@ Vue.use(Router)
 import store from './store'
 
 // 
+// open dev tools if debugging
+// 
+import { remote } from 'electron'
+const currentWindow = remote.getCurrentWindow()
+currentWindow.openDevTools()
+
+// 
 // Libraries
 // 
 
@@ -79,8 +86,4 @@ export default App
 </script>
 
 <style>
-::selection {
-    background:rgba(255, 255, 125, 0.99);
-    color:#032764;
-}
 </style>
