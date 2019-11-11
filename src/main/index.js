@@ -31,24 +31,20 @@ if (process.env.NODE_ENV !== "development") {
     require("electron-debug")()
 
     // Install `vue-devtools`
-    require("electron").app.on("ready", () => {
+    require("electron").app.on("ready", async () => {
         let installExtension = require("electron-devtools-installer")
-        installExtension
-            .default(installExtension.VUEJS_DEVTOOLS)
-            .then(() => {})
-            .catch(err => {
-                console.log("Unable to install `vue-devtools`: \n", err)
-            })
+        try {
+            await installExtension.default(installExtension.VUEJS_DEVTOOLS)
+        } catch (err) {
+            console.log("Unable to install `vue-devtools`: \n", err)
+        }
     })
 }
 
-
-const winURL = process.env.NODE_ENV === "development" ? `http://localhost:9080` : `file://${__dirname}/index.html`
-
 function createWindow() {
-    /**
-     * Initial window options
-     */
+    // 
+    // Window Options
+    // 
     mainWindow = new BrowserWindow({
         height: 563,
         useContentSize: true,
@@ -58,10 +54,10 @@ function createWindow() {
         },
     })
 
-    // Add the default menu
+    // Add the default menu items like copy and paste 
     Menu.setApplicationMenu(Menu.buildFromTemplate(defaultMenu(app, shell)))
 
-    mainWindow.loadURL(winURL)
+    mainWindow.loadURL(windowUrl)
 
     mainWindow.on("closed", () => {
         mainWindow = null

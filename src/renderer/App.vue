@@ -19,6 +19,7 @@ Vue.http = Vue.prototype.$http = axios
 
 // in renderer process
 import { webFrame } from 'electron'
+// allow zooming in with Mac Trackpad
 webFrame.setVisualZoomLevelLimits(1, 3)
 
 // Routes
@@ -70,12 +71,12 @@ Vue.use(Toasted)
 // App
 // 
 let App = {
-    components: { App, VueJsonPretty },
     name: 'video_labeller',
+    components: { App, VueJsonPretty },
     router: new Router({routes: routes}),
 }
 // create and attach app
-setTimeout(()=>(new (Vue.extend(App))).$mount('#app'),500)
+setTimeout(()=>(new (Vue.extend(App))).$mount('#app'),0)
 export default App
 </script>
 
