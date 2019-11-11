@@ -31,18 +31,12 @@ Vue.use(Router)
 // Libraries
 // 
 
-// Bootstrap
-import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-Vue.use(BootstrapVue)
-
 // GoodVue
 import GoodVue from 'good-vue'
 Vue.use(GoodVue)
 
 // Baseline
-// import 'css-baseline/css/4.css'
+import 'css-baseline/css/3.css'
 
 // KeenUI
 import KeenUI from 'keen-ui'

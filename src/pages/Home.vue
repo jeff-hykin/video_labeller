@@ -19,12 +19,12 @@
             <!-- Current Video -->
             <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
                 <column align-h=left align-v=top margin=2rem v-if='!currentVideoFilePath'>
-                    <h2>What does this app do?</h2>
+                    <h4>What does this app do?</h4>
                     <p>
                         It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.
                         For example, you could label a video with mouse movements that corrispond to how happy you think the person in the video is.
                     </p>
-                    <h2>How exactly do I use it?</h2>
+                    <h4>How exactly do I use it?</h4>
                     <p>
                         1. First open up the settings panel all the way over to the &lt;- left (just hover your mouse over it)
                     </p>
@@ -41,7 +41,7 @@
                     <p>
                         5. Press the blue save button to save the data for that video
                     </p>
-                    <h2>How is the data formatted?</h2>
+                    <h4>How is the data formatted?</h4>
                     <p>
                         The data is in a JSON format like this.
 <pre>
@@ -86,21 +86,20 @@
                         <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
                     </row> -->
                     <row align-h=center width=100% min-width=min-content>
-                        <!-- <b-button class="back-button" @click="prevImage" :style="{visibility:showBackButton?'visible':'hidden'}">
-                            Back
-                        </b-button> -->
                         <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                         <row padding='0 1rem'>
-                            <input class=file-picker type="file" @change="chooseFile" />
+                            <input class=file-picker type="file" tabIndex="-1" @change="chooseFile" placeholder="Choose Video" />
                             <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
-                            <b-button variant="primary" class="save-button" @click="saveData" :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}">
+                            <ui-button 
+                                @click="saveData"
+                                class="save-button"
+                                color="primary"
+                                raised
+                                :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}"
+                                >
                                 Save
-                            </b-button>
+                            </ui-button>
                         </row>
-                        
-                        <!-- <b-button class="next-button" @click="nextImage" :style="{visibility:showNextButton?'visible':'hidden'}">
-                            Next
-                        </b-button> -->
                     </row>
                     
                     <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
@@ -509,10 +508,13 @@ export default {
         border-bottom: white solid;
     }
     
-    button {
+    .save-button {
         height: min-content;
     }
     video {
         height: -webkit-fill-available;
+    }
+    .ui-button {
+        padding: 0.8em 1.7em;
     }
 </style>
