@@ -4,10 +4,17 @@
     description: An electron app designed to help people quickly label features on videos
     
     todo:
-        - add keybindings for speed changes
-        - add a list of features pulled from JSON to show in the graph
-        - add a way to query the value of the feature for the last/next 5 seconds
-        - add "how to use this"
+        - add input controls for rate of speed and skipBackAmount
+        - graph:
+            - read in graph features when video is loaded
+            - filter the names to be ones that are numbers
+            - create the value-query-at-time function
+            - repeat value-query-at-time for the 5sec ago mark, and 5sec in future mark
+            - collect all values inbetween
+            - display them on a graph spanning the lower portion of the app
+            - create an interval on play
+            - check to see if the resuming point is same as before (increment) or different (seek, use binary search)
+            - list out the features to show in the graph on the side bar
         - add a help section
     
     later:
