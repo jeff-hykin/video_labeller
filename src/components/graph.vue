@@ -32,9 +32,6 @@ export default {
     props: ['jsonData'],
     data: ()=>({
         scores: {
-            eyebrowScores: [],
-            raised: [],
-            mouthOpenness: []
         },
         names: []
     }),
@@ -46,11 +43,16 @@ export default {
             return []
         },
         labels() {
+            let output = []
+            try {
+                output = Object.keys(this.$data.scores)
+            } catch (e) {}
+            return output
+        },
+        names() {
             let labels = []
             try {
-                for (let each in this.$props.jsonData) {
-                    labels.push(each)
-                }
+                labels = Object.keys(this.$props.jsonData)
             } catch (e) {}
             return labels
         }
@@ -62,12 +64,6 @@ export default {
     },
     methods: {
         updateValues() {
-            if (this.$props.jsonData) {
-                let frames = Object.values(this.$props.jsonData)
-                this.$data.scores.eyebrowScores = scale0to100(frames.map(each => each["eyebrow_raise_score"]))
-                this.$data.scores.raised        = frames.map(each => each["raised"])
-                this.$data.scores.mouthOpenness = frames.map(each => each["mouth_openness"])
-            }
             this.names = Object.keys(this.$data.scores)
         }
     },

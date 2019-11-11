@@ -125,7 +125,7 @@ import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 import ytdl from 'ytdl-core'
-import { onWheelFlick } from '../util/all'
+import { onWheelFlick, binSearch } from '../util/all'
 
 let dialog = remote.dialog
 let app = remote.app
@@ -181,6 +181,9 @@ class FeatureRecord {
             this.records = firstPart.concat(record, lastPart)
         }
     }
+    getNewRange(startTime, endTime) {
+        
+    }
 }
 export default {
     name: "main-page",
@@ -198,10 +201,6 @@ export default {
         youtubeLink: "",
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
-        scrollSpeeds: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        scrollSpeedTrendIncreasing: null,
-        scrollFlickUpConfirmed: false,
-        scrollFlickDownConfirmed: false,
     }),
     mounted() {
         // have an initial value that gets turned to false (for css classes)
@@ -351,6 +350,7 @@ export default {
                         newRate = 1
                     }
                     video.playbackRate = newRate
+                    this.$toasted.show(`Speed x${Math.floor(newRate*100)/100}`).goAway(1000)
                 }
             },
             increaseVideoSpeed() {

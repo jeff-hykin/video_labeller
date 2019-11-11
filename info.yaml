@@ -4,6 +4,8 @@
     description: An electron app designed to help people quickly label features on videos
     
     todo:
+        - add notification when speed changes
+        - make up/down be a speed change
         - add input controls for rate of speed and skipBackAmount
         - graph:
             - read in graph features when video is loaded

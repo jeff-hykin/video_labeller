@@ -4,7 +4,7 @@ let wheelFlickHelper = {
     scrollFlickUpConfirmed: false,
     scrollSpeedTrendIncreasing: false
 }
-export function onWheelFlick(e, increaseCallback, decreaseCallback) {
+export function onWheelFlick(e, flickUpCallback, flickDownCallback) {
     wheelFlickHelper.scrollSpeeds.push(e.wheelDelta)
     wheelFlickHelper.scrollSpeeds.shift()
     if (wheelFlickHelper.scrollSpeeds.length > 10) {
@@ -17,14 +17,14 @@ export function onWheelFlick(e, increaseCallback, decreaseCallback) {
         if (lastIsIn120Range && secondToLastIsIn120Range) {
             if (last > 0 && secondToLast > 0) {
                 if (wheelFlickHelper.scrollFlickDownConfirmed) {
-                    decreaseCallback(e)
+                    flickDownCallback(e)
                     wheelFlickHelper.scrollFlickDownConfirmed = false
                 } else {
                     wheelFlickHelper.scrollFlickDownConfirmed = true
                 }
             } else if (last < 0 && secondToLast < 0) {
                 if (wheelFlickHelper.scrollFlickUpConfirmed) {
-                    increaseCallback(e)
+                    flickUpCallback(e)
                     wheelFlickHelper.scrollFlickUpConfirmed = false
                 } else {
                     wheelFlickHelper.scrollFlickUpConfirmed = true
@@ -52,12 +52,53 @@ export function onWheelFlick(e, increaseCallback, decreaseCallback) {
             // if there was a change in trend
             if (wheelFlickHelper.scrollSpeedTrendIncreasing != isIncreasing) {
                 if (isIncreasing && last > 0) {
-                    increaseCallback(e)
+                    flickDownCallback(e)
                 } else if (isDecreaseing && last < 0) {
-                    decreaseCallback(e)
+                    flickUpCallback(e)
                 }
             }
             wheelFlickHelper.scrollSpeedTrendIncreasing = isIncreasing
+        }
+    }
+}
+
+
+export function binSearch(array, value, start, end) {
+    // initilize arguments
+    if (start == undefined) {
+        start = 0
+    }
+    if (end == undefined) {
+        end = array.length
+    }
+    let func
+    if (!(value instanceof Function)) {
+        func = (each) => {
+            if (each == value) {
+                return 0
+            } else if (each > value) {
+                return 1
+            } else {
+                return -1
+            }
+        }
+    } else {
+        func = value
+    }
+    while (true) {
+        // base case
+        if (start > end) {
+            return middleIndex
+        }
+        let middleIndex = Math.floor( (start+end)/2 )
+        let middle = array[middleIndex]
+        if (func(middle) === 0) {
+            return middleIndex
+        }
+        if (func(middle) === 1) {
+            end = middleIndex-1
+        } else {
+            start = middleIndex+1
         }
     }
 }
