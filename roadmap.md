@@ -1,2 +1,0 @@
-- fix the relative positioning.
-- save to the new JSON file on pressing next/back

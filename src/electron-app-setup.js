@@ -41,16 +41,19 @@ if (process.env.NODE_ENV !== "development") {
     })
 }
 
+// 
+// Main Application Setup
+// 
 function createWindow() {
     // 
     // Window Options
     // 
     mainWindow = new BrowserWindow({
         height: 563,
-        useContentSize: true,
         width: 1000,
+        useContentSize: true,
         webPreferences: {
-            webSecurity: false,
+            webSecurity: false, // allows opening local files
         },
     })
 
@@ -67,9 +70,7 @@ function createWindow() {
 app.on("ready", createWindow)
 
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit()
-    }
+    app.quit()
 })
 
 app.on("activate", () => {
