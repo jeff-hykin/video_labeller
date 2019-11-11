@@ -1,7 +1,7 @@
 import { app, Menu, shell, BrowserWindow } from "electron"
 import electron from "electron"
 import defaultMenu from "electron-default-menu"
-let settings = require("../../package.json")
+let settings = require("../package.json")
 
 let mainWindow
 let windowUrl
