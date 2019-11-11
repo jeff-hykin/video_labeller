@@ -2,7 +2,9 @@
     <row class=wrapper >
         <!-- Mouse Height-Measure Bar -->
         <column class=bar-measure-container shadow=2 z-index=10>
-            <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" ></div>
+            <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" >
+                <h6 style='position: relative; left: 4.7rem; bottom: 0.24em;'>{{Math.floor(mouseHeightPercentage*100)}}%</h6>
+            </div>
         </column>
         <!-- Settings Panel -->
         <column align-v=top v-bind:class="['panel', {init}]" shadow=2>
@@ -154,6 +156,7 @@ export default {
         youtubeLink: "",
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
+        mouseHeightPercentage: 0,
     }),
     mounted() {
         // have an initial value that gets turned to false (for css classes)
@@ -241,14 +244,14 @@ export default {
             },
             saveMousePosition(e) {
                 let videoElement = this.$refs.video
-                if (videoElement && !videoElement.paused){
-                    let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
-                    let mouseHeightPercentage = 1 - (yPosition / window.innerHeight)
+                let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
+                this.mouseHeightPercentage = 1 - (yPosition / window.innerHeight)
+                if (videoElement && !videoElement.paused) {
                     let time = videoElement.currentTime
                     if (!this.recordedFeatures) {
                         this.recordedFeatures = []
                     }
-                    this.recordedFeatures.push([ time, mouseHeightPercentage ])
+                    this.recordedFeatures.push([ time, this.mouseHeightPercentage ])
                 }
             },
         // 
