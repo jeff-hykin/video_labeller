@@ -26,13 +26,13 @@
                     </p>
                     <h4>How exactly do I use it?</h4>
                     <p>
-                        1. First open up the settings panel all the way over to the &lt;- left (just hover your mouse over it)
+                        1. First open up the <code>settings panel</code> all the way over to the &lt;- left (just hover your mouse over it)
                     </p>
                     <p>
                         2. Then add the name of the feature you are labelling
                     </p>
                     <p>
-                        3. Open up a video
+                        3. Open up a video file (bottom bar)
                     </p>
                     <p>
                         4. Use the spacebar to pause/play the video<br>
@@ -410,6 +410,23 @@ export default {
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
     @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
     
+    pre, code {
+        color: var(--pink);
+    }
+    
+    h4 {
+        margin-top: 1.8rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .ui-button {
+        padding: 0.8em 1.7em;
+    }
+    
+    video {
+        height: -webkit-fill-available;
+    }
+    
     
     .wrapper {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
@@ -506,15 +523,5 @@ export default {
     }
     >>>.youtube-link-input label {
         border-bottom: white solid;
-    }
-    
-    .save-button {
-        height: min-content;
-    }
-    video {
-        height: -webkit-fill-available;
-    }
-    .ui-button {
-        padding: 0.8em 1.7em;
     }
 </style>
