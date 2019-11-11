@@ -11,6 +11,7 @@
 import Vue from 'vue'
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
+Vue.config.devtools = process.env.NODE_ENV === 'development'
 
 // make http requests work
 import axios from 'axios'
@@ -26,13 +27,6 @@ import routes from './routes'
 Vue.use(Router)
 
 import store from './store'
-
-// 
-// open dev tools if debugging
-// 
-import { remote } from 'electron'
-const currentWindow = remote.getCurrentWindow()
-currentWindow.openDevTools()
 
 // 
 // Libraries

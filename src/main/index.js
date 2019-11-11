@@ -1,18 +1,48 @@
 import { app, Menu, shell, BrowserWindow } from "electron"
 import electron from "electron"
 import defaultMenu from "electron-default-menu"
+let settings = require("../../package.json")
 
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
+let mainWindow
+let windowUrl
+
+// 
+// When in Production only
+// 
 if (process.env.NODE_ENV !== "development") {
+    // source code for the window 
+    windowUrl = `file://${__dirname}/index.html`
+
+    /**
+     * Set `__static` path to static files in production
+     * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
+     */
     global.__static = require("path")
         .join(__dirname, "/static")
         .replace(/\\/g, "\\\\")
+// 
+//  When in Developer only
+// 
+} else if (process.env.NODE_ENV == "development") {
+    // source is a local server
+    windowUrl = `http://localhost:${settings.vueElectronSettings.devPortNumber}`
+
+    // Install `electron-debug` with `devtron`
+    require("electron-debug")()
+
+    // Install `vue-devtools`
+    require("electron").app.on("ready", () => {
+        let installExtension = require("electron-devtools-installer")
+        installExtension
+            .default(installExtension.VUEJS_DEVTOOLS)
+            .then(() => {})
+            .catch(err => {
+                console.log("Unable to install `vue-devtools`: \n", err)
+            })
+    })
 }
 
-let mainWindow
+
 const winURL = process.env.NODE_ENV === "development" ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow() {

@@ -17,6 +17,9 @@
         "postinstall": "",
         "package": "npx electron-packager . --no-prune --overwrite ; mv video_labeller-darwin-x64 app.nosync"
     },
+    "vueElectronSettings": {
+        "devPortNumber": 9080
+    },
     "buildDependenciesFromSource": true,
     "nodeGypRebuild": false,
     "npmRebuild": false,
