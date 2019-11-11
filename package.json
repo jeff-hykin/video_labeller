@@ -63,7 +63,7 @@
         "css-baseline": "^1.1.4",
         "electron-default-menu": "^1.0.1",
         "electron-localshortcut": "^3.1.0",
-        "good-vue": "^1.0.3",
+        "good-vue": "^1.1.6",
         "jquery": "^3.4.1",
         "keen-ui": "^1.2.0",
         "less": "^3.10.3",

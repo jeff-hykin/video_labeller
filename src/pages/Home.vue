@@ -130,18 +130,10 @@ import fs, { write } from "fs"
 import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
-import Vue from 'vue'
-
-import Graph from "./LandingPage/graph"
-import Point from "./LandingPage/Draggable"
-import Column from './LandingPage/column'
-import Row from './LandingPage/row'
 import ytdl from 'ytdl-core'
 
 let dialog = remote.dialog
 let app = remote.app
-
-// ytdl('http://www.youtube.com/watch?v=A02s8omM_hI', { filter: (format) => format.container === 'mp4' }).pipe(fs.createWriteStream('video.mp4'))
 
 document.body.style.overflow = 'hidden'
 
@@ -196,7 +188,7 @@ class FeatureRecord {
 }
 export default {
     name: "main-page",
-    components: { Point, Column, Row, VueJsonPretty, Graph },
+    components: { VueJsonPretty },
     data: ()=>({
         currentVideoFilePath: null,
         videoFileUrl: null,
