@@ -6,7 +6,9 @@
             <br><br><br><br>
             <h5>Settings</h5>
             <br>
-            <ui-textbox label="Skip Back Amount (Seconds)" placeholder="Name of the feature being labelled" v-model="skipBackAmount" />
+            <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
+            <br>
+            <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
         <!-- Settings panel gost -->
@@ -54,7 +56,7 @@
                     </row>
                     <!-- Graph -->
                     <div v-if=showGraph style="width: calc(100% + 6rem); margin-bottom: -3rem;" >
-                        <graph :duration='this.$refs.video && Math.ceil(this.$refs.video.duration)' :jsonData="this.verifiedFeatureRecord && { [this.currentFeatureName]: this.verifiedFeatureRecord.records}" />
+                        <graph :duration='this.$refs.video && Math.ceil(this.$refs.video.duration)' :jsonData="this.verifiedFeatureRecord ? {...this.videoLabelData, [this.currentFeatureName]: this.verifiedFeatureRecord.records} : this.videoLabelData" />
                     </div>
                 </column>
             </row>
@@ -143,7 +145,8 @@ export default {
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
         mouseHeightPercentage: 0,
-        showGraph: true,
+        showGraph: false,
+        videoLabelData: {},
     }),
     mounted() {
         this.recordedFeatures = []
@@ -190,9 +193,23 @@ export default {
                 }
             }
         })
-        
+        setInterval(_=>{
+            // update the feature record
+            if (this.verifiedFeatureRecord) {
+                this.saveMousePosition({})
+                this.verifiedFeatureRecord.addNewRecords(this.recordedFeatures)
+                this.recordedFeatures = []
+                // update the videoLabelData
+                this.videoLabelData[this.currentFeatureName] = this.verifiedFeatureRecord.records
+            }
+        }, 300)
     },
     computed: {
+        jsonFilePath() {
+            let directory = path.dirname(this.currentVideoFilePath)
+            let basename = path.basename(this.currentVideoFilePath)
+            return path.join(directory, basename+".features.json")
+        }
     },
     watch: {
         youtubeLink(url) {
@@ -328,9 +345,7 @@ export default {
                 return output
             },
             saveData() {
-                let directory = path.dirname(this.currentVideoFilePath)
-                let basename = path.basename(this.currentVideoFilePath)
-                let jsonFilePath = path.join(directory, basename+".features.json")
+                let jsonFilePath = this.jsonFilePath()
                 
                 let dataToSave = {
                     [this.currentFeatureName]: this.verifiedFeatureRecord.records 
@@ -376,11 +391,18 @@ export default {
                 this.openVideo()
             },
             openVideo() {
+                this.videoLabelData = {}
                 this.videoFileUrl = `file:///${this.currentVideoFilePath}`
                 // for some reason the source doesn't update itself so this manually updates it
                 this.$refs.video && (this.$refs.video.src = this.videoFileUrl)
-                
                 this.verifiedFeatureRecord = new FeatureRecord()
+                let filePath = this.jsonFilePath
+                if (fs.existsSync(filePath)) {
+                    this.videoLabelData = JSON.parse(fs.readFileSync(filePath))
+                    if (this.videoLabelData[this.currentFeatureName] instanceof Array) {
+                        this.verifiedFeatureRecord.records = this.videoLabelData[this.currentFeatureName]
+                    }
+                }
             },
             async openFolder(e) {
                 let folderPath = e.target.files[0].path
@@ -422,7 +444,7 @@ export default {
     
     .wrapper .bar-measure-container {
         min-width: 3rem;
-        height: -webkit-fill-available;
+        height: 100%;
         background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
     }
     .wrapper .bar-measure {

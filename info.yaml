@@ -3,34 +3,32 @@
     name: Video Labeller
     description: An electron app designed to help people quickly label features on videos
     
-    todo:
+    done:
+        - clean up the code
+        - ability to slow down video
+        - ability to go back 5 seconds
         - add notification when speed changes
         - make up/down be a speed change
         - add input controls for rate of speed and skipBackAmount
+        
+    todo:
         - graph:
-            - read in graph features when video is loaded
-            - filter the names to be ones that are numbers
-            - create the value-query-at-time function
-            - repeat value-query-at-time for the 5sec ago mark, and 5sec in future mark
-            - collect all values inbetween
-            - display them on a graph spanning the lower portion of the app
-            - create an interval on play
-            - check to see if the resuming point is same as before (increment) or different (seek, use binary search)
+            - fix bugs when changing or loading features
+            - get the graph to update in real time
+            - fix the edgecase bug of the measuring tool being too short
             - list out the features to show in the graph on the side bar
+            - create a zoom function that focuses on only the next 5 seconds and previous five seconds
+            - filter the names to be ones that are numbers
         - add a help section
+        - add a controls section
+        - use localstorage to save the last-used feature name, multiplier, and skipBack
     
     later:
-        - ability to slow down video
-        - ability to go back 5 seconds
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
-        - ability to have a "instant" value or a marker (maybe an M)
-        - have the multiple levels for the feature recording
-        - have the ability to add a list of videos to evaluate in order
-        - have a short graph displaying the change
-        - clean up the code
         - ability to enter a Null value
-        - use localstorage to save the last-used feature name
+        - ability to have a "instant" value or a marker (maybe an M)
+        - have the ability to add a list of videos to evaluate in order
     
     commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
         dev: npm run dev
