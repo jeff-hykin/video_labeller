@@ -1,23 +1,9 @@
 <template>
-    <graph-line
-            class='my-graph'
-            :width="600"
-            :height="400"
-            :shape="'normal'"
-            :axis-min="0"
-            :axis-max="50"
-            :axis-full-mode="true"
-            :labels="labels"
-            :names="names"
-            :values="values">
-        <note :text="'Line Chart'"></note>
-        <legends :names="names"></legends>
-        <tooltip :names="names" :position="'right'"></tooltip>
-        <guideline :tooltip-y="true"></guideline>
-    </graph-line>
+    <apexchart type=area width='100%' height='250' :options="chartOptions" :series="series" />
 </template>
 
 <script>
+import { duration } from 'moment'
 
 let scale0to100 = (aList) => {
     let minScore = Math.min(...aList)
@@ -29,55 +15,468 @@ let scale0to100 = (aList) => {
 }
     
 export default {
-    props: ['jsonData'],
+    props: ['jsonData', 'duration'],
     data: ()=>({
-        scores: {
+        series: [],
+        series1: [
+            {
+                name: "Eyebrow Raise",
+                data: [
+                    [
+                        0.016162,
+                        0.4031971580817052
+                    ],
+                    [
+                        1.123606,
+                        0.41207815275310833
+                    ],
+                    [
+                        1.14015,
+                        0.44049733570159855
+                    ],
+                    [
+                        1.156254,
+                        0.4547069271758437
+                    ],
+                    [
+                        1.172984,
+                        0.4813499111900533
+                    ],
+                    [
+                        1.189648,
+                        0.49200710479573717
+                    ],
+                    [
+                        1.21044,
+                        0.5115452930728241
+                    ],
+                    [
+                        1.227962,
+                        0.522202486678508
+                    ],
+                    [
+                        1.239429,
+                        0.5381882770870338
+                    ],
+                    [
+                        1.256126,
+                        0.5523978685612789
+                    ],
+                    [
+                        1.275854,
+                        0.5595026642984013
+                    ],
+                    [
+                        1.290404,
+                        0.5754884547069272
+                    ],
+                    [
+                        1.30625,
+                        0.5825932504440497
+                    ],
+                    [
+                        1.327586,
+                        0.6039076376554173
+                    ],
+                    [
+                        1.344719,
+                        0.6181172291296626
+                    ],
+                    [
+                        1.356325,
+                        0.6323268206039077
+                    ],
+                    [
+                        1.373909,
+                        0.6412078152753109
+                    ],
+                    [
+                        1.389582,
+                        0.6820603907637656
+                    ],
+                    [
+                        1.409717,
+                        0.7229129662522202
+                    ],
+                    [
+                        1.422982,
+                        0.738898756660746
+                    ],
+                    [
+                        1.440277,
+                        0.7460035523978685
+                    ],
+                    [
+                        1.457271,
+                        0.7673179396092362
+                    ],
+                    [
+                        1.472934,
+                        0.7815275310834814
+                    ],
+                    [
+                        1.494565,
+                        0.8259325044404974
+                    ],
+                    [
+                        1.525813,
+                        0.8436944937833037
+                    ],
+                    [
+                        1.544652,
+                        0.8490230905861457
+                    ],
+                    [
+                        1.556461,
+                        0.8650088809946714
+                    ],
+                    [
+                        1.574,
+                        0.8685612788632326
+                    ],
+                    [
+                        1.589833,
+                        0.8738898756660746
+                    ],
+                    [
+                        1.606975,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.623448,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.690822,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.740475,
+                        0.8738898756660746
+                    ],
+                    [
+                        3.44242,
+                        0.8738898756660746
+                    ],
+                    [
+                        3.477102,
+                        0.872113676731794
+                    ],
+                    [
+                        3.57519,
+                        0.872113676731794
+                    ],
+                    [
+                        3.758525,
+                        0.8703374777975134
+                    ],
+                    [
+                        3.809339,
+                        0.8685612788632326
+                    ],
+                    [
+                        3.879018,
+                        0.8685612788632326
+                    ],
+                    [
+                        3.926407,
+                        0.866785079928952
+                    ],
+                    [
+                        3.942393,
+                        0.866785079928952
+                    ],
+                    [
+                        3.976739,
+                        0.8650088809946714
+                    ]
+                ]
+            },
+            {
+                name: "Eyebrow Raise 2",
+                data: [
+                    [
+                        0.016162,
+                        0.4031971580817052
+                    ],
+                    [
+                        1.123606,
+                        0.41207815275310833
+                    ],
+                    [
+                        1.14015,
+                        0.44049733570159855
+                    ],
+                    [
+                        1.156254,
+                        0.4547069271758437
+                    ],
+                    [
+                        1.172984,
+                        0.4813499111900533
+                    ],
+                    [
+                        1.189648,
+                        0.49200710479573717
+                    ],
+                    [
+                        1.21044,
+                        0.5115452930728241
+                    ],
+                    [
+                        1.227962,
+                        0.522202486678508
+                    ],
+                    [
+                        1.239429,
+                        0.5381882770870338
+                    ],
+                    [
+                        1.256126,
+                        0.5523978685612789
+                    ],
+                    [
+                        1.275854,
+                        0.5595026642984013
+                    ],
+                    [
+                        1.290404,
+                        0.5754884547069272
+                    ],
+                    [
+                        1.30625,
+                        0.5825932504440497
+                    ],
+                    [
+                        1.327586,
+                        0.6039076376554173
+                    ],
+                    [
+                        1.344719,
+                        0.6181172291296626
+                    ],
+                    [
+                        1.356325,
+                        0.6323268206039077
+                    ],
+                    [
+                        1.373909,
+                        0.6412078152753109
+                    ],
+                    [
+                        1.389582,
+                        0.6820603907637656
+                    ],
+                    [
+                        1.409717,
+                        0.7229129662522202
+                    ],
+                    [
+                        1.422982,
+                        0.738898756660746
+                    ],
+                    [
+                        1.440277,
+                        0.7460035523978685
+                    ],
+                    [
+                        1.457271,
+                        0.7673179396092362
+                    ],
+                    [
+                        1.472934,
+                        0.7815275310834814
+                    ],
+                    [
+                        1.494565,
+                        0.8259325044404974
+                    ],
+                    [
+                        1.525813,
+                        0.8436944937833037
+                    ],
+                    [
+                        1.544652,
+                        0.8490230905861457
+                    ],
+                    [
+                        1.556461,
+                        0.8650088809946714
+                    ],
+                    [
+                        1.574,
+                        0.8685612788632326
+                    ],
+                    [
+                        1.589833,
+                        0.8738898756660746
+                    ],
+                    [
+                        1.606975,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.623448,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.690822,
+                        0.8756660746003553
+                    ],
+                    [
+                        1.740475,
+                        0.8738898756660746
+                    ],
+                    [
+                        3.44242,
+                        0.8738898756660746
+                    ],
+                    [
+                        3.477102,
+                        0.872113676731794
+                    ],
+                    [
+                        3.57519,
+                        0.872113676731794
+                    ],
+                    [
+                        3.758525,
+                        0.8703374777975134
+                    ],
+                    [
+                        3.809339,
+                        0.8685612788632326
+                    ],
+                    [
+                        3.879018,
+                        0.8685612788632326
+                    ],
+                    [
+                        3.926407,
+                        0.866785079928952
+                    ],
+                    [
+                        3.942393,
+                        0.866785079928952
+                    ],
+                    [
+                        3.976739,
+                        0.8650088809946714
+                    ]
+                ]
+            },
+        ],
+        chartOptions: {
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                curve: "straight",
+            },
+            colors: ['#2E93fA', '#546E7A', '#FF9800', '#C792EA', '#E91E63', '#89DDFF', ],
+            title: {
+                text: "",
+                align: "left",
+                style: {
+                    fontSize: "14px",
+                },
+            },
+            xaxis: {
+                min: 0,
+                axisBorder: {
+                    show: false,
+                },
+                axisTicks: {
+                    show: true,
+                },
+                tickAmount: 4,
+                labels: {
+                    formatter: each => each.toFixed(2),
+                }
+            },
+            yaxis: {
+                min: 0,
+                max: 1,
+                tickAmount: 4,
+                floating: false,
+                labels: {
+                    style: {
+                        color: "#fff",
+                    },
+                    offsetY: -7,
+                    offsetX: 0,
+                    formatter: each => `${Math.floor(each * 100)}%`
+                },
+                axisBorder: {
+                    show: false,
+                },
+                axisTicks: {
+                    show: false,
+                },
+            },
+            fill: {
+                opacity: 0.5,
+            },
+            tooltip: {
+                fixed: {
+                    enabled: false,
+                    position: "topRight",
+                },
+            },
+            zoom: {
+                enabled: true,
+                type: 'x',
+            },
+            grid: {
+                yaxis: {
+                    lines: {
+                        offsetX: -30,
+                    },
+                },
+                padding: {
+                    left: 20,
+                },
+            },
         },
-        names: []
     }),
     computed: {
-        values() {
-            try {
-                return Object.values(this.$data.scores)
-            } catch (e) {}
-            return []
-        },
-        labels() {
-            let output = []
-            try {
-                output = Object.keys(this.$data.scores)
-            } catch (e) {}
-            return output
-        },
-        names() {
-            let labels = []
-            try {
-                labels = Object.keys(this.$props.jsonData)
-            } catch (e) {}
-            return labels
-        }
     },
     watch: {
-        jsonData() {
-            this.updateValues()
-        }
+        jsonData(newValue, prevValue) {
+            // only update if something actually changed
+            if (JSON.stringify(newValue) != JSON.stringify(prevValue)) {
+                this.updateData(newValue)
+            }
+        },
     },
     methods: {
-        updateValues() {
-            this.names = Object.keys(this.$data.scores)
+        updateData(newValue) {
+            let output = []
+            if (newValue) {
+                for (let eachKey in newValue) {
+                    output.push({
+                        name: eachKey,
+                        data: newValue[eachKey],
+                    })
+                }
+            }
+            this.chartOptions.xaxis.max = this.$props.duration
+            this.series = output
         }
     },
     mounted() {
-        this.updateValues()
+        this.updateData(this.$props.jsonData)
     },
 }
 </script>
 
 <style scoped>
-/deep/.widget-legend {
-    padding: 2rem;
-}
-/deep/ .widget-legend {
-    padding: 2rem;
+.wrapper {
+    position: fixed;
+    bottom: 6rem;
+    height: fit-content;
+    width: 100vw;
+    left: 6rem;
+    overflow: auto;
 }
 </style>

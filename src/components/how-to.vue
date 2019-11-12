@@ -1,5 +1,5 @@
 <template>
-    <column align-h=left align-v=top margin='1rem 5rem'>
+    <column align-h=left align-v=top margin='1rem 5rem' min-height=fit-content>
         <h4>What does this app do?</h4>
         <p>
             It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.

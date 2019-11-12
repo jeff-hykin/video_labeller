@@ -1,39 +1,41 @@
 <template>
-    <row class=wrapper >
-        <!-- Mouse Height-Measure Bar -->
-        <column class=bar-measure-container shadow=2 z-index=10>
-            <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" >
-                {{Math.floor(mouseHeightPercentage*100)}}%
-            </div>
-        </column>
+    <row class=wrapper align-h=left >
         <!-- Settings Panel -->
-        <column align-v=top v-bind:class="['panel', {init}]" shadow=2>
+        <column align-h=left align-v=top v-bind:class="['panel', {init}]" shadow=2>
             <ui-textbox label="Feature" placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+            <br><br><br><br>
+            <h5>Settings</h5>
+            <br>
+            <ui-textbox label="Skip Back Amount (Seconds)" placeholder="Name of the feature being labelled" v-model="skipBackAmount" />
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
+        <!-- Settings panel gost -->
+        <div class=panel-ghost ></div>
         <!-- Main Section -->
-        <div class=middle-container @mouseenter="mouseEnter" @mouseleave="mouseExit">
-            <!-- Current Video -->
-            <column align-h=left align-v=top :max-height='`calc(100vh - ${bottomBarHeight()})`' max-width='100vw' overflow=auto>
-                <how-to v-if='!currentVideoFilePath' />
-                <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
-                    <source :src="videoFileUrl" type="video/mp4">
-                </video>
-            </column>
+        <div class=main-area @mouseenter="mouseEnter" @mouseleave="mouseExit">
+            <row class=video-area align-h=left align-v=top>
+                <!-- Mouse Height-Measure Bar -->
+                <column ref=mouseMeasure class=bar-measure-container shadow=2>
+                    <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" >
+                        {{Math.floor(mouseHeightPercentage*100)}}%
+                    </div>
+                </column>
+                <!-- Current Video -->
+                <column align-h=left align-v=top overflow=auto height=100%>
+                    <how-to v-if='!currentVideoFilePath' />
+                    <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+                        <source :src="videoFileUrl" type="video/mp4">
+                    </video>
+                </column>
+            </row>
             <!-- The bottom bar -->
             <row class=bottom-bar ref=bottomBar >
+                <!-- Graph Switch -->
+                <column position=absolute left=2rem top=2rem color=white>
+                    <ui-switch v-model="showGraph">Show Graph</ui-switch>
+                </column>
+                <!-- File Area -->
                 <column width=100%>
-                    <!-- <div class="popover-trigger" style="position:absolute; top: 0; left: 0;">
-                        <p class=corner-popover style='padding: 0.7rem;'>Options</p>
-                        <ui-popover open-on="mouseenter">
-                            <column padding='2rem' min-height=10rem>
-                                <ui-switch v-model="showPoints">Show X's</ui-switch>
-                            </column>
-                        </ui-popover>
-                    </div> -->
-                    <!-- <row padding='0.5rem' position=relative top='-0.5rem'>
-                        <pre v-if="this.currentImagePath != null">{{this.currentImagePath}}</pre>
-                    </row> -->
                     <row align-h=center width=100% min-width=min-content>
                         <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
                         <row padding='0 1rem'>
@@ -50,24 +52,10 @@
                             </ui-button>
                         </row>
                     </row>
-                    
-                    <!-- <div v-if="this.data" class="popover-trigger" style="position:absolute; top: 0; right: 10rem;">
-                        <p class=corner-popover style='padding: 0.7rem;'>Graph</p>
-                        <ui-popover open-on="click">
-                            <column padding='2rem' min-height=10rem>
-                                <graph :jsonData="data" />
-                            </column>
-                        </ui-popover>
-                    </div> -->
-                    
-                    <!-- <div class="popover-trigger" style="position:absolute; top: 0; right: 0;">
-                        <p class=corner-popover style='padding: 0.7rem;'>FrameData</p>
-                        <ui-popover class=json-popover open-on="click">
-                            <row width=100vw height=100% align-v=top align-h=left padding=1rem>
-                                <vue-json-pretty :data="frameData" />
-                            </row>
-                        </ui-popover>
-                    </div> -->
+                    <!-- Graph -->
+                    <div v-if=showGraph style="width: calc(100% + 6rem); margin-bottom: -3rem;" >
+                        <graph :duration='this.$refs.video && Math.ceil(this.$refs.video.duration)' :jsonData="this.verifiedFeatureRecord && { [this.currentFeatureName]: this.verifiedFeatureRecord.records}" />
+                    </div>
                 </column>
             </row>
         </div>
@@ -80,6 +68,7 @@ import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 import ytdl from 'ytdl-core'
 import HowTo from '../components/how-to'
+import Graph from '../components/graph'
 import { onWheelFlick, binSearch } from '../util/all'
 
 let dialog = remote.dialog
@@ -136,13 +125,10 @@ class FeatureRecord {
             this.records = firstPart.concat(record, lastPart)
         }
     }
-    getNewRange(startTime, endTime) {
-        
-    }
 }
 export default {
     name: "main-page",
-    components: { VueJsonPretty, HowTo },
+    components: { VueJsonPretty, HowTo, Graph },
     data: ()=>({
         currentVideoFilePath: null,
         videoFileUrl: null,
@@ -157,8 +143,10 @@ export default {
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
         mouseHeightPercentage: 0,
+        showGraph: true,
     }),
     mounted() {
+        this.recordedFeatures = []
         // have an initial value that gets turned to false (for css classes)
         setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
@@ -245,12 +233,16 @@ export default {
             saveMousePosition(e) {
                 let videoElement = this.$refs.video
                 let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
-                this.mouseHeightPercentage = 1 - (yPosition / window.innerHeight)
+                if (this.$refs.mouseMeasure) {
+                    let range = this.$refs.mouseMeasure.$el.clientHeight
+                    if (yPosition > range) {
+                        this.mouseHeightPercentage = 0
+                    } else {
+                        this.mouseHeightPercentage = 1 - (yPosition / range)
+                    }
+                }
                 if (videoElement && !videoElement.paused) {
                     let time = videoElement.currentTime
-                    if (!this.recordedFeatures) {
-                        this.recordedFeatures = []
-                    }
                     this.recordedFeatures.push([ time, this.mouseHeightPercentage ])
                 }
             },
@@ -298,7 +290,9 @@ export default {
             skipBack() {
                 let video = this.$refs.video
                 if (video) {
+                    this.stopRecoringFeature()
                     video.currentTime -= this.skipBackAmount
+                    this.startRecordingFeature()
                 }
             },
             changeVideoSpeed(multiplier) {
@@ -412,6 +406,7 @@ export default {
     
     video {
         height: -webkit-fill-available;
+        width: auto;
     }
     
     
@@ -419,15 +414,15 @@ export default {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
         width: 100vw;
         --bar-measure-width: 5rem;
-        --unhovered-panel-amount: 2.6rem;
+        --unhovered-panel-amount: 3rem;
         --blue: #2196F3;
         --green: #64FFDA;
         --red: #EF5350;
     }
     
     .wrapper .bar-measure-container {
-        min-width: var(--bar-measure-width);
-        height: 100vh;
+        min-width: 3rem;
+        height: -webkit-fill-available;
         background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
     }
     .wrapper .bar-measure {
@@ -438,6 +433,7 @@ export default {
         opacity: 0.5;
     }
     .wrapper .bar-cursor {
+        z-index: 1;
         width: fit-content;
         height: fit-content;
         padding: 0.5rem 1rem 0.5rem calc(0.5rem + var(--unhovered-panel-amount));
@@ -476,9 +472,13 @@ export default {
         width: 20rem;
         overflow: auto;
     }
-    .json-area {
+    .video-area {
+        height: -webkit-fill-available;
+        width: -webkit-fill-available;
     }
     .bottom-bar {
+        z-index: 10;
+        min-height: fit-content;
         width: -webkit-fill-available;
         box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
         max-width: 100vw;
@@ -486,10 +486,10 @@ export default {
         background-color: var(--teal);
         padding: 2rem 3rem;
         padding-top: 1rem;
+        /* transition: all 500ms ease-out; */
     }
-    .middle-container {
-        max-width: calc(100vw - var(--bar-measure-width));
-        min-height: 100vh;
+    .main-area {
+        height: 100vh;
         flex-grow: 1;
         justify-content: space-between;
         align-items: flex-start;
@@ -504,16 +504,19 @@ export default {
     .wrapper .panel {
         position: fixed;
         min-width: 22rem;
-        transform: translateX(calc(-100% + var(--unhovered-panel-amount)));
+        transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
         transition: all 500ms ease-out;
         background-color: whitesmoke;
         height: 100vh;
         left: 0;
         z-index: 11;
-        padding: 2rem;
+        padding: 2rem 3rem;
     }
     .panel:hover {
         transform: translateX(0);
+    }
+    .wrapper .panel-ghost {
+        min-width: var(--unhovered-panel-amount);
     }
     
     .youtube-link-input {

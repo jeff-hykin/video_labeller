@@ -22,21 +22,17 @@ import { webFrame } from 'electron'
 // allow zooming in with Mac Trackpad
 webFrame.setVisualZoomLevelLimits(1, 3)
 
-// Routes
-import Router from "vue-router"
-import routes from './routes'
-Vue.use(Router)
 
 // 
 // Libraries
 // 
 
+// Baseline
+import 'css-baseline/css/4.css'
+
 // GoodVue
 import GoodVue from 'good-vue'
 Vue.use(GoodVue)
-
-// Baseline
-import 'css-baseline/css/3.css'
 
 // KeenUI
 import KeenUI from 'keen-ui'
@@ -56,8 +52,20 @@ Vue.component(NoteWidget.name, NoteWidget)
 Vue.component(LegendWidget.name, LegendWidget)
 Vue.use(VueGraph)
 
+// Charts
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+Vue.component('apexchart', VueApexCharts)
+import moment from 'moment'
+window.moment = moment
+
 import Toasted from 'vue-toasted'
 Vue.use(Toasted)
+
+// Routes
+import Router from "vue-router"
+import routes from './routes'
+Vue.use(Router)
 
 // 
 // App
