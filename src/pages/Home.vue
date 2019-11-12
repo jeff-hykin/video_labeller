@@ -3,7 +3,7 @@
         <!-- Mouse Height-Measure Bar -->
         <column class=bar-measure-container shadow=2 z-index=10>
             <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" >
-                <h6 style='position: relative; left: 4.7rem; bottom: 0.24em;'>{{Math.floor(mouseHeightPercentage*100)}}%</h6>
+                {{Math.floor(mouseHeightPercentage*100)}}%
             </div>
         </column>
         <!-- Settings Panel -->
@@ -419,6 +419,7 @@ export default {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
         width: 100vw;
         --bar-measure-width: 5rem;
+        --unhovered-panel-amount: 2.6rem;
         --blue: #2196F3;
         --green: #64FFDA;
         --red: #EF5350;
@@ -436,13 +437,17 @@ export default {
         width: var(--bar-measure-width);
         opacity: 0.5;
     }
-    .bar-cursor {
-        width: 3rem;
-        height: 1rem;
+    .wrapper .bar-cursor {
+        width: fit-content;
+        height: fit-content;
+        padding: 0.5rem 1rem 0.5rem calc(0.5rem + var(--unhovered-panel-amount));
         background: var(--red);
         border: white 4px solid;
-        border-radius: 15px;
+        border-radius: 100vh;
         box-sizing: content-box;
+        left: 0;
+        color: white;
+        transform: translateY(-50%);
     }
     
     * {
@@ -496,10 +501,10 @@ export default {
     .panel.init {
         transform: translateX(0);
     }
-    .panel {
+    .wrapper .panel {
         position: fixed;
         min-width: 22rem;
-        transform: translateX(-90%);
+        transform: translateX(calc(-100% + var(--unhovered-panel-amount)));
         transition: all 500ms ease-out;
         background-color: whitesmoke;
         height: 100vh;
