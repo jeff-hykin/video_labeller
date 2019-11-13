@@ -103,20 +103,20 @@ export function binSearch(array, value, start, end) {
     }
 }
 
-export let once = async ({ isTrue, then, interval=100 }) => new Promise((resolve, reject)=>{
-    
-    let intervalFunction = () => {
+export let once = ({ isTrue, then, interval=100 }) => new Promise((resolve, reject)=>{
+    let clearIntervalId
+    let intervalFunction = async () => {
         // once the statement is true
         if (isTrue()) {
             // detact the loop
-            clearInterval(intervalFunction)
+            clearInterval(clearIntervalId)
             // run the computation
-            resolve(then())
+            resolve(await then())
         }
     }
     // try it first before scheduling it
     intervalFunction()
-    setInterval(intervalFunction, interval)
+    clearIntervalId = setInterval(intervalFunction, interval)
 })
 
 export let scale0to100 = (aList) => {

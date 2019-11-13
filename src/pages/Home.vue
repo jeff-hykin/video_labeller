@@ -27,7 +27,7 @@
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100%>
                     <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video :style='{visibility:this.currentVideoFilePath||'hidden'}' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
                         <source :src="videoFileUrl" type="video/mp4">
                     </video>
                 </column>
@@ -93,7 +93,6 @@ export default {
         verifiedFeatureRecord: null,
         // Video data
         currentVideoFilePath: null,
-        videoFileUrl: null,
         prevMousePageYPosition: 0,
         init: true,
         allowedToCaptureWindowKeypresses: false,
@@ -106,15 +105,16 @@ export default {
         mouseHeightPercentage: 0,
         youtubeLink: "",
         videoLabelData: null,
-        graphFrameRate: 5, // fps
+        graphFrameRate: 1, // fps
         numberOfChunks: 1,
         getGraphData: null,
     }),
     mounted() {
+        window.main = this
         this.pendingRecords = []
         
         // set the rate for the graph to be updated
-        setInterval(this.updateGraph, 1/this.graphFrameRate)
+        setInterval(this.updateGraph, 1000/this.graphFrameRate)
         // have an initial value that gets turned to false (for css classes)
         setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
@@ -134,7 +134,7 @@ export default {
             }
         })
         window.addEventListener('wheel', (e)=>{
-            onWheelFlick(e, ()=>this.increaseVideoSpeed(), ()=>this.decreaseVideoSpeed())
+            onWheelFlick(e, ()=>this.videoLabelData&&this.increaseVideoSpeed(), ()=>this.videoLabelData&&this.decreaseVideoSpeed())
         })
         window.addEventListener('keydown', (e)=>{
             if (this.allowedToCaptureWindowKeypresses) {
@@ -164,9 +164,23 @@ export default {
             let directory = path.dirname(this.currentVideoFilePath)
             let basename = path.basename(this.currentVideoFilePath)
             return path.join(directory, basename+".features.json")
+        },
+        videoFileUrl() {
+            if (this.currentVideoFilePath) {
+                return `file://${this.currentVideoFilePath}`
+            }
         }
     },
     watch: {
+        currentVideoFilePath(newValue) {
+            if (this.$refs.video) {
+                if (newValue) {
+                    this.$refs.video.style.visibility = 'visible'
+                } else {
+                    this.$refs.video.style.visibility = 'hidden'
+                }
+            }
+        },
         youtubeLink(url) {
             if (typeof url == 'string') {
                 if (ytdl.validateURL(url)) {
@@ -197,44 +211,46 @@ export default {
         // Data recording methods
         // 
             updateGraph() {
-                if (this.$refs.video) {
+                if (this.$refs.video && this.videoLabelData && !this.isPaused()) {
                     let currentTime  = this.$refs.video.currentTime
                     if (this.pendingRecords.length > 0) {
                         let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
                         // add (ficticiously) the last/current data point
                         // this datapoint will be removed with the next mouse movement
                         // and if it is never removed it won't harm anything since it is a duplicate
-                        let tempRecord = this.pendingRecords.concat([currentTime, lastValue])
+                        let tempRecord = this.pendingRecords.concat([[currentTime, lastValue]])
+                        console.log(`tempRecord is:`,tempRecord)
                         // commit the pending changes
-                        this.videoLabelData[this.currentFeatureName].addNewRecordSegment(tempRecord)
+                        this.updateRecordsWith(tempRecord)
                     }
                     // extract the time segment from the labels
                     let segmentStart = currentTime - this.graphRange/2
                     let segmentEnd   = currentTime - this.graphRange/2
                     // get the data into a graph-digestible form
-                    let graphData = this.videoLabelData[eachLabel].map(each=>each.getSegment(segmentStart, segmentEnd))
+                    let graphData = Object.values(this.videoLabelData).map(each=>each.getSegment(segmentStart, segmentEnd))
                     // tell the graph to update
                     this.getGraphData = () => graphData
-                } else {
-                    this.getGraphData = null
                 }
             },
             startRecordingFeature() {
                 this.pendingRecords = []
             },
             stopRecoringFeature() {
+                this.updateRecordsWith(this.pendingRecords)
+            },
+            updateRecordsWith(records) {
                 // if the label doesn't exist yet
-                if (!this.videoLabelData[this.currentFeatureName] instanceof LabelRecord) {
+                if (!(this.videoLabelData[this.currentFeatureName] instanceof LabelRecord)) {
                     // create a LabelRecord for it
                     this.videoLabelData[this.currentFeatureName] = new LabelRecord({
                         numberOfChunks: this.numberOfChunks,
                         graphFrameRate: this.graphFrameRate,
-                        records: this.pendingRecords
+                        records: records
                     })
                 // if the label is a LabelRecord
                 } else {
                     // then just add the new data
-                    this.videoLabelData[this.currentFeatureName].addNewRecordSegment(this.pendingRecords)
+                    this.videoLabelData[this.currentFeatureName].addNewRecordSegment(records)
                 }
             },
             saveMousePosition(e) {
@@ -265,10 +281,12 @@ export default {
             },
             togglePlayPause() {
                 let videoElement = this.$refs.video
-                if (videoElement.paused) {
-                    videoElement.play()
-                } else {
-                    videoElement.pause()
+                if (videoElement) {
+                    if (videoElement.paused) {
+                        videoElement.play()
+                    } else {
+                        videoElement.pause()
+                    }
                 }
             },
             pauseVideo() {
@@ -351,9 +369,9 @@ export default {
                 // reset the video-specific data
                 this.videoLabelData = {}
                 this.pendingRecords = []
-                this.videoFileUrl = `file:///${this.currentVideoFilePath}`
                 // for some reason the source doesn't update itself so this manually updates it if needed
                 this.$refs.video && (this.$refs.video.src = this.videoFileUrl)
+                this.$forceUpdate()
                 // try loading any existing data
                 let filePath = this.jsonFilePath
                 let newVideoData = {}
@@ -366,7 +384,7 @@ export default {
                 }
                 // wait for the video Element to load
                 once({
-                    isTrue: _=>(this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
+                    isTrue: _=> (this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
                     then: _=> {
                         this.numberOfChunks = this.$refs.video.duration / this.graphFrameRate
 
@@ -385,6 +403,7 @@ export default {
                         }
                         // once all the LabelRecords are created, update the video data
                         this.videoLabelData = newVideoData
+                        this.updateGraph()
                     },
                 })
                

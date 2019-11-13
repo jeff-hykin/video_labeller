@@ -16,6 +16,7 @@
         - graph:
             - list out the features to show in the graph on the side bar
             - filter the names to be ones that are numbers
+            - load on initial load
         - add a help section
         - add a controls section
         - use localstorage to save the last-used feature name, multiplier, and skipBack

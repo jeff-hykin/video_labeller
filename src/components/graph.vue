@@ -88,8 +88,9 @@ export default {
     watch: {
         getData(newValue, prevValue) {
             if (newValue instanceof Function) {
-                let data = this.$props.newValue()
+                let data = newValue()
                 let series = []
+                console.log(`data is:`,data)
                 if (data instanceof Object) {
                     for (let each in data) {
                         series.push({
@@ -98,6 +99,7 @@ export default {
                         })
                     }
                 }
+                console.log(`series is:`,series)
                 this.series = series
             }
         },
