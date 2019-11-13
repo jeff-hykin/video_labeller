@@ -10,14 +10,11 @@
         - add notification when speed changes
         - make up/down be a speed change
         - add input controls for rate of speed and skipBackAmount
+        - fix the edgecase bug of the measuring tool being too short
         
     todo:
         - graph:
-            - fix bugs when changing or loading features
-            - get the graph to update in real time
-            - fix the edgecase bug of the measuring tool being too short
             - list out the features to show in the graph on the side bar
-            - create a zoom function that focuses on only the next 5 seconds and previous five seconds
             - filter the names to be ones that are numbers
         - add a help section
         - add a controls section

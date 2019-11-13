@@ -102,3 +102,28 @@ export function binSearch(array, value, start, end) {
         }
     }
 }
+
+export let once = async ({ isTrue, then, interval=100 }) => new Promise((resolve, reject)=>{
+    
+    let intervalFunction = () => {
+        // once the statement is true
+        if (isTrue()) {
+            // detact the loop
+            clearInterval(intervalFunction)
+            // run the computation
+            resolve(then())
+        }
+    }
+    // try it first before scheduling it
+    intervalFunction()
+    setInterval(intervalFunction, interval)
+})
+
+export let scale0to100 = (aList) => {
+    let minScore = Math.min(...aList)
+    let shiftedScores = aList.map(each => each - minScore)
+    let maxScore = Math.max(...shiftedScores)
+    let scaleTo100 = 100.0 / maxScore
+    let adjustedScores = shiftedScores.map(each => each * scaleTo100)
+    return adjustedScores
+}

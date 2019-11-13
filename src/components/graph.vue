@@ -4,18 +4,10 @@
 
 <script>
 import { duration } from 'moment'
-
-let scale0to100 = (aList) => {
-    let minScore = Math.min(...aList)
-    let shiftedScores = aList.map(each => each - minScore)
-    let maxScore = Math.max(...shiftedScores)
-    let scaleTo100 = 100.0 / maxScore
-    let adjustedScores = shiftedScores.map(each => each * scaleTo100)
-    return adjustedScores
-}
+import LabelRecord from '../util/LabelRecord'
     
 export default {
-    props: ['jsonData', 'duration'],
+    props: ['getData'],
     data: ()=>({
         series: [],
         chartOptions: {
@@ -94,30 +86,25 @@ export default {
     computed: {
     },
     watch: {
-        jsonData(newValue, prevValue) {
-            // only update if something actually changed
-            if (JSON.stringify(newValue) != JSON.stringify(prevValue)) {
-                this.updateData(newValue)
+        getData(newValue, prevValue) {
+            if (newValue instanceof Function) {
+                let data = this.$props.newValue()
+                let series = []
+                if (data instanceof Object) {
+                    for (let each in data) {
+                        series.push({
+                            name: each,
+                            data: data[each]
+                        })
+                    }
+                }
+                this.series = series
             }
         },
     },
     methods: {
-        updateData(newValue) {
-            let output = []
-            if (newValue) {
-                for (let eachKey in newValue) {
-                    output.push({
-                        name: eachKey,
-                        data: newValue[eachKey],
-                    })
-                }
-            }
-            this.chartOptions.xaxis.max = this.$props.duration
-            this.series = output
-        }
     },
     mounted() {
-        this.updateData(this.$props.jsonData)
     },
 }
 </script>

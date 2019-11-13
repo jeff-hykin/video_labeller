@@ -9,6 +9,8 @@
             <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
             <br>
             <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
+            <br>
+            <ui-textbox label="Number of seconds graph should show" v-model="graphRange" />
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
         <!-- Settings panel gost -->
@@ -25,7 +27,7 @@
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100%>
                     <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video v-if='currentVideoFilePath' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+                    <video ref=video :style='{visibility:this.currentVideoFilePath||'hidden'}' @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
                         <source :src="videoFileUrl" type="video/mp4">
                     </video>
                 </column>
@@ -48,7 +50,7 @@
                                 class="save-button"
                                 color="primary"
                                 raised
-                                :style="{marginLeft: '2rem', visibility:this.verifiedFeatureRecord!=null?'visible':'hidden'}"
+                                :style="{marginLeft: '2rem', visibility:this.videoLabelData||'hidden'}"
                                 >
                                 Save
                             </ui-button>
@@ -56,7 +58,7 @@
                     </row>
                     <!-- Graph -->
                     <div v-if=showGraph style="width: calc(100% + 6rem); margin-bottom: -3rem;" >
-                        <graph :duration='this.$refs.video && Math.ceil(this.$refs.video.duration)' :jsonData="this.verifiedFeatureRecord ? {...this.videoLabelData, [this.currentFeatureName]: this.verifiedFeatureRecord.records} : this.videoLabelData" />
+                        <graph :getData='getGraphData' />
                     </div>
                 </column>
             </row>
@@ -71,85 +73,48 @@ import path from 'path'
 import ytdl from 'ytdl-core'
 import HowTo from '../components/how-to'
 import Graph from '../components/graph'
-import { onWheelFlick, binSearch } from '../util/all'
+import { onWheelFlick, binSearch, once } from '../util/all'
+import LabelRecord from '../util/LabelRecord'
 
-let dialog = remote.dialog
-let app = remote.app
+let   util    = require("util")
+const readdir = util.promisify(fs.readdir)
+let   dialog  = remote.dialog
+let   app     = remote.app
 
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
-let util = require("util")
-const readdir = util.promisify(fs.readdir)
-const stat = util.promisify(fs.stat)
 
-class FeatureRecord {
-    constructor() {
-        this.records = []
-    }
-    addNewRecords(record) {
-        if (record.length != 0) {
-            // extract start and end times
-            let oldestRecord = record[0]
-            let newestRecord = record[record.length-1]
-            let startTime    = oldestRecord[0]
-            let endTime      = newestRecord[0]
-            // 
-            // remove all of the records times that are in this record's duration
-            // replace them with the new records
-            // 
-            let startIndex = null
-            let endIndex = null
-            for (let eachIndex in this.records) {
-                // convert to number
-                eachIndex = eachIndex-0
-                
-                let [eachTime, eachValue] = this.records[eachIndex]
-                if (startIndex == null && eachTime >= startTime) {
-                    startIndex = eachIndex
-                }
-                if (endIndex == null && eachTime >= endTime) {
-                    if (eachTime == endTime) {
-                        endIndex = (eachIndex-0)+1
-                    } else {
-                        endIndex = eachIndex
-                    }
-                }
-            }
-            if (startIndex == null) {
-                startIndex = this.records.length
-            }
-            if (endIndex == null) {
-                endIndex = this.records.length
-            }
-            let firstPart = this.records.slice(0, startIndex)
-            let lastPart = this.records.slice(endIndex, this.records.length)
-            this.records = firstPart.concat(record, lastPart)
-        }
-    }
-}
 export default {
     name: "main-page",
     components: { VueJsonPretty, HowTo, Graph },
     data: ()=>({
+        currentFeatureName: "testFeature1",
+        verifiedFeatureRecord: null,
+        // Video data
         currentVideoFilePath: null,
         videoFileUrl: null,
-        currentFeatureName: "testFeature1",
-        currentFeatureValue: 0,
-        verifiedFeatureRecord: null,
         prevMousePageYPosition: 0,
         init: true,
         allowedToCaptureWindowKeypresses: false,
-        videoList: "",
-        youtubeLink: "",
+        // settings panel
+        showGraph: false,
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
+        graphRange: 10, // seconds
+        // other
         mouseHeightPercentage: 0,
-        showGraph: false,
-        videoLabelData: {},
+        youtubeLink: "",
+        videoLabelData: null,
+        graphFrameRate: 5, // fps
+        numberOfChunks: 1,
+        getGraphData: null,
     }),
     mounted() {
-        this.recordedFeatures = []
+        this.pendingRecords = []
+        
+        // set the rate for the graph to be updated
+        setInterval(this.updateGraph, 1/this.graphFrameRate)
         // have an initial value that gets turned to false (for css classes)
         setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
@@ -193,16 +158,6 @@ export default {
                 }
             }
         })
-        setInterval(_=>{
-            // update the feature record
-            if (this.verifiedFeatureRecord) {
-                this.saveMousePosition({})
-                this.verifiedFeatureRecord.addNewRecords(this.recordedFeatures)
-                this.recordedFeatures = []
-                // update the videoLabelData
-                this.videoLabelData[this.currentFeatureName] = this.verifiedFeatureRecord.records
-            }
-        }, 300)
     },
     computed: {
         jsonFilePath() {
@@ -241,11 +196,46 @@ export default {
         // 
         // Data recording methods
         // 
+            updateGraph() {
+                if (this.$refs.video) {
+                    let currentTime  = this.$refs.video.currentTime
+                    if (this.pendingRecords.length > 0) {
+                        let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
+                        // add (ficticiously) the last/current data point
+                        // this datapoint will be removed with the next mouse movement
+                        // and if it is never removed it won't harm anything since it is a duplicate
+                        let tempRecord = this.pendingRecords.concat([currentTime, lastValue])
+                        // commit the pending changes
+                        this.videoLabelData[this.currentFeatureName].addNewRecordSegment(tempRecord)
+                    }
+                    // extract the time segment from the labels
+                    let segmentStart = currentTime - this.graphRange/2
+                    let segmentEnd   = currentTime - this.graphRange/2
+                    // get the data into a graph-digestible form
+                    let graphData = this.videoLabelData[eachLabel].map(each=>each.getSegment(segmentStart, segmentEnd))
+                    // tell the graph to update
+                    this.getGraphData = () => graphData
+                } else {
+                    this.getGraphData = null
+                }
+            },
             startRecordingFeature() {
-                this.recordedFeatures = []
+                this.pendingRecords = []
             },
             stopRecoringFeature() {
-                this.verifiedFeatureRecord.addNewRecords(this.recordedFeatures)
+                // if the label doesn't exist yet
+                if (!this.videoLabelData[this.currentFeatureName] instanceof LabelRecord) {
+                    // create a LabelRecord for it
+                    this.videoLabelData[this.currentFeatureName] = new LabelRecord({
+                        numberOfChunks: this.numberOfChunks,
+                        graphFrameRate: this.graphFrameRate,
+                        records: this.pendingRecords
+                    })
+                // if the label is a LabelRecord
+                } else {
+                    // then just add the new data
+                    this.videoLabelData[this.currentFeatureName].addNewRecordSegment(this.pendingRecords)
+                }
             },
             saveMousePosition(e) {
                 let videoElement = this.$refs.video
@@ -260,7 +250,7 @@ export default {
                 }
                 if (videoElement && !videoElement.paused) {
                     let time = videoElement.currentTime
-                    this.recordedFeatures.push([ time, this.mouseHeightPercentage ])
+                    this.pendingRecords.push([ time, this.mouseHeightPercentage ])
                 }
             },
         // 
@@ -293,7 +283,6 @@ export default {
                 this.saveMousePosition(e)
             },
             onPauseVideo() {
-                let videoElement = this.$refs.video
                 this.stopRecoringFeature()
             },
             onVideoEnd() {
@@ -323,7 +312,7 @@ export default {
                         newRate = 1
                     }
                     video.playbackRate = newRate
-                    this.$toasted.show(`Speed x${Math.floor(newRate*100)/100}`).goAway(1000)
+                    this.$toasted.show(`Speed x${newRate.toFixed(2)}`).goAway(1000)
                 }
             },
             increaseVideoSpeed() {
@@ -345,42 +334,10 @@ export default {
                 return output
             },
             saveData() {
-                let jsonFilePath = this.jsonFilePath()
-                
-                let dataToSave = {
-                    [this.currentFeatureName]: this.verifiedFeatureRecord.records 
-                }
-                
-                // 
-                // try opening the existing (old) file if it is already there
-                // 
-                let oldData = null
-                try {
-                    oldData = JSON.parse(fs.readFileSync(jsonFilePath))
-                } catch (e) {
-                    
-                }
-                if (oldData) {
-                    // preserve other values
-                    dataToSave = { ...oldData, ...dataToSave }
-                    if (oldData[this.currentFeatureName] instanceof Array) {
-                        // 
-                        // combine the new and old data at the timestamp level (give the new data precedence over the old data in a conflict)
-                        // 
-                        try {
-                            let existingRecord = new FeatureRecord()
-                            existingRecord.addNewRecords(this.verifiedFeatureRecord.records)
-                            dataToSave[this.currentFeatureName] = existingRecord.records
-                        } catch (e) {
-                            // do nothing if the old data is corrupt
-                        }
-                    }
-                }
-                
                 // 
                 // Save the file
                 // 
-                fs.writeFile(jsonFilePath, JSON.stringify(dataToSave), _=>console.log(`data written to ${jsonFilePath}`))
+                fs.writeFile(this.jsonFilePath(), JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
                 this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
             },
             open(link) {
@@ -391,18 +348,46 @@ export default {
                 this.openVideo()
             },
             openVideo() {
+                // reset the video-specific data
                 this.videoLabelData = {}
+                this.pendingRecords = []
                 this.videoFileUrl = `file:///${this.currentVideoFilePath}`
-                // for some reason the source doesn't update itself so this manually updates it
+                // for some reason the source doesn't update itself so this manually updates it if needed
                 this.$refs.video && (this.$refs.video.src = this.videoFileUrl)
-                this.verifiedFeatureRecord = new FeatureRecord()
+                // try loading any existing data
                 let filePath = this.jsonFilePath
+                let newVideoData = {}
                 if (fs.existsSync(filePath)) {
-                    this.videoLabelData = JSON.parse(fs.readFileSync(filePath))
-                    if (this.videoLabelData[this.currentFeatureName] instanceof Array) {
-                        this.verifiedFeatureRecord.records = this.videoLabelData[this.currentFeatureName]
+                    try {
+                        newVideoData = JSON.parse(fs.readFileSync(filePath))
+                        this.$toasted.show(`Previous data file loaded`).goAway(2500)
+                    } catch (err) {
                     }
                 }
+                // wait for the video Element to load
+                once({
+                    isTrue: _=>(this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
+                    then: _=> {
+                        this.numberOfChunks = this.$refs.video.duration / this.graphFrameRate
+
+                        // load up the labels
+                        for (let eachKey in newVideoData) {
+                            let labelData = newVideoData[eachKey]
+                            // if its at least kind of formatted correctly
+                            if (labelData instanceof Array) {
+                                // then convert it to being a LabelRecord
+                                newVideoData[eachKey] = new LabelRecord({
+                                    numberOfChunks: this.numberOfChunks,
+                                    graphFrameRate: this.graphFrameRate,
+                                    records: labelData
+                                })
+                            }
+                        }
+                        // once all the LabelRecords are created, update the video data
+                        this.videoLabelData = newVideoData
+                    },
+                })
+               
             },
             async openFolder(e) {
                 let folderPath = e.target.files[0].path
