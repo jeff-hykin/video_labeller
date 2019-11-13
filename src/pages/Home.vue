@@ -210,8 +210,8 @@ export default {
         // 
         // Data recording methods
         // 
-            updateGraph() {
-                if (this.$refs.video && this.videoLabelData && !this.isPaused()) {
+            updateGraph(input) {
+                if (this.$refs.video && this.videoLabelData && ((input && input.force) || !this.isPaused())) {
                     let currentTime  = this.$refs.video.currentTime
                     if (this.pendingRecords.length > 0) {
                         let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
@@ -224,14 +224,17 @@ export default {
                     }
                     // extract the time segment from the labels
                     let segmentStart = currentTime - this.graphRange/2
-                    let segmentEnd   = currentTime - this.graphRange/2
+                    let segmentEnd   = currentTime + this.graphRange/2
                     // get the data into a graph-digestible form
                     let graphData = {}
+                    console.log(`this.videoLabelData is:`,this.videoLabelData)
                     for (let each in this.videoLabelData) {
+                        console.log(`each is:`,each)
                         graphData[each] = this.videoLabelData[each].getSegment(segmentStart, segmentEnd)
+                        console.log(`graphData[each] is:`,graphData[each])
                     }
                     // tell the graph to update
-                    this.getGraphData = () => graphData
+                    this.getGraphData = () => ({ max: segmentEnd, min: segmentStart, data:graphData})
                 }
             },
             startRecordingFeature() {
@@ -388,11 +391,11 @@ export default {
                 once({
                     isTrue: _=> (this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
                     then: _=> {
-                        this.numberOfChunks = this.$refs.video.duration * this.graphFrameRate
+                        this.numberOfChunks = Math.ceil(this.$refs.video.duration * this.graphFrameRate)
 
                         // load up the labels
                         for (let eachKey in newVideoData) {
-                            let labelData = newVideoData[eachKey]
+                            let labelData = JSON.parse( JSON.stringify( newVideoData[eachKey]))
                             // if its at least kind of formatted correctly
                             if (labelData instanceof Array) {
                                 // then convert it to being a LabelRecord
@@ -405,7 +408,7 @@ export default {
                         }
                         // once all the LabelRecords are created, update the video data
                         this.videoLabelData = newVideoData
-                        this.updateGraph()
+                        this.updateGraph({force:true})
                     },
                 })
                

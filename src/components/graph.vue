@@ -88,7 +88,12 @@ export default {
     watch: {
         getData(newValue, prevValue) {
             if (newValue instanceof Function) {
-                let data = newValue()
+                let {max, min, data} = newValue()
+                console.log(`data is:`,data)
+                console.log(`max is:`,max)
+                console.log(`min is:`,min)
+                this.chartOptions.xaxis.min = min
+                this.chartOptions.xaxis.max = max
                 let series = []
                 if (data instanceof Object) {
                     for (let each in data) {

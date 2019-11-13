@@ -14,6 +14,9 @@ export default class LabelRecord {
         for (let i = 0; i < numberOfChunks; i++) {
             this.chunks.push([])
         }
+        for (let eachRecord of this.records) {
+            this.addRecordToChunks(eachRecord)
+        }
     }
     toJSON() {
         return this.records
@@ -93,6 +96,6 @@ export default class LabelRecord {
         let startingRecords   = startChunk.filter(each=>each[0]>=startTime)
         let endingRecords     = endChunk.filter(each=>each[0]<=endTime)
         let chunkInnerSegment = this.chunks.filter((each, index)=>index>startChunkIndex && index<endChunkIndex)
-        return startingRecords.concat(...endingRecords, endChunk)
+        return startingRecords.concat(...chunkInnerSegment, endingRecords)
     }
 }
