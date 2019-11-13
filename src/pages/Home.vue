@@ -6,9 +6,12 @@
             <br><br><br><br>
             <h5>Settings</h5>
             <br>
+            <br>
             <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
             <br>
+            <br>
             <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
+            <br>
             <br>
             <ui-textbox label="Number of seconds graph should show" v-model="graphRange" />
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
@@ -25,7 +28,7 @@
                     </div>
                 </column>
                 <!-- Current Video -->
-                <column align-h=left align-v=top overflow=auto height=100%>
+                <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
                     <how-to v-if='!currentVideoFilePath' />
                     <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek controls>
                         <source :src="videoFileUrl" type="video/mp4">
@@ -35,24 +38,24 @@
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
                 <!-- Graph Switch -->
-                <row align-h=space-between width=100% min-width=min-content>
+                <row align-h=space-between padding=2rem width=100% min-width=min-content>
                     <column padding=2rem color=white>
                         <ui-switch v-model="showGraph">Show Graph</ui-switch>
                     </column>
                     <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-                    <!-- <row padding='0 1rem'> -->
+                    <row padding='0 1rem'>
                         <input class=file-picker type="file" tabIndex="-1" @change="chooseFile" placeholder="Choose Video" />
                         <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
-                        <ui-button 
-                            @click="saveData"
-                            class="save-button"
-                            color="primary"
-                            raised
-                            :style="{marginLeft: '2rem', visibility:this.videoLabelData||'hidden'}"
-                            >
-                            Save
-                        </ui-button>
-                    <!-- </row> -->
+                    </row>
+                    <ui-button 
+                        @click="saveData"
+                        class="save-button"
+                        color="primary"
+                        raised
+                        :style="{marginLeft: '2rem'}"
+                        >
+                        Save
+                    </ui-button>
                 </row>
                 <!-- Graph -->
                 <div v-if=showGraph class=graph-container >
@@ -374,7 +377,8 @@ export default {
                 // 
                 // Save the file
                 // 
-                fs.writeFile(this.jsonFilePath(), JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
+                let jsonFilePath = this.jsonFilePath
+                fs.writeFile(jsonFilePath, JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
                 this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
             },
             open(link) {
@@ -521,17 +525,19 @@ export default {
         height: -webkit-fill-available;
         width: -webkit-fill-available;
     }
-    .bottom-bar {
+    .wrapper .bottom-bar {
         z-index: 10;
         min-height: fit-content;
-        width: -webkit-fill-available;
+        width: calc(100vw - var(--unhovered-panel-amount));
         box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
         max-width: 100vw;
         position: relative;
         background-color: var(--teal);
+        /* transition: all 500ms ease-out; */
+    }
+    .control-bar {
         padding: 2rem 3rem;
         padding-top: 1rem;
-        /* transition: all 500ms ease-out; */
     }
     .main-area {
         height: 100vh;
@@ -574,7 +580,7 @@ export default {
         border-bottom: white solid;
     }
     .graph-container {
-        width: calc(100% + 3rem);
+        width: calc(100%);
         margin-bottom: -3rem;
     }
 </style>

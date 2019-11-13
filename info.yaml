@@ -13,9 +13,9 @@
         - fix the edgecase bug of the measuring tool being too short
         
     todo:
+        - make save button hide again
         - graph:
-            - list out the features to show in the graph on the side bar
-            - switch to just change max/min values
+            - fix 
             - fix the max and min values with second-by-second samples
             - filter the names to be ones that are numbers
             - load on initial load
