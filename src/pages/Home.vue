@@ -58,7 +58,7 @@
                     </row>
                     <!-- Graph -->
                     <div v-if=showGraph style="width: calc(100% + 3rem); margin-bottom: -3rem;" >
-                        <graph :getData='getGraphData' />
+                        <graph ref=graph :getData='getGraphData' />
                     </div>
                 </column>
             </row>
@@ -211,6 +211,7 @@ export default {
         // Data recording methods
         // 
             updateGraph(input) {
+                console.log(`input is:`,input)
                 if (this.$refs.video && this.videoLabelData && ((input && input.force) || !this.isPaused())) {
                     let currentTime  = this.$refs.video.currentTime
                     if (this.pendingRecords.length > 0) {
@@ -235,6 +236,7 @@ export default {
                     }
                     // tell the graph to update
                     this.getGraphData = () => ({ max: segmentEnd, min: segmentStart, data:graphData})
+                    this.$refs.graph.$forceUpdate()
                 }
             },
             startRecordingFeature() {

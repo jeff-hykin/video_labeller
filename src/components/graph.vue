@@ -87,6 +87,7 @@ export default {
     },
     watch: {
         getData(newValue, prevValue) {
+            console.log(`newValue is:`,newValue)
             if (newValue instanceof Function) {
                 let {max, min, data} = newValue()
                 console.log(`data is:`,data)
