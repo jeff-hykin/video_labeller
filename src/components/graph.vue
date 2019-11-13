@@ -96,16 +96,16 @@ export default {
                 let data = newValue()
                 this.chartOptions.xaxis.max = this.chartOptions.xaxis.max+0
                 this.chartOptions.xaxis.min = this.chartOptions.xaxis.min+0
-                this.series = []
+                let series = []
                 if (data instanceof Object) {
                     for (let each in data) {
-                        this.series.push({
+                        series.push({
                             name: each,
                             data: data[each]
                         })
                     }
                 }
-                // this.series = [...this.series]
+                this.series = series
             }
         },
     },

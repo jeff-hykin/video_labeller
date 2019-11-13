@@ -33,35 +33,32 @@
                 </column>
             </row>
             <!-- The bottom bar -->
-            <row class=bottom-bar ref=bottomBar >
+            <column class=bottom-bar ref=bottomBar align-h=center >
                 <!-- Graph Switch -->
-                <column position=absolute left=2rem top=2rem color=white>
-                    <ui-switch v-model="showGraph">Show Graph</ui-switch>
-                </column>
-                <!-- File Area -->
-                <column width=100%>
-                    <row align-h=center width=100% min-width=min-content>
-                        <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-                        <row padding='0 1rem'>
-                            <input class=file-picker type="file" tabIndex="-1" @change="chooseFile" placeholder="Choose Video" />
-                            <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
-                            <ui-button 
-                                @click="saveData"
-                                class="save-button"
-                                color="primary"
-                                raised
-                                :style="{marginLeft: '2rem', visibility:this.videoLabelData||'hidden'}"
-                                >
-                                Save
-                            </ui-button>
-                        </row>
-                    </row>
-                    <!-- Graph -->
-                    <div v-if=showGraph class=graph-container >
-                        <graph ref=graph :getData='getGraphData' :min=segmentStart :max=segmentEnd />
-                    </div>
-                </column>
-            </row>
+                <row align-h=space-between width=100% min-width=min-content>
+                    <column padding=2rem color=white>
+                        <ui-switch v-model="showGraph">Show Graph</ui-switch>
+                    </column>
+                    <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
+                    <!-- <row padding='0 1rem'> -->
+                        <input class=file-picker type="file" tabIndex="-1" @change="chooseFile" placeholder="Choose Video" />
+                        <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
+                        <ui-button 
+                            @click="saveData"
+                            class="save-button"
+                            color="primary"
+                            raised
+                            :style="{marginLeft: '2rem', visibility:this.videoLabelData||'hidden'}"
+                            >
+                            Save
+                        </ui-button>
+                    <!-- </row> -->
+                </row>
+                <!-- Graph -->
+                <div v-if=showGraph class=graph-container >
+                    <graph ref=graph :getData='getGraphData' :min=segmentStart :max=segmentEnd />
+                </div>
+            </column>
         </div>
     </row>
 </template>
@@ -108,7 +105,7 @@ export default {
         mouseHeightPercentage: 0,
         youtubeLink: "",
         videoLabelData: null,
-        graphFrameRate: 5, // fps
+        graphFrameRate: 30, // fps
         numberOfChunks: 1,
         getGraphData: ()=>statelessData.graph,
         segmentStart: 0,
@@ -177,8 +174,11 @@ export default {
         }
     },
     watch: {
+        graphRange(newValue) {
+            newValue && this.updateGraph({force: true, noDataChange:true })
+        },
         showGraph(newValue) {
-            setTimeout(_=>newValue && this.updateGraph(),0)
+            newValue && this.updateGraph({force: true, noDataChange:true })
         },
         currentVideoFilePath(newValue) {
             if (this.$refs.video) {
