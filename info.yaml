@@ -13,16 +13,13 @@
         - fix the edgecase bug of the measuring tool being too short
         
     todo:
-        - make save button hide again
-        - graph:
-            - fix 
-            - fix the max and min values with second-by-second samples
-            - filter the names to be ones that are numbers
-            - load on initial load
-        - fix records being in incorrect order 
-        - add a help section
-        - add a controls section
+        - disable the scroll wheel speed increase/decrease
         - use localstorage to save the last-used feature name, multiplier, and skipBack
+        - add a controls section
+        - add a help section
+        - graph:
+            - filter the names to be ones that are numbers
+        - make save button hide again
     
     later:
         - add ability to change the save-as name
