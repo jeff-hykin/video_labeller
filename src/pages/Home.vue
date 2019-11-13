@@ -536,8 +536,7 @@ export default {
         /* transition: all 500ms ease-out; */
     }
     .control-bar {
-        padding: 2rem 3rem;
-        padding-top: 1rem;
+        padding: 1rem 3rem;
     }
     .main-area {
         height: 100vh;
@@ -580,7 +579,6 @@ export default {
         border-bottom: white solid;
     }
     .graph-container {
-        width: calc(100%);
-        margin-bottom: -3rem;
+        width: 100%;
     }
 </style>
