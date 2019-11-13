@@ -8,12 +8,12 @@ export default class LabelRecord {
         } else {
             this.records = records
         }
+        this.numberOfChunks = numberOfChunks
         // init the chunks version
         this.chunks = []
         for (let i = 0; i < numberOfChunks; i++) {
             this.chunks.push([])
         }
-        console.log(`[INIT] this.chunks is:`,this.chunks)
     }
     toJSON() {
         return this.records
@@ -23,14 +23,10 @@ export default class LabelRecord {
         return Math.floor( time * this.graphFrameRate )
     }
     addRecordToChunks(record) {
-        console.log(`record is:`,record)
         let index = this.getChunkIndexFor(record)
-        console.log(`index is:`,index)
         let chunk = this.chunks[index]
         window.lr = this
         window.i = index
-        console.log(`chunk is:`,chunk)
-        console.log(`this.chunks is:`,this.chunks)
         this.chunks[index].push(record)
     }
     addNewRecordSegment(newRecords) {
@@ -82,12 +78,14 @@ export default class LabelRecord {
             }
             // add the new middle part to the chunks
             for (let eachRecord of newRecords) {
-                console.log(`eachRecord is:`,eachRecord)
                 this.addRecordToChunks(eachRecord)
             }
         }
     }
     getSegment(startTime, endTime) {
+        if (startTime < 0) {
+            startTime = 0
+        }
         let startChunkIndex   = this.getChunkIndexFor([startTime, null])
         let endChunkIndex     = this.getChunkIndexFor([endTime, null])
         let startChunk        = this.chunks[startChunkIndex] || []

@@ -57,7 +57,7 @@
                         </row>
                     </row>
                     <!-- Graph -->
-                    <div v-if=showGraph style="width: calc(100% + 6rem); margin-bottom: -3rem;" >
+                    <div v-if=showGraph style="width: calc(100% + 3rem); margin-bottom: -3rem;" >
                         <graph :getData='getGraphData' />
                     </div>
                 </column>
@@ -105,7 +105,7 @@ export default {
         mouseHeightPercentage: 0,
         youtubeLink: "",
         videoLabelData: null,
-        graphFrameRate: 1, // fps
+        graphFrameRate: 5, // fps
         numberOfChunks: 1,
         getGraphData: null,
     }),
@@ -219,7 +219,6 @@ export default {
                         // this datapoint will be removed with the next mouse movement
                         // and if it is never removed it won't harm anything since it is a duplicate
                         let tempRecord = this.pendingRecords.concat([[currentTime, lastValue]])
-                        console.log(`tempRecord is:`,tempRecord)
                         // commit the pending changes
                         this.updateRecordsWith(tempRecord)
                     }
@@ -227,7 +226,10 @@ export default {
                     let segmentStart = currentTime - this.graphRange/2
                     let segmentEnd   = currentTime - this.graphRange/2
                     // get the data into a graph-digestible form
-                    let graphData = Object.values(this.videoLabelData).map(each=>each.getSegment(segmentStart, segmentEnd))
+                    let graphData = {}
+                    for (let each in this.videoLabelData) {
+                        graphData[each] = this.videoLabelData[each].getSegment(segmentStart, segmentEnd)
+                    }
                     // tell the graph to update
                     this.getGraphData = () => graphData
                 }
@@ -386,7 +388,7 @@ export default {
                 once({
                     isTrue: _=> (this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
                     then: _=> {
-                        this.numberOfChunks = this.$refs.video.duration / this.graphFrameRate
+                        this.numberOfChunks = this.$refs.video.duration * this.graphFrameRate
 
                         // load up the labels
                         for (let eachKey in newVideoData) {

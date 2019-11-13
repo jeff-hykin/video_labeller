@@ -90,7 +90,6 @@ export default {
             if (newValue instanceof Function) {
                 let data = newValue()
                 let series = []
-                console.log(`data is:`,data)
                 if (data instanceof Object) {
                     for (let each in data) {
                         series.push({
@@ -99,7 +98,6 @@ export default {
                         })
                     }
                 }
-                console.log(`series is:`,series)
                 this.series = series
             }
         },
