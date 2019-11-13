@@ -3,11 +3,10 @@
 </template>
 
 <script>
-import { duration } from 'moment'
 import LabelRecord from '../util/LabelRecord'
-    
+
 export default {
-    props: ['getData'],
+    props: ['getData', 'min', 'max'],
     data: ()=>({
         series: [],
         chartOptions: {
@@ -86,25 +85,27 @@ export default {
     computed: {
     },
     watch: {
+        min(newValue) {
+            this.chartOptions.xaxis.min = newValue
+        },
+        max(newValue) {
+            this.chartOptions.xaxis.max = newValue
+        },
         getData(newValue, prevValue) {
-            console.log(`newValue is:`,newValue)
             if (newValue instanceof Function) {
-                let {max, min, data} = newValue()
-                console.log(`data is:`,data)
-                console.log(`max is:`,max)
-                console.log(`min is:`,min)
-                this.chartOptions.xaxis.min = min
-                this.chartOptions.xaxis.max = max
-                let series = []
+                let data = newValue()
+                this.chartOptions.xaxis.max = this.chartOptions.xaxis.max+0
+                this.chartOptions.xaxis.min = this.chartOptions.xaxis.min+0
+                this.series = []
                 if (data instanceof Object) {
                     for (let each in data) {
-                        series.push({
+                        this.series.push({
                             name: each,
                             data: data[each]
                         })
                     }
                 }
-                this.series = series
+                // this.series = [...this.series]
             }
         },
     },

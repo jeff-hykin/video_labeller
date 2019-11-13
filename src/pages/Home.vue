@@ -27,7 +27,7 @@
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100%>
                     <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked controls>
+                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek controls>
                         <source :src="videoFileUrl" type="video/mp4">
                     </video>
                 </column>
@@ -57,8 +57,8 @@
                         </row>
                     </row>
                     <!-- Graph -->
-                    <div v-if=showGraph style="width: calc(100% + 3rem); margin-bottom: -3rem;" >
-                        <graph ref=graph :getData='getGraphData' />
+                    <div v-if=showGraph class=graph-container >
+                        <graph ref=graph :getData='getGraphData' :min=segmentStart :max=segmentEnd />
                     </div>
                 </column>
             </row>
@@ -84,6 +84,9 @@ let   app     = remote.app
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
+let statelessData = {
+    graph:{}
+}
 
 export default {
     name: "main-page",
@@ -107,7 +110,9 @@ export default {
         videoLabelData: null,
         graphFrameRate: 5, // fps
         numberOfChunks: 1,
-        getGraphData: null,
+        getGraphData: ()=>statelessData.graph,
+        segmentStart: 0,
+        segmentEnd: 0,
     }),
     mounted() {
         window.main = this
@@ -172,6 +177,9 @@ export default {
         }
     },
     watch: {
+        showGraph(newValue) {
+            setTimeout(_=>newValue && this.updateGraph(),0)
+        },
         currentVideoFilePath(newValue) {
             if (this.$refs.video) {
                 if (newValue) {
@@ -211,32 +219,33 @@ export default {
         // Data recording methods
         // 
             updateGraph(input) {
-                console.log(`input is:`,input)
-                if (this.$refs.video && this.videoLabelData && ((input && input.force) || !this.isPaused())) {
+                let force        = input && input.force
+                let noDataChange = input && input.noDataChange
+                
+                if (this.$refs.video && this.videoLabelData && (force || !this.isPaused())) {
                     let currentTime  = this.$refs.video.currentTime
-                    if (this.pendingRecords.length > 0) {
-                        let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
-                        // add (ficticiously) the last/current data point
-                        // this datapoint will be removed with the next mouse movement
-                        // and if it is never removed it won't harm anything since it is a duplicate
-                        let tempRecord = this.pendingRecords.concat([[currentTime, lastValue]])
-                        // commit the pending changes
-                        this.updateRecordsWith(tempRecord)
+                    if (!noDataChange) {
+                        if (this.pendingRecords.length > 0) {
+                            let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
+                            // add (ficticiously) the last/current data point
+                            // this datapoint will be removed with the next mouse movement
+                            // and if it is never removed it won't harm anything since it is a duplicate
+                            let tempRecord = this.pendingRecords.concat([[currentTime, lastValue]])
+                            // commit the pending changes
+                            this.updateRecordsWith(tempRecord)
+                        }
+                        // get the data into a graph-digestible form
+                        statelessData.graph = {}
+                        for (let each in this.videoLabelData) {
+                            statelessData.graph [each] = this.videoLabelData[each].records
+                        }
                     }
                     // extract the time segment from the labels
-                    let segmentStart = currentTime - this.graphRange/2
-                    let segmentEnd   = currentTime + this.graphRange/2
-                    // get the data into a graph-digestible form
-                    let graphData = {}
-                    console.log(`this.videoLabelData is:`,this.videoLabelData)
-                    for (let each in this.videoLabelData) {
-                        console.log(`each is:`,each)
-                        graphData[each] = this.videoLabelData[each].getSegment(segmentStart, segmentEnd)
-                        console.log(`graphData[each] is:`,graphData[each])
-                    }
-                    // tell the graph to update
-                    this.getGraphData = () => ({ max: segmentEnd, min: segmentStart, data:graphData})
-                    this.$refs.graph.$forceUpdate()
+                    this.segmentStart = currentTime - this.graphRange/2
+                    this.segmentEnd   = currentTime + this.graphRange/2
+                    this.$refs.graph&&this.$refs.graph.$forceUpdate()
+                    
+                    this.getGraphData = ()=>statelessData.graph
                 }
             },
             startRecordingFeature() {
@@ -302,6 +311,9 @@ export default {
                 } catch (e) {
                     
                 }
+            },
+            onVideoSeek() {
+                this.updateGraph({force:true, noDataChange: true})
             },
             onPlayVideo(e) {
                 this.startRecordingFeature()
@@ -560,5 +572,9 @@ export default {
     }
     >>>.youtube-link-input label {
         border-bottom: white solid;
+    }
+    .graph-container {
+        width: calc(100% + 3rem);
+        margin-bottom: -3rem;
     }
 </style>

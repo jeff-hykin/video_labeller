@@ -15,6 +15,8 @@
     todo:
         - graph:
             - list out the features to show in the graph on the side bar
+            - switch to just change max/min values
+            - fix the max and min values with second-by-second samples
             - filter the names to be ones that are numbers
             - load on initial load
         - fix records being in incorrect order 
