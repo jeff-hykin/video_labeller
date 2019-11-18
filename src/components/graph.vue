@@ -1,12 +1,13 @@
 <template>
-    <apexchart type=area width='100%' height='250' :options="chartOptions" :series="series" />
+    <apexchart class='shift-down' type=area width='100%' :height='height' :options="chartOptions" :series="series" />
 </template>
 
 <script>
 import LabelRecord from '../util/LabelRecord'
+import {statelessData} from "../pages/Home"
 
 export default {
-    props: ['getData', 'min', 'max'],
+    props: ['getData', 'height' ],
     data: ()=>({
         series: [],
         chartOptions: {
@@ -31,6 +32,9 @@ export default {
                 },
                 axisTicks: {
                     show: true,
+                },
+                style: {
+                    colors: ['#89DDFF'],
                 },
                 tickAmount: 4,
                 labels: {
@@ -70,6 +74,9 @@ export default {
                 enabled: true,
                 type: 'x',
             },
+            legend: {
+                position: 'top',
+            },
             grid: {
                 yaxis: {
                     lines: {
@@ -85,17 +92,12 @@ export default {
     computed: {
     },
     watch: {
-        min(newValue) {
-            this.chartOptions.xaxis.min = newValue
-        },
-        max(newValue) {
-            this.chartOptions.xaxis.max = newValue
-        },
         getData(newValue, prevValue) {
+            // convert min and max into numbers
+            this.chartOptions.xaxis.min = statelessData.graphMin-0
+            this.chartOptions.xaxis.max = statelessData.graphMax-0
             if (newValue instanceof Function) {
                 let data = newValue()
-                this.chartOptions.xaxis.max = this.chartOptions.xaxis.max+0
-                this.chartOptions.xaxis.min = this.chartOptions.xaxis.min+0
                 let series = []
                 if (data instanceof Object) {
                     for (let each in data) {
@@ -124,5 +126,9 @@ export default {
     width: 100vw;
     left: 6rem;
     overflow: auto;
+}
+.shift-down {
+    margin-bottom: -20px;
+    margin-top: 12px;
 }
 </style>

@@ -2,18 +2,40 @@
     <row class=wrapper align-h=left >
         <!-- Settings Panel -->
         <column align-h=left align-v=top v-bind:class="['panel', {init}]" shadow=2>
-            <ui-textbox label="Feature" placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+            <h5>Video</h5>
+            <column class='video-selector bubble' shadow=1>
+                <input class=file-picker type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
+                <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
+            </column>
+            <row align-h=space-between width=100% padding='1rem 0rem'>
+                <ui-textbox placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+                <ui-button 
+                    @click="saveData"
+                    class="save-button"
+                    color="primary"
+                    raised
+                    :style="{marginLeft: '0rem'}"
+                    >
+                    Save
+                </ui-button>
+            </row>
             <br><br><br><br>
             <h5>Settings</h5>
-            <br>
-            <br>
-            <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
-            <br>
-            <br>
-            <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
-            <br>
-            <br>
-            <ui-textbox label="Number of seconds graph should show" v-model="graphRange" />
+            <column class='settings-bubble bubble' shadow=1 align-h=left>
+                <ui-switch v-model="showGraph">Show Graph</ui-switch>
+                <br>
+                <br>
+                <ui-textbox label="Graph Height" v-model="graphHeight" />
+                <br>
+                <br>
+                <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
+                <br>
+                <br>
+                <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
+                <br>
+                <br>
+                <ui-textbox label="Number of seconds graph should show" v-model="graphRange" />
+            </column>
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
         <!-- Settings panel gost -->
@@ -38,29 +60,12 @@
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
                 <!-- Control  -->
-                <row class=control-bar align-h=space-between width=100% min-width=min-content>
-                    <!-- Graph Switch -->
-                    <column color=white>
-                        <ui-switch v-model="showGraph">Show Graph</ui-switch>
-                    </column>
-                    <!-- <input @change="openFolder" type="file" webkitdirectory /> -->
-                    <row padding='0 1rem'>
-                        <input class=file-picker type="file" tabIndex="-1" @change="chooseFile" placeholder="Choose Video" />
-                        <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
-                    </row>
-                    <ui-button 
-                        @click="saveData"
-                        class="save-button"
-                        color="primary"
-                        raised
-                        :style="{marginLeft: '2rem'}"
-                        >
-                        Save
-                    </ui-button>
-                </row>
+                <!-- <row class=control-bar align-h=space-between width=100% min-width=min-content>
+                    <input @change="openFolder" type="file" webkitdirectory />
+                </row> -->
                 <!-- Graph -->
                 <div v-if=showGraph class=graph-container >
-                    <graph ref=graph :getData='getGraphData' :min=segmentStart :max=segmentEnd />
+                    <graph ref=graph :getData='getGraphData' :height=graphHeight />
                 </div>
             </column>
         </div>
@@ -85,8 +90,10 @@ let   app     = remote.app
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
-let statelessData = {
-    graph:{}
+export let statelessData = {
+    graph:{},
+    graphMin: 0,
+    graphMax: 10,
 }
 
 export default {
@@ -105,6 +112,7 @@ export default {
         videoSpeedMultiplier: 1.4,
         skipBackAmount: 5, // seconds
         graphRange: 10, // seconds
+        graphHeight: 250, // pixels
         // other
         mouseHeightPercentage: 0,
         youtubeLink: "",
@@ -112,8 +120,6 @@ export default {
         graphFrameRate: 30, // fps
         numberOfChunks: 1,
         getGraphData: ()=>statelessData.graph,
-        segmentStart: 0,
-        segmentEnd: 0,
     }),
     mounted() {
         window.main = this
@@ -140,7 +146,8 @@ export default {
             }
         })
         window.addEventListener('wheel', (e)=>{
-            onWheelFlick(e, ()=>this.videoLabelData&&this.increaseVideoSpeed(), ()=>this.videoLabelData&&this.decreaseVideoSpeed())
+            // uncomment this to allow the scroll to control the video speed
+            // onWheelFlick(e, ()=>this.videoLabelData&&this.increaseVideoSpeed(), ()=>this.videoLabelData&&this.decreaseVideoSpeed())
         })
         window.addEventListener('keydown', (e)=>{
             if (this.allowedToCaptureWindowKeypresses) {
@@ -182,7 +189,7 @@ export default {
             newValue && this.updateGraph({force: true, noDataChange:true })
         },
         showGraph(newValue) {
-            newValue && this.updateGraph({force: true, noDataChange:true })
+            setTimeout(()=>newValue && this.updateGraph({force: true, noDataChange:true }), 0)
         },
         currentVideoFilePath(newValue) {
             if (this.$refs.video) {
@@ -245,10 +252,8 @@ export default {
                         }
                     }
                     // extract the time segment from the labels
-                    this.segmentStart = currentTime - this.graphRange/2
-                    this.segmentEnd   = currentTime + this.graphRange/2
-                    this.$refs.graph&&this.$refs.graph.$forceUpdate()
-                    
+                    statelessData.graphMin = currentTime - this.graphRange/2
+                    statelessData.graphMax = currentTime + this.graphRange/2
                     this.getGraphData = ()=>statelessData.graph
                 }
             },
@@ -464,7 +469,7 @@ export default {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
         width: 100vw;
         --bar-measure-width: 5rem;
-        --unhovered-panel-amount: 3rem;
+        --unhovered-panel-amount: 2.8rem;
         --blue: #2196F3;
         --green: #64FFDA;
         --red: #EF5350;
@@ -495,16 +500,29 @@ export default {
         color: white;
         transform: translateY(-50%);
     }
+    .wrapper .bubble {
+        width: 100%;
+        margin-top: 0.8rem;
+        padding: 1.5rem;
+        border-radius: 1rem;
+    }
+    .wrapper .settings-bubble {
+        background: white;
+    }
+    .wrapper .video-selector {
+        background: var(--teal);
+    }
+    
     
     * {
         margin: 0;
         padding: 0;
     }
     
-    .file-picker {
+    .wrapper .file-picker {
         width: 16rem;
         background-color: whitesmoke;
-        border: 1rem solid whitesmoke !important;
+        border: 0.8rem solid whitesmoke !important;
         border-radius: 100vh;
     }
     .corner-popover {
@@ -571,7 +589,7 @@ export default {
     }
     
     .youtube-link-input {
-        margin: 1rem 2rem;
+        margin: 0.8rem 1rem;
     }
     >>>.youtube-link-input input::placeholder {
         color: white;

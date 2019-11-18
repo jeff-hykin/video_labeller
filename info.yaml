@@ -14,12 +14,15 @@
         
     todo:
         - disable the scroll wheel speed increase/decrease
+        - remove the chunk storage
         - use localstorage to save the last-used feature name, multiplier, and skipBack
-        - add a controls section
+        - fix the proportions to work on a smaller screen
+        - add a controls-explaination section
         - add a help section
         - graph:
             - filter the names to be ones that are numbers
         - make save button hide again
+        - have a "unsaved changes" feature, prevent accidental closing
     
     later:
         - add ability to change the save-as name

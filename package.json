@@ -75,7 +75,7 @@
         "moment": "^2.24.0",
         "node-gyp": "^6.0.1",
         "node-pre-gyp": "^0.14.0",
-        "vue": "^2.5.16",
+        "vue": "^2.6.10",
         "vue-apexcharts": "^1.5.1",
         "vue-electron": "^1.0.6",
         "vue-graph": "^0.8.6",
