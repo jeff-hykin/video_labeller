@@ -124,7 +124,7 @@ export default {
         getGraphData: ()=>statelessData.graph,
     }),
     mounted() {
-        window.main = this
+        window.main = this // debugging
         this.pendingRecords = []
         
         // set the rate for the graph to be updated
@@ -212,7 +212,7 @@ export default {
         youtubeLink(url) {
             if (typeof url == 'string') {
                 if (ytdl.validateURL(url)) {
-                    let localPath =  path.resolve(app.getPath("desktop"), path.basename(url))
+                    let localPath =  path.resolve(app.getPath("desktop"), "*Name for Downloaded Video*")
                     let videoPath = dialog.showSaveDialog({ defaultPath: localPath })+'.mp4'
                     let writeStream = fs.createWriteStream(videoPath)
                     writeStream.on('close', ()=>{
