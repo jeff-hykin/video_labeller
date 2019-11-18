@@ -33,9 +33,6 @@ export default {
                 axisTicks: {
                     show: true,
                 },
-                style: {
-                    colors: ['#89DDFF'],
-                },
                 tickAmount: 4,
                 labels: {
                     formatter: each => each.toFixed(2),
@@ -130,5 +127,8 @@ export default {
 .shift-down {
     margin-bottom: -20px;
     margin-top: 12px;
+}
+>>> .apexcharts-xaxis text {
+    fill: rgba(0, 0, 0, 0.3) !important;
 }
 </style>
