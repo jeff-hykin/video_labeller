@@ -1,5 +1,5 @@
 export default class LabelRecord {
-    constructor({records, numberOfChunks, graphFrameRate}) {
+    constructor({records, graphFrameRate}) {
         this.graphFrameRate = graphFrameRate
         if (records == null) {
             this.records = []
@@ -8,29 +8,9 @@ export default class LabelRecord {
         } else {
             this.records = records
         }
-        this.numberOfChunks = numberOfChunks
-        // init the chunks version
-        this.chunks = []
-        for (let i = 0; i < numberOfChunks; i++) {
-            this.chunks.push([])
-        }
-        for (let eachRecord of this.records) {
-            this.addRecordToChunks(eachRecord)
-        }
     }
     toJSON() {
         return this.records
-    }
-    getChunkIndexFor(record) {
-        let [ time, value ] = record
-        return Math.floor( time * this.graphFrameRate )
-    }
-    addRecordToChunks(record) {
-        let index = this.getChunkIndexFor(record)
-        let chunk = this.chunks[index]
-        window.lr = this
-        window.i = index
-        this.chunks[index].push(record)
     }
     addNewRecordSegment(newRecords) {
         if (newRecords.length != 0) {
@@ -73,29 +53,6 @@ export default class LabelRecord {
             
             // create a new record with the new info overwriting the old
             this.records = firstPart.concat(newRecords, lastPart)
-            
-            // remove the middle part from the chunks
-            for (let eachRecord of middlePart) {
-                // remove the record from its chunk
-                this.chunks[this.getChunkIndexFor(eachRecord)].filter(each=>each==eachRecord)
-            }
-            // add the new middle part to the chunks
-            for (let eachRecord of newRecords) {
-                this.addRecordToChunks(eachRecord)
-            }
         }
-    }
-    getSegment(startTime, endTime) {
-        if (startTime < 0) {
-            startTime = 0
-        }
-        let startChunkIndex   = this.getChunkIndexFor([startTime, null])
-        let endChunkIndex     = this.getChunkIndexFor([endTime, null])
-        let startChunk        = this.chunks[startChunkIndex] || []
-        let endChunk          = this.chunks[endChunkIndex] || []
-        let startingRecords   = startChunk.filter(each=>each[0]>=startTime)
-        let endingRecords     = endChunk.filter(each=>each[0]<=endTime)
-        let chunkInnerSegment = this.chunks.filter((each, index)=>index>startChunkIndex && index<endChunkIndex)
-        return startingRecords.concat(...chunkInnerSegment, endingRecords)
     }
 }

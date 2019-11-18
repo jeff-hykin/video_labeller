@@ -22,19 +22,19 @@
             <br><br><br><br>
             <h5>Settings</h5>
             <column class='settings-bubble bubble' shadow=1 align-h=left>
-                <ui-switch v-model="showGraph">Show Graph</ui-switch>
+                <ui-switch v-model="settings.showGraph">Show Graph</ui-switch>
                 <br>
                 <br>
-                <ui-textbox label="Graph Height" v-model="graphHeight" />
+                <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
                 <br>
                 <br>
-                <ui-textbox label="Skip Back Amount (Seconds)" v-model="skipBackAmount" />
+                <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
                 <br>
                 <br>
-                <ui-textbox label="Video Speed Multiplier" v-model="videoSpeedMultiplier" />
+                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
                 <br>
                 <br>
-                <ui-textbox label="Number of seconds graph should show" v-model="graphRange" />
+                <ui-textbox label="Number of seconds graph should show" v-model="settings.graphRange" />
             </column>
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </column>
@@ -64,8 +64,8 @@
                     <input @change="openFolder" type="file" webkitdirectory />
                 </row> -->
                 <!-- Graph -->
-                <div v-if=showGraph class=graph-container >
-                    <graph ref=graph :getData='getGraphData' :height=graphHeight />
+                <div v-if='settings.showGraph' class=graph-container >
+                    <graph ref=graph :getData='getGraphData' :height='settings.graphHeight' />
                 </div>
             </column>
         </div>
@@ -90,6 +90,8 @@ let   app     = remote.app
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
+let localSettingsLocation = "videoLabelerSettings"
+
 export let statelessData = {
     graph:{},
     graphMin: 0,
@@ -108,17 +110,18 @@ export default {
         init: true,
         allowedToCaptureWindowKeypresses: false,
         // settings panel
-        showGraph: false,
-        videoSpeedMultiplier: 1.4,
-        skipBackAmount: 5, // seconds
-        graphRange: 10, // seconds
-        graphHeight: 250, // pixels
+        settings: {
+            showGraph: false,
+            videoSpeedMultiplier: 1.4,
+            skipBackAmount: 5,          // seconds
+            graphRange: 10,             // seconds
+            graphHeight: 250,           // pixels
+        },
         // other
         mouseHeightPercentage: 0,
         youtubeLink: "",
         videoLabelData: null,
         graphFrameRate: 30, // fps
-        numberOfChunks: 1,
         getGraphData: ()=>statelessData.graph,
     }),
     mounted() {
@@ -171,6 +174,7 @@ export default {
                 }
             }
         })
+        this.loadSettings()
     },
     computed: {
         jsonFilePath() {
@@ -185,10 +189,16 @@ export default {
         }
     },
     watch: {
-        graphRange(newValue) {
+        settings: {
+            deep: true,
+            handler(val) {
+                this.saveSettings()
+            }   
+        },
+        'settings.graphRange': function (newValue) {
             newValue && this.updateGraph({force: true, noDataChange:true })
         },
-        showGraph(newValue) {
+        'settings.showGraph': function (newValue) {
             setTimeout(()=>newValue && this.updateGraph({force: true, noDataChange:true }), 0)
         },
         currentVideoFilePath(newValue) {
@@ -252,8 +262,8 @@ export default {
                         }
                     }
                     // extract the time segment from the labels
-                    statelessData.graphMin = currentTime - this.graphRange/2
-                    statelessData.graphMax = currentTime + this.graphRange/2
+                    statelessData.graphMin = currentTime - this.settings.graphRange/2
+                    statelessData.graphMax = currentTime + this.settings.graphRange/2
                     this.getGraphData = ()=>statelessData.graph
                 }
             },
@@ -268,7 +278,6 @@ export default {
                 if (!(this.videoLabelData[this.currentFeatureName] instanceof LabelRecord)) {
                     // create a LabelRecord for it
                     this.videoLabelData[this.currentFeatureName] = new LabelRecord({
-                        numberOfChunks: this.numberOfChunks,
                         graphFrameRate: this.graphFrameRate,
                         records: records
                     })
@@ -343,7 +352,7 @@ export default {
                 let video = this.$refs.video
                 if (video) {
                     this.stopRecoringFeature()
-                    video.currentTime -= this.skipBackAmount
+                    video.currentTime -= this.settings.skipBackAmount
                     this.startRecordingFeature()
                 }
             },
@@ -362,14 +371,26 @@ export default {
                 }
             },
             increaseVideoSpeed() {
-                this.changeVideoSpeed(this.videoSpeedMultiplier)
+                this.changeVideoSpeed(this.settings.videoSpeedMultiplier)
             },
             decreaseVideoSpeed() {
-                this.changeVideoSpeed(1/this.videoSpeedMultiplier)
+                this.changeVideoSpeed(1/this.settings.videoSpeedMultiplier)
             },
         // 
         // other methods
         // 
+            saveSettings() {
+                window.localStorage.setItem(
+                    localSettingsLocation,
+                    JSON.stringify(this.settings)
+                )
+            },
+            loadSettings() {
+                let settings = window.localStorage.getItem(localSettingsLocation)
+                if (typeof settings == 'string') {
+                    this.settings = JSON.parse(settings)
+                }
+            },
             bottomBarHeight() {
                 let output = '0'
                 if (this.$refs.bottomBar) {
@@ -393,6 +414,7 @@ export default {
             chooseFile(e) {
                 this.currentVideoFilePath = e.target.files[0].path
                 this.openVideo()
+                this.loadSettings()
             },
             openVideo() {
                 // reset the video-specific data
@@ -415,7 +437,6 @@ export default {
                 once({
                     isTrue: _=> (this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
                     then: _=> {
-                        this.numberOfChunks = Math.ceil(this.$refs.video.duration * this.graphFrameRate)
 
                         // load up the labels
                         for (let eachKey in newVideoData) {
@@ -424,7 +445,6 @@ export default {
                             if (labelData instanceof Array) {
                                 // then convert it to being a LabelRecord
                                 newVideoData[eachKey] = new LabelRecord({
-                                    numberOfChunks: this.numberOfChunks,
                                     graphFrameRate: this.graphFrameRate,
                                     records: labelData
                                 })
