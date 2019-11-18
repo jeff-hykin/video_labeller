@@ -8,7 +8,7 @@
                 <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
             </column>
             <row align-h=space-between width=100% padding='1rem 0rem'>
-                <ui-textbox placeholder="Name of the feature being labelled" v-model="currentFeatureName" />
+                <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentFeatureName" />
                 <ui-button 
                     @click="saveData"
                     class="save-button"
@@ -102,15 +102,12 @@ export default {
     name: "main-page",
     components: { VueJsonPretty, HowTo, Graph },
     data: ()=>({
-        currentFeatureName: "testFeature1",
-        verifiedFeatureRecord: null,
         // Video data
         currentVideoFilePath: null,
         prevMousePageYPosition: 0,
-        init: true,
-        allowedToCaptureWindowKeypresses: false,
-        // settings panel
+        // saved settings
         settings: {
+            currentFeatureName: "ExampleFeature1",
             showGraph: false,
             videoSpeedMultiplier: 1.4,
             skipBackAmount: 5,          // seconds
@@ -118,6 +115,8 @@ export default {
             graphHeight: 250,           // pixels
         },
         // other
+        init: true,
+        allowedToCaptureWindowKeypresses: false,
         mouseHeightPercentage: 0,
         youtubeLink: "",
         videoLabelData: null,
@@ -275,16 +274,16 @@ export default {
             },
             updateRecordsWith(records) {
                 // if the label doesn't exist yet
-                if (!(this.videoLabelData[this.currentFeatureName] instanceof LabelRecord)) {
+                if (!(this.videoLabelData[this.settings.currentFeatureName] instanceof LabelRecord)) {
                     // create a LabelRecord for it
-                    this.videoLabelData[this.currentFeatureName] = new LabelRecord({
+                    this.videoLabelData[this.settings.currentFeatureName] = new LabelRecord({
                         graphFrameRate: this.graphFrameRate,
                         records: records
                     })
                 // if the label is a LabelRecord
                 } else {
                     // then just add the new data
-                    this.videoLabelData[this.currentFeatureName].addNewRecordSegment(records)
+                    this.videoLabelData[this.settings.currentFeatureName].addNewRecordSegment(records)
                 }
             },
             saveMousePosition(e) {

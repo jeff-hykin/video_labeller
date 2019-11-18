@@ -22,6 +22,7 @@
         - fix the performance issues with >= 3 features:
             - do this by having one static graph in the background (just scrolling)
             - and then another graph that is getting the real time recorded data
+            - or do the stretched out method with CSS scrolling
         - graph:
             - allow toggling the displayed features
             - filter the feature names to be ones that are numbers
