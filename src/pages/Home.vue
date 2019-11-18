@@ -37,9 +37,10 @@
             </row>
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
-                <!-- Graph Switch -->
-                <row align-h=space-between padding=2rem width=100% min-width=min-content>
-                    <column padding=2rem color=white>
+                <!-- Control  -->
+                <row class=control-bar align-h=space-between width=100% min-width=min-content>
+                    <!-- Graph Switch -->
+                    <column color=white>
                         <ui-switch v-model="showGraph">Show Graph</ui-switch>
                     </column>
                     <!-- <input @change="openFolder" type="file" webkitdirectory /> -->

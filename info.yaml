@@ -34,6 +34,7 @@
         gco: git checkout video-image-labeller-stable
         run_ruby: !language/ruby |
             puts 'placeholder text'
+        (setup): ruby setup.rb
     
     paths: &paths
         root: ./
