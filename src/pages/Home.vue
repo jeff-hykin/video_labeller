@@ -1,42 +1,44 @@
 <template>
-    <row class=wrapper align-h=left >
+    <row class=wrapper align-h=left align-v=top>
         <!-- Settings Panel -->
-        <column align-h=left align-v=top v-bind:class="['panel', {init}]" shadow=2>
-            <h5>Video</h5>
-            <column class='video-selector bubble' shadow=1>
-                <input class=file-picker type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
-                <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
-            </column>
-            <row align-h=space-between width=100% padding='1rem 0rem'>
-                <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentFeatureName" />
-                <ui-button 
-                    @click="saveData"
-                    class="save-button"
-                    color="primary"
-                    raised
-                    :style="{marginLeft: '0rem'}"
-                    >
-                    Save
-                </ui-button>
-            </row>
-            <br><br><br><br>
-            <h5>Settings</h5>
-            <column class='settings-bubble bubble' shadow=1 align-h=left>
-                <ui-switch v-model="settings.showGraph">Show Graph</ui-switch>
-                <br>
-                <br>
-                <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
-                <br>
-                <br>
-                <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
-                <br>
-                <br>
-                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
-                <br>
-                <br>
-                <ui-textbox label="Number of seconds graph should show" v-model="settings.graphRange" />
-            </column>
-            <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
+        <column align-h=left align-v=top :class="['panel', {init}]" shadow=2>
+            <div>
+                <h5>Video</h5>
+                <column class='video-selector bubble' shadow=1>
+                    <input class=file-picker type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
+                    <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
+                </column>
+                <row align-h=space-between width=100% padding='1rem 0rem'>
+                    <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentFeatureName" />
+                    <ui-button 
+                        @click="saveData"
+                        class="save-button"
+                        color="primary"
+                        raised
+                        :style="{marginLeft: '0rem'}"
+                        >
+                        Save
+                    </ui-button>
+                </row>
+                <br><br><br><br>
+                <h5>Settings</h5>
+                <column class='settings-bubble bubble' shadow=1 align-h=left>
+                    <ui-switch v-model="settings.showGraph">Show Graph</ui-switch>
+                    <br>
+                    <br>
+                    <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
+                    <br>
+                    <br>
+                    <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
+                    <br>
+                    <br>
+                    <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
+                    <br>
+                    <br>
+                    <ui-textbox label="Number of seconds graph should show" v-model="settings.graphRange" />
+                </column>
+                <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
+            </div>
         </column>
         <!-- Settings panel gost -->
         <div class=panel-ghost ></div>
@@ -591,7 +593,7 @@ export default {
         flex-wrap: nowrap;
         margin: 0;
     }
-    .panel.init {
+    .wrapper .panel.init {
         transform: translateX(0);
     }
     .wrapper .panel {
@@ -601,6 +603,7 @@ export default {
         transition: all 500ms ease-out;
         background-color: whitesmoke;
         height: 100vh;
+        overflow: auto;
         left: 0;
         z-index: 11;
         padding: 2rem 3rem;
