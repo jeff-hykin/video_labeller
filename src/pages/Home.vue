@@ -217,10 +217,12 @@ export default {
                     let writeStream = fs.createWriteStream(videoPath)
                     writeStream.on('close', ()=>{
                         this.$toasted.show(`Finished download`).goAway(2500)
-                        // chop off the first character
-                        this.currentVideoFilePath = videoPath.slice(1,999999999)
-                        this.openVideo()
-                        this.youtubeLink = null
+                        setTimeout(() => {
+                            // chop off the first character
+                            this.currentVideoFilePath = videoPath
+                            this.openVideo()
+                            this.youtubeLink = null
+                        }, 0)
                     })
                     this.$toasted.show(`Starting youtube video download`).goAway(2500)
                     ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
@@ -230,10 +232,10 @@ export default {
     },
     methods: {
             mouseEnter() {
-                this.allowedToCaptureWindowKeypresses = true;
+                this.allowedToCaptureWindowKeypresses = true
             },
             mouseExit() {
-                this.allowedToCaptureWindowKeypresses = false;
+                this.allowedToCaptureWindowKeypresses = false
             },
         // 
         // Data recording methods
@@ -413,7 +415,6 @@ export default {
             chooseFile(e) {
                 this.currentVideoFilePath = e.target.files[0].path
                 this.openVideo()
-                this.loadSettings()
             },
             openVideo() {
                 // reset the video-specific data
@@ -434,7 +435,11 @@ export default {
                 }
                 // wait for the video Element to load
                 once({
-                    isTrue: _=> (this.$refs.video != null) && (this.$refs.video.currentSrc == this.videoFileUrl),
+                    isTrue: _=> {
+                        let currentPlayingPath = this.$refs.video.currentSrc.replace(/file:\/*/, "")
+                        let currentVariablePath = this.videoFileUrl.replace(/file:\/*/, "")
+                        return (this.$refs.video != null) && (currentPlayingPath == currentVariablePath)
+                    },
                     then: _=> {
 
                         // load up the labels
