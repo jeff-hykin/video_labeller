@@ -16,8 +16,13 @@
             3. Open up a video file (bottom bar)
         </p>
         <p>
-            4. Use the spacebar to pause/play the video<br>
-            (the mouse movements are automatically recorded when the video is playing)
+            4. Play the video<br>
+            Mouse movements are automatically recorded when the video is playing<br>
+            Controls:
+            - spacebar: plays/pauses the video
+            - up arrow / w: speeds up the video
+            - down arrow / s: slows down the video
+            - left arrow / a: jumps backwards a few seconds
         </p>
         <p>
             5. Press the blue save button to save the data for that video

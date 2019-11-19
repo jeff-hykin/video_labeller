@@ -15,10 +15,10 @@
         - disable the scroll wheel speed increase/decrease
         - remove the chunk storage
         - fix the proportions to work on a smaller screen
+        - add a controls-explaination section
         
     todo:
         - add a help section
-        - add a controls-explaination section
         - fix the performance issues with >= 3 features:
             - do this by having one static graph in the background (just scrolling)
             - and then another graph that is getting the real time recorded data
