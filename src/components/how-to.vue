@@ -18,11 +18,11 @@
         <p>
             4. Play the video<br>
             Mouse movements are automatically recorded when the video is playing<br>
-            Controls:
-            - spacebar: plays/pauses the video
-            - up arrow / w: speeds up the video
-            - down arrow / s: slows down the video
-            - left arrow / a: jumps backwards a few seconds
+            Controls:<br>
+            - spacebar: plays/pauses the video<br>
+            - up arrow / w: speeds up the video<br>
+            - down arrow / s: slows down the video<br>
+            - left arrow / a: jumps backwards a few seconds<br>
         </p>
         <p>
             5. Press the blue save button to save the data for that video
