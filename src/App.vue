@@ -24,55 +24,21 @@ webFrame.setVisualZoomLevelLimits(1, 3)
 
 
 // 
-// Libraries
+// Plugins
 // 
-
-// Baseline
-import 'css-baseline/css/4.css'
-
-// GoodVue
-import GoodVue from 'good-vue'
-Vue.use(GoodVue)
-
-// KeenUI
-import KeenUI from 'keen-ui'
-import 'keen-ui/dist/keen-ui.css'
-Vue.use(KeenUI)
-
-// VueJsonPretty
-import VueJsonPretty from 'vue-json-pretty'
-
-// VueGraph
-import VueGraph from 'vue-graph'
-import GraphLine3D from 'vue-graph/src/components/line3d.js'
-import NoteWidget from 'vue-graph/src/widgets/note.js'
-import LegendWidget from 'vue-graph/src/widgets/legends.js'
-Vue.component(GraphLine3D.name, GraphLine3D)
-Vue.component(NoteWidget.name, NoteWidget)
-Vue.component(LegendWidget.name, LegendWidget)
-Vue.use(VueGraph)
-
-// Charts
-import VueApexCharts from 'vue-apexcharts'
-Vue.use(VueApexCharts)
-Vue.component('apexchart', VueApexCharts)
-import moment from 'moment'
-window.moment = moment
-
-import Toasted from 'vue-toasted'
-Vue.use(Toasted)
-
-// Routes
-import Router from "vue-router"
-import routes from './routes'
-Vue.use(Router)
+import './plugins/css-baseline'
+import './plugins/good-vue'
+import './plugins/keen-ui'
+import './plugins/vue-apexcharts'
+import './plugins/vue-toasted'
+import './plugins/vue-router'
 
 // 
 // App
 // 
 let App = {
     name: 'video_labeller',
-    components: { App, VueJsonPretty },
+    components: { App },
     router: new Router({routes: routes}),
 }
 // create and attach app
