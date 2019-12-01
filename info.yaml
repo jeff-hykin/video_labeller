@@ -16,8 +16,35 @@
         - remove the chunk storage
         - fix the proportions to work on a smaller screen
         - add a controls-explaination section
-        
+    
+    new-design:
+        - show avalible keys
+        - modes:
+            - mouse mode
+            - keyboard mode
+        - on mode change:
+            - detach, re-attach listeners
+            - change the look of the bar
+        - record previous position value every 1 second
+        - add a marker value on keypress of 1,2, or 3
+        - How to display marker on graph??
+        - controls:
+            shift + back arrow: slow down
+            shift + forward arrow: speed up
+            back arrow: go back 5 seconds
+            forward arrow: go forward 5 sec
+            up arrow: value up
+            down arrow: value down
+            click once: to start recording
+            click again: to stop recording
+            spacebar: play/pause
+            hold down E: to erase recording
+    
     todo:
+        - labels with three keys positive negative or neutral
+        - fix moving to next video without saving
+        - recording mechanizism
+        - show only current feature option
         - add a help section
         - fix the performance issues with >= 3 features:
             - do this by having one static graph in the background (just scrolling)
