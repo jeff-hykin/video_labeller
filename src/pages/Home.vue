@@ -3,11 +3,15 @@
         <!-- Settings Panel -->
         <column align-h=left align-v=top :class="['panel', {init}]" shadow=2>
             <div>
+                <!-- Open Video -->
                 <h5>Video</h5>
                 <column class='video-selector bubble' shadow=1>
                     <input class=file-picker type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
                     <ui-textbox class='youtube-link-input' placeholder="Paste YouTube link" v-model="youtubeLink" />
                 </column>
+                
+                <br><br><br><br>
+                <h5>Features</h5>
                 <row align-h=space-between width=100% padding='1rem 0rem'>
                     <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentFeatureName" />
                     <ui-button 
@@ -20,6 +24,11 @@
                         Save
                     </ui-button>
                 </row>
+                <!-- Labels to display -->
+                <column v-if="showLabels" class='labels-bubble bubble' shadow=1 align-h=left>
+                    <ui-switch v-for="(eachLabel, eachIndex) in labels" :key='eachIndex' v-model="labels[eachIndex]" :label=eachIndex></ui-switch>
+                </column>
+                <!-- Settings -->
                 <br><br><br><br>
                 <h5>Settings</h5>
                 <column class='settings-bubble bubble' shadow=1 align-h=left>
@@ -61,10 +70,6 @@
             </row>
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
-                <!-- Control  -->
-                <!-- <row class=control-bar align-h=space-between width=100% min-width=min-content>
-                    <input @change="openFolder" type="file" webkitdirectory />
-                </row> -->
                 <!-- Graph -->
                 <div v-if='settings.showGraph' class=graph-container >
                     <graph ref=graph :getData='getGraphData' :height='settings.graphHeight' />
@@ -95,7 +100,8 @@ document.body.style.overflow = 'hidden'
 let localSettingsLocation = "videoLabelerSettings"
 
 export let statelessData = {
-    graph:{},
+    graph: {},
+    labels: {},
     graphMin: 0,
     graphMax: 10,
 }
@@ -107,6 +113,7 @@ export default {
         // Video data
         currentVideoFilePath: null,
         prevMousePageYPosition: 0,
+        labels: {},
         // saved settings
         settings: {
             currentFeatureName: "ExampleFeature1",
@@ -130,7 +137,7 @@ export default {
         this.pendingRecords = []
         
         // set the rate for the graph to be updated
-        setInterval(this.updateGraph, 1000/this.graphFrameRate)
+        setInterval(()=>this.updateGraph({force: false}), 1000/this.graphFrameRate)
         // have an initial value that gets turned to false (for css classes)
         setTimeout(_=>this.init = false, 1300)
         // pause the video whenever the mouse goes outside of the frame
@@ -178,6 +185,13 @@ export default {
         this.loadSettings()
     },
     computed: {
+        showLabels() {
+            if (Object.keys(this.labels).length > 0) {
+                return true
+            } else {
+                return false
+            }
+        },
         jsonFilePath() {
             let directory = path.dirname(this.currentVideoFilePath)
             let basename = path.basename(this.currentVideoFilePath)
@@ -197,10 +211,10 @@ export default {
             }   
         },
         'settings.graphRange': function (newValue) {
-            newValue && this.updateGraph({force: true, noDataChange:true })
+            newValue && this.updateGraph({noDataChange:true})
         },
         'settings.showGraph': function (newValue) {
-            setTimeout(()=>newValue && this.updateGraph({force: true, noDataChange:true }), 0)
+            setTimeout(()=>newValue && this.updateGraph({noDataChange:true}), 0)
         },
         currentVideoFilePath(newValue) {
             if (this.$refs.video) {
@@ -230,6 +244,13 @@ export default {
                     ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
                 }
             }
+        },
+        labels: {
+            deep: true,
+            handler(val) {
+                statelessData.labels = val
+                this.updateGraph()
+            }   
         }
     },
     methods: {
@@ -243,8 +264,16 @@ export default {
         // Data recording methods
         // 
             updateGraph(input) {
-                let force        = input && input.force
-                let noDataChange = input && input.noDataChange
+                let force = true
+                let noDataChange = false
+                if (input != null) {
+                    if (input.force != null) {
+                        force = input.force
+                    }
+                    if (input.noDataChange != null) {
+                        noDataChange = input.noDataChange
+                    }
+                }
                 
                 if (this.$refs.video && this.videoLabelData && (force || !this.isPaused())) {
                     let currentTime  = this.$refs.video.currentTime
@@ -261,7 +290,7 @@ export default {
                         // get the data into a graph-digestible form
                         statelessData.graph = {}
                         for (let each in this.videoLabelData) {
-                            statelessData.graph [each] = this.videoLabelData[each].records
+                            statelessData.graph[each] = this.videoLabelData[each].records
                         }
                     }
                     // extract the time segment from the labels
@@ -334,7 +363,7 @@ export default {
                 }
             },
             onVideoSeek() {
-                this.updateGraph({force:true, noDataChange: true})
+                this.updateGraph({noDataChange: true})
             },
             onPlayVideo(e) {
                 this.startRecordingFeature()
@@ -443,7 +472,6 @@ export default {
                         return (this.$refs.video != null) && (currentPlayingPath == currentVariablePath)
                     },
                     then: _=> {
-
                         // load up the labels
                         for (let eachKey in newVideoData) {
                             let labelData = JSON.parse( JSON.stringify( newVideoData[eachKey]))
@@ -458,7 +486,12 @@ export default {
                         }
                         // once all the LabelRecords are created, update the video data
                         this.videoLabelData = newVideoData
-                        this.updateGraph({force:true})
+                        let labels = {}
+                        for (let each in newVideoData) {
+                            labels[each] = true
+                        }
+                        this.labels = labels
+                        this.updateGraph()
                     },
                 })
                
@@ -477,12 +510,13 @@ export default {
 }
 
 </script>
-<style scoped>
+<style lang='scss' scoped>
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
     @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap');
     
-    .ui-button {
-        padding: 0.8em 1.7em;
+    * {
+        margin: 0;
+        padding: 0;
     }
     
     video {
@@ -490,6 +524,16 @@ export default {
         width: auto;
     }
     
+    .ui-button {
+        padding: 0.8em 1.7em;
+    } 
+    
+    .file-picker {
+        width: 16rem;
+        background-color: whitesmoke;
+        border: 0.8rem solid whitesmoke !important;
+        border-radius: 100vh;
+    }
     
     .wrapper {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
@@ -499,132 +543,111 @@ export default {
         --blue: #2196F3;
         --green: #64FFDA;
         --red: #EF5350;
+        
+        .panel {
+            position: fixed;
+            min-width: 22rem;
+            transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
+            transition: all 500ms ease-out;
+            background-color: whitesmoke;
+            height: 100vh;
+            overflow: auto;
+            left: 0;
+            z-index: 11;
+            padding: 2rem 3rem;
+            
+            .bubble {
+                width: 100%;
+                margin-top: 0.8rem;
+                padding: 1.5rem;
+                border-radius: 1rem;
+            }
+            
+            .video-selector {
+                background: var(--teal);
+                
+                .youtube-link-input {
+                    margin: 0.8rem 1rem;
+                }
+                
+                >>>.youtube-link-input {
+                    input::placeholder {
+                        color: white;
+                    }
+                    label {
+                        border-bottom: white solid;
+                    }
+                }
+            }
+            
+            .labels-bubble {
+                background: white;
+            }
+            
+            .settings-bubble {
+                background: white;
+            }
+        }
+        .panel.init {
+            transform: translateX(0);
+        }
+        .panel:hover {
+            transform: translateX(0);
+        }
+        .panel-ghost {
+            min-width: var(--unhovered-panel-amount);
+        }
+        
+        .main-area {
+            height: 100vh;
+            flex-grow: 1;
+            justify-content: space-between;
+            align-items: flex-start;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            margin: 0;
+            
+            .video-area {
+                height: -webkit-fill-available;
+                width: -webkit-fill-available;
+                
+                .bar-measure-container {
+                    min-width: 3rem;
+                    height: 100%;
+                    background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
+                    
+                    .bar-cursor {
+                        z-index: 1;
+                        width: fit-content;
+                        height: fit-content;
+                        padding: 0.5rem 1rem 0.5rem calc(0.5rem + var(--unhovered-panel-amount));
+                        background: var(--red);
+                        border: white 4px solid;
+                        border-radius: 100vh;
+                        box-sizing: content-box;
+                        left: 0;
+                        color: white;
+                        transform: translateY(-50%);
+                    }
+                }
+            }
+            
+            .bottom-bar {
+                z-index: 10;
+                min-height: fit-content;
+                width: calc(100vw - var(--unhovered-panel-amount));
+                box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
+                max-width: 100vw;
+                position: relative;
+                background-color: var(--teal);
+                /* transition: all 500ms ease-out; */
+                
+                .graph-container {
+                    width: 100%;
+                }
+            }
+        }
     }
     
-    .wrapper .bar-measure-container {
-        min-width: 3rem;
-        height: 100%;
-        background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
-    }
-    .wrapper .bar-measure {
-        height: calc(20vh + 2px);
-        margin-top: -1px;
-        margin-bottom: -1px;
-        width: var(--bar-measure-width);
-        opacity: 0.5;
-    }
-    .wrapper .bar-cursor {
-        z-index: 1;
-        width: fit-content;
-        height: fit-content;
-        padding: 0.5rem 1rem 0.5rem calc(0.5rem + var(--unhovered-panel-amount));
-        background: var(--red);
-        border: white 4px solid;
-        border-radius: 100vh;
-        box-sizing: content-box;
-        left: 0;
-        color: white;
-        transform: translateY(-50%);
-    }
-    .wrapper .bubble {
-        width: 100%;
-        margin-top: 0.8rem;
-        padding: 1.5rem;
-        border-radius: 1rem;
-    }
-    .wrapper .settings-bubble {
-        background: white;
-    }
-    .wrapper .video-selector {
-        background: var(--teal);
-    }
-    
-    
-    * {
-        margin: 0;
-        padding: 0;
-    }
-    
-    .wrapper .file-picker {
-        width: 16rem;
-        background-color: whitesmoke;
-        border: 0.8rem solid whitesmoke !important;
-        border-radius: 100vh;
-    }
-    .corner-popover {
-        font-family: Roboto;
-        font-weight: 100;
-        font-size: 14pt;
-        margin-left: 1rem;
-        margin-right: 1rem;
-        color: #eeeeee;
-        text-decoration: underline;
-    }
-    .json-popover {
-        min-height: 7rem;
-        min-width: 30vw;
-        width: 20rem;
-        overflow: auto;
-    }
-    .video-area {
-        height: -webkit-fill-available;
-        width: -webkit-fill-available;
-    }
-    .wrapper .bottom-bar {
-        z-index: 10;
-        min-height: fit-content;
-        width: calc(100vw - var(--unhovered-panel-amount));
-        box-shadow: rgba(0, 0, 0, -0.86) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
-        max-width: 100vw;
-        position: relative;
-        background-color: var(--teal);
-        /* transition: all 500ms ease-out; */
-    }
-    .control-bar {
-        padding: 1rem 3rem;
-    }
-    .main-area {
-        height: 100vh;
-        flex-grow: 1;
-        justify-content: space-between;
-        align-items: flex-start;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        margin: 0;
-    }
-    .wrapper .panel.init {
-        transform: translateX(0);
-    }
-    .wrapper .panel {
-        position: fixed;
-        min-width: 22rem;
-        transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
-        transition: all 500ms ease-out;
-        background-color: whitesmoke;
-        height: 100vh;
-        overflow: auto;
-        left: 0;
-        z-index: 11;
-        padding: 2rem 3rem;
-    }
-    .panel:hover {
-        transform: translateX(0);
-    }
-    .wrapper .panel-ghost {
-        min-width: var(--unhovered-panel-amount);
-    }
-    
-    .youtube-link-input {
-        margin: 0.8rem 1rem;
-    }
-    >>>.youtube-link-input input::placeholder {
-        color: white;
-    }
-    >>>.youtube-link-input label {
-        border-bottom: white solid;
-    }
-    .graph-container {
-        width: 100%;
-    }
 </style>

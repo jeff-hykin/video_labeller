@@ -94,14 +94,17 @@ export default {
             this.chartOptions.xaxis.min = statelessData.graphMin-0
             this.chartOptions.xaxis.max = statelessData.graphMax-0
             if (newValue instanceof Function) {
-                let data = newValue()
+                let data = statelessData.graph
                 let series = []
                 if (data instanceof Object) {
                     for (let each in data) {
-                        series.push({
-                            name: each,
-                            data: data[each]
-                        })
+                        // if the label for it is turned on
+                        if (statelessData.labels[each]) {
+                            series.push({
+                                name: each,
+                                data: data[each]
+                            })
+                        }
                     }
                 }
                 this.series = series
