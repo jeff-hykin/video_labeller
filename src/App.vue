@@ -31,7 +31,10 @@ import './plugins/good-vue'
 import './plugins/keen-ui'
 import './plugins/vue-apexcharts'
 import './plugins/vue-toasted'
-import './plugins/vue-router'
+import { Router } from './plugins/vue-router'
+
+// routes
+import routes from './routes'
 
 // 
 // App
@@ -39,7 +42,7 @@ import './plugins/vue-router'
 let App = {
     name: 'video_labeller',
     components: { App },
-    router: new Router({routes: routes}),
+    router: new Router({ routes }),
 }
 // create and attach app
 setTimeout(()=>(new (Vue.extend(App))).$mount('#app'),0)
