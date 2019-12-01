@@ -99,7 +99,7 @@ export default {
                 if (data instanceof Object) {
                     for (let each in data) {
                         // if the label for it is turned on
-                        if (statelessData.labels[each]) {
+                        if (statelessData.labels[each] !== false) {
                             series.push({
                                 name: each,
                                 data: data[each]
