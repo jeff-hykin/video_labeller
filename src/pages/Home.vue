@@ -35,6 +35,15 @@
                     <ui-switch v-model="settings.showGraph">Show Graph</ui-switch>
                     <br>
                     <br>
+                    <ui-radio-group
+                        name="Input Mode"
+                        :options="modeOptions"
+                        v-model="settings.inputMode"
+                        >
+                        Input Mode
+                    </ui-radio-group>
+                    <br>
+                    <br>
                     <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
                     <br>
                     <br>
@@ -55,8 +64,8 @@
         <div class=main-area @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <row class=video-area align-h=left align-v=top>
                 <!-- Mouse Height-Measure Bar -->
-                <column ref=mouseMeasure class=bar-measure-container shadow=2>
-                    <div class=bar-cursor :style="`position: absolute; top: ${prevMousePageYPosition}px;`" >
+                <column ref=barMeasure class=bar-measure-container shadow=2>
+                    <div class=bar-cursor :style="`position: absolute; top: ${barCursorPosition}px;`" >
                         {{Math.floor(mouseHeightPercentage*100)}}%
                     </div>
                 </column>
@@ -117,6 +126,7 @@ export default {
         // saved settings
         settings: {
             currentFeatureName: "ExampleFeature1",
+            inputMode: "Mouse",
             showGraph: false,
             videoSpeedMultiplier: 1.4,
             skipBackAmount: 5,          // seconds
@@ -131,6 +141,16 @@ export default {
         videoLabelData: null,
         graphFrameRate: 30, // fps
         getGraphData: ()=>statelessData.graph,
+        modeOptions: [
+            {
+                label: 'Keyboard',
+                value: 'Keyboard'
+            },
+            {
+                label: 'Mouse',
+                value: 'Mouse'
+            },
+        ],
     }),
     mounted() {
         window.main = this // debugging
@@ -201,7 +221,12 @@ export default {
             if (this.currentVideoFilePath) {
                 return `file://${this.currentVideoFilePath}`
             }
-        }
+        },
+        barCursorPosition() {
+            if (this.settings.inputMode == "Mouse") {
+                return this.prevMousePageYPosition
+            }
+        },
     },
     watch: {
         settings: {
@@ -323,8 +348,8 @@ export default {
             saveMousePosition(e) {
                 let videoElement = this.$refs.video
                 let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
-                if (this.$refs.mouseMeasure) {
-                    let range = this.$refs.mouseMeasure.$el.clientHeight
+                if (this.$refs.barMeasure) {
+                    let range = this.$refs.barMeasure.$el.clientHeight
                     if (yPosition > range) {
                         this.mouseHeightPercentage = 0
                     } else {
