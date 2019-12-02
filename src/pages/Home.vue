@@ -521,7 +521,7 @@ export default {
     }
     
     // variables for child elements
-    >>>,.wrapper {
+    .wrapper , ::v-deep {
         --bar-measure-width: 5rem;
         --unhovered-panel-amount: 2.8rem;
         --blue: #2196F3;
