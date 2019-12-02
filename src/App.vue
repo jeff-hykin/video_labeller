@@ -32,6 +32,7 @@ import './plugins/keen-ui'
 import './plugins/vue-apexcharts'
 import './plugins/vue-toasted'
 import './plugins/self-listener'
+import './plugins/window-listener'
 import { Router } from './plugins/vue-router'
 
 // routes
