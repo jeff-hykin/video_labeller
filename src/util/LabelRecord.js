@@ -1,6 +1,5 @@
 export default class LabelRecord {
-    constructor({records, graphFrameRate}) {
-        this.graphFrameRate = graphFrameRate
+    constructor({records}) {
         if (records == null) {
             this.records = []
         } else if (!(records instanceof Array)) {

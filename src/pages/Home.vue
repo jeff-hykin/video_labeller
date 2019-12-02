@@ -275,7 +275,9 @@ export default {
                     }
                 }
                 
-                if (this.$refs.video && this.videoLabelData && (force || !this.isPaused())) {
+                let videoExists = this.$refs.video && this.videoLabelData
+                let notPaused = !this.isPaused()
+                if (videoExists && (force || notPaused)) {
                     let currentTime  = this.$refs.video.currentTime
                     if (!noDataChange) {
                         if (this.pendingRecords.length > 0) {
@@ -310,7 +312,6 @@ export default {
                 if (!(this.videoLabelData[this.settings.currentFeatureName] instanceof LabelRecord)) {
                     // create a LabelRecord for it
                     this.videoLabelData[this.settings.currentFeatureName] = new LabelRecord({
-                        graphFrameRate: this.graphFrameRate,
                         records: records
                     })
                 // if the label is a LabelRecord
@@ -479,7 +480,6 @@ export default {
                             if (labelData instanceof Array) {
                                 // then convert it to being a LabelRecord
                                 newVideoData[eachKey] = new LabelRecord({
-                                    graphFrameRate: this.graphFrameRate,
                                     records: labelData
                                 })
                             }
