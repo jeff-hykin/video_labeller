@@ -9,10 +9,10 @@
 <script>
 import { settingsPanel } from "@/components/settings-panel"
 
-export let barMeasure
 
+export let barMeasure
 export default {
-    name: 'bar-measure',
+    name: 'barMeasure',
     beforeCreate() {
         // attach to variable since this component is a singleton
         barMeasure = this
@@ -23,6 +23,7 @@ export default {
         barCursorContent: "",
         // recording 
         mouseHeightPercent: 0,
+        arrowValue: 0,
         // listeners
         listenFor$: {
             updateBar({barCursorHeightPercent, barCursorContent}) {
@@ -33,15 +34,34 @@ export default {
         windowListeners$: {
             // save the location of the mouse
             mousemove(eventObj) {
-                let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
-                if (newMouseHeightPercent > 1) {
-                    newMouseHeightPercent = 1
-                } else if (newMouseHeightPercent < 0) {
-                    newMouseHeightPercent = 0
+                // only in mouse mode, keep track of mouse position
+                if (settingsPanel.settings.inputMode == "Mouse") {
+                    let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
+                    if (newMouseHeightPercent > 1) {
+                        newMouseHeightPercent = 1
+                    } else if (newMouseHeightPercent < 0) {
+                        newMouseHeightPercent = 0
+                    }
+                    // if there was a change
+                    if (newMouseHeightPercent !== this.mouseHeightPercent) {
+                        this.mouseHeightPercent = newMouseHeightPercent
+                    }
                 }
-                // if there was a change
-                if (newMouseHeightPercent !== this.mouseHeightPercent) {
-                    this.mouseHeightPercent = newMouseHeightPercent
+            },
+            keydown(eventObj) {
+                // only in keyboard mode, keep track of arrowValue position
+                if (settingsPanel.settings.inputMode == "Mouse") {
+                    // TODO: improve this
+                    // basically if not inside of an input box
+                    if (window.allowedToCaptureWindowKeypresses) {
+                        if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
+                            eventObj.preventDefault()
+                            this.arrowValue += 1
+                        } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
+                            eventObj.preventDefault()
+                            this.arrowValue -= 1
+                        }
+                    }
                 }
             },
         }
@@ -51,11 +71,20 @@ export default {
         //  connect to settings
         // 
         if (settingsPanel.settings.inputMode == "Mouse") {
-                console.log(`inputMode = Mouse`)
+            console.log(`inputMode = Mouse`)
         }
         settingsPanel.$watch('settings.inputMode',  (newValue) => {
-            console.log(`settings.inputMode is:`,newValue)
+            // reset the arrow value
+            this.arrowValue = 0
         })
+    },
+    watch: {
+        arrowValue() {
+            console.log(`arrowValue is:`,this.arrowValue)
+        },
+        mouseHeightPercent() {
+            console.log(`mouseHeightPercent is:`,this.mouseHeightPercent)
+        }
     },
     computed: {
         barCursorPosition() {

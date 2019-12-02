@@ -28,7 +28,7 @@
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
                     <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek @mousemove="featureManager.mouseMove" controls>
+                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek controls>
                         <source :src="videoFileUrl" type="video/mp4">
                     </video>
                 </column>
@@ -118,11 +118,11 @@ export default {
                     } else if (eventObj.code == 'ArrowRight') {
                         eventObj.preventDefault()
                     } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
-                        eventObj.preventDefault()
-                        this.increaseVideoSpeed()
+                        // eventObj.preventDefault()
+                        // this.increaseVideoSpeed()
                     } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
-                        eventObj.preventDefault()
-                        this.decreaseVideoSpeed()
+                        // eventObj.preventDefault()
+                        // this.decreaseVideoSpeed()
                     } else if (eventObj.code == 'BracketRight') {
                     } else if (eventObj.code == 'BracketLeft') {
                         
@@ -214,9 +214,11 @@ export default {
     methods: {
             mouseEnter() {
                 this.allowedToCaptureWindowKeypresses = true
+                window.allowedToCaptureWindowKeypresses = true
             },
             mouseExit() {
                 this.allowedToCaptureWindowKeypresses = false
+                window.allowedToCaptureWindowKeypresses = false
             },
         // 
         // Data recording methods
