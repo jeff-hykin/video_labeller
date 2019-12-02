@@ -18,7 +18,9 @@
             <br /><br /><br /><br />
             <h5>Settings</h5>
             <column class="settings-bubble bubble" shadow="1" align-h="left">
-                <ui-switch v-model="settings.showGraph">Show Graph</ui-switch>
+                <ui-switch v-model="settings.showGraph">
+                    Show Graph
+                </ui-switch>
                 <br />
                 <br />
                 <ui-radio-group name="Input Mode" :options="modeOptions" v-model="settings.inputMode">

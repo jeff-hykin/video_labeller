@@ -41,14 +41,9 @@
             hold down E: to erase recording
     todo:
         - fix up barMeasure:
-            - fix the mouse positioning:
-                - have barCursor handle the getting of the mouse position from window relative to barCursor
-            - add a barMeasure mixin?:
-                - have it listen for changes to settings
-                - or upgrade the settings manager into a component
-            - have the bar measure also handle recording the keyboard up/down value:
-                - have the value reset whenever the settings switches it
             - have it set the recorder value
+        
+        - have the recording method use two seperate keys, one for mouse, one for 
         
         - remap controls, make them external:
             shift + back arrow: slow down
@@ -78,6 +73,7 @@
         - add marker
         - eraser feature in LabelRecord
         - eraser feature keybinding
+        - optimize graph display by having non-active features stored in graph-display form
     
     objectives:
         - labels with three keys positive negative or neutral
