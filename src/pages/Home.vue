@@ -64,15 +64,16 @@
         <div class=main-area @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <row class=video-area align-h=left align-v=top>
                 <!-- Mouse Height-Measure Bar -->
-                <column ref=barMeasure class=bar-measure-container shadow=2>
+                <bar-measure />
+                <!-- <column ref=barMeasure class=bar-measure-container shadow=2>
                     <div class=bar-cursor :style="`position: absolute; top: ${barCursorPosition}px;`" >
                         {{Math.floor(mouseHeightPercentage*100)}}%
                     </div>
-                </column>
+                </column> -->
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
                     <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek controls>
+                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek @mousemove="featureManager.mouseMove" controls>
                         <source :src="videoFileUrl" type="video/mp4">
                     </video>
                 </column>
@@ -93,12 +94,19 @@ import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import path from 'path'
 import ytdl from 'ytdl-core'
-import HowTo from '../components/how-to'
-import Graph from '../components/graph'
-import { onWheelFlick, binSearch, once } from '../util/all'
-import LabelRecord from '../util/LabelRecord'
-import WindowListenerMixin from '../util/window-listener-mixin'
-import SettingsMixin from '../components/settings-manager'
+
+// utils
+import { onWheelFlick, binSearch, once } from '@/util/all'
+import WindowListenerMixin from '@/util/window-listener-mixin'
+import LabelRecord from '@/util/LabelRecord'
+
+// components/mixins
+import HowTo from '@/components/how-to'
+import Graph from '@/components/graph'
+import BarMeasure from '@/components/bar-measure'
+import SettingsMixin from '@/components/settings-manager'
+import FeatureMixin from '@/components/feature-manager'
+
 
 let   util    = require("util")
 const readdir = util.promisify(fs.readdir)
@@ -117,8 +125,8 @@ export let statelessData = {
 
 export default {
     name: "main-page",
-    components: { VueJsonPretty, HowTo, Graph },
-    mixins: [ SettingsMixin, WindowListenerMixin ],
+    components: { VueJsonPretty, HowTo, Graph, BarMeasure },
+    mixins: [ SettingsMixin, WindowListenerMixin, FeatureMixin ],
     data: ()=>({
         // Video data
         currentVideoFilePath: null,

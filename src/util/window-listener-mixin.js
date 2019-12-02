@@ -1,6 +1,3 @@
-import Vue from 'vue'
-Vue.prototype.$windowListeners = {}
-
 export default {
     data: ()=>({
         windowListeners$: {}
