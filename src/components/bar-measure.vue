@@ -7,7 +7,7 @@
 </template>
 
 <script>
-
+import { settingsPanel } from "@/components/settings-panel"
 
 export let barMeasure
 
@@ -18,17 +18,45 @@ export default {
         barMeasure = this
     },
     data: ()=>({
-        // data
+        // bar data
         barCursorHeightPercent: 0,
         barCursorContent: "",
+        // recording 
+        mouseHeightPercent: 0,
         // listeners
         listenFor$: {
             updateBar({barCursorHeightPercent, barCursorContent}) {
                 this.barCursorHeightPercent = barCursorHeightPercent
                 this.barCursorContent = barCursorContent
             }
+        },
+        windowListeners$: {
+            // save the location of the mouse
+            mousemove(eventObj) {
+                let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
+                if (newMouseHeightPercent > 1) {
+                    newMouseHeightPercent = 1
+                } else if (newMouseHeightPercent < 0) {
+                    newMouseHeightPercent = 0
+                }
+                // if there was a change
+                if (newMouseHeightPercent !== this.mouseHeightPercent) {
+                    this.mouseHeightPercent = newMouseHeightPercent
+                }
+            },
         }
     }),
+    mounted() {
+        // 
+        //  connect to settings
+        // 
+        if (settingsPanel.settings.inputMode == "Mouse") {
+                console.log(`inputMode = Mouse`)
+        }
+        settingsPanel.$watch('settings.inputMode',  (newValue) => {
+            console.log(`settings.inputMode is:`,newValue)
+        })
+    },
     computed: {
         barCursorPosition() {
             try {

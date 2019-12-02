@@ -39,8 +39,47 @@
             click again: to stop recording
             spacebar: play/pause
             hold down E: to erase recording
-    
     todo:
+        - fix up barMeasure:
+            - fix the mouse positioning:
+                - have barCursor handle the getting of the mouse position from window relative to barCursor
+            - add a barMeasure mixin?:
+                - have it listen for changes to settings
+                - or upgrade the settings manager into a component
+            - have the bar measure also handle recording the keyboard up/down value:
+                - have the value reset whenever the settings switches it
+            - have it set the recorder value
+        
+        - remap controls, make them external:
+            shift + back arrow: slow down
+            shift + forward arrow: speed up
+            back arrow: go back 5 seconds
+            forward arrow: go forward 5 sec
+            up arrow: value up
+            down arrow: value down
+            spacebar: play/pause
+            
+        - add a start/stop click event inside feature manager:
+            - figure out how to merge window listeners
+        
+        - extract video events into seperate singlton component:
+            - trigger the start/stop/play
+            - trigger finishedOpening and extract the callback out of openVideo()
+        
+        - fill out feature-manager:
+            - move videoLabelData into the manager
+            - create external facing method for replacing temp datapoints in this.pendingRecords[]
+            - pull in the code from openVideo, load data from file, create method for saving data on button click
+            - add loop for recording previous value every 1 sec
+        
+        - ask about saving before opening new video
+        - start/stop recording in LabelRecord
+        - convert start/stop to null in graph, extract out graph operations
+        - add marker
+        - eraser feature in LabelRecord
+        - eraser feature keybinding
+    
+    objectives:
         - labels with three keys positive negative or neutral
         - fix moving to next video without saving
         - recording mechanizism
@@ -54,7 +93,6 @@
             - allow toggling the displayed features
             - filter the feature names to be ones that are numbers
         - make save button hide again
-        - have a "unsaved changes" feature, prevent accidental closing
     
     later:
         - add ability to change the save-as name

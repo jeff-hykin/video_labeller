@@ -28,13 +28,13 @@ export default {
     watch: {
         // whenever the feature value is changed, tell the bar to update
         'featureManager.featureValue': function (newVal) {
-            barMeasure.tell$({say:'updateBar', from:'featureManager', args:[{
-                barCursorHeightPercent: this.featureManager.featureValue,
-                barCursorContent: `${Math.round(this.featureManager.featureValue*100)}%`
-            }]})
+            // barMeasure.tell$({say:'updateBar', from:'featureManager', args:[{
+            //     barCursorHeightPercent: this.featureManager.featureValue,
+            //     barCursorContent: `${Math.round(this.featureManager.featureValue*100)}%`
+            // }]})
         },
         'settings.inputMode': function (newVal) {
-            
+            console.log(`newVal is:`,newVal)
         }
     },
     mounted() {
