@@ -11,6 +11,16 @@ export default {
             graphRange: 10, // seconds
             graphHeight: 250, // pixels
         },
+        modeOptions: [
+            {
+                label: 'Keyboard',
+                value: 'Keyboard'
+            },
+            {
+                label: 'Mouse',
+                value: 'Mouse'
+            },
+        ],
     }),
     mounted() {
         this.loadSettings()

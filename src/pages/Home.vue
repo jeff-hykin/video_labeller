@@ -97,6 +97,7 @@ import HowTo from '../components/how-to'
 import Graph from '../components/graph'
 import { onWheelFlick, binSearch, once } from '../util/all'
 import LabelRecord from '../util/LabelRecord'
+import WindowListenerMixin from '../util/window-listener-mixin'
 import SettingsMixin from '../components/settings-manager'
 
 let   util    = require("util")
@@ -117,7 +118,7 @@ export let statelessData = {
 export default {
     name: "main-page",
     components: { VueJsonPretty, HowTo, Graph },
-    mixins: [ SettingsMixin ],
+    mixins: [ SettingsMixin, WindowListenerMixin ],
     data: ()=>({
         // Video data
         currentVideoFilePath: null,
@@ -131,16 +132,42 @@ export default {
         videoLabelData: null,
         graphFrameRate: 30, // fps
         getGraphData: ()=>statelessData.graph,
-        modeOptions: [
-            {
-                label: 'Keyboard',
-                value: 'Keyboard'
+        
+        windowListeners$: {
+            mousemove(eventObj) {
+                this.prevMousePageYPosition = eventObj.pageY
+                this.saveMousePosition(eventObj)
             },
-            {
-                label: 'Mouse',
-                value: 'Mouse'
+            click(eventObj) {
+                // if video is playing
+                if (!this.isPaused()) {
+                    e.preventDefault()
+                    this.pauseVideo()
+                }
             },
-        ],
+            keydown(eventObj) {
+                if (this.allowedToCaptureWindowKeypresses) {
+                    if (eventObj.code == 'Space') {
+                        eventObj.preventDefault()
+                        this.togglePlayPause()
+                    } else if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
+                        eventObj.preventDefault()
+                        this.skipBack()
+                    } else if (eventObj.code == 'ArrowRight') {
+                        eventObj.preventDefault()
+                    } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
+                        eventObj.preventDefault()
+                        this.increaseVideoSpeed()
+                    } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
+                        eventObj.preventDefault()
+                        this.decreaseVideoSpeed()
+                    } else if (eventObj.code == 'BracketRight') {
+                    } else if (eventObj.code == 'BracketLeft') {
+                        
+                    }
+                }
+            }
+        }
     }),
     mounted() {
         window.main = this // debugging
@@ -153,44 +180,6 @@ export default {
         // pause the video whenever the mouse goes outside of the frame
         document.body.addEventListener('mouseleave', (e)=>{
             this.pauseVideo()
-        })
-        // record the mouse movements whenever the video is playing
-        window.addEventListener('mousemove', (e)=>{
-            this.prevMousePageYPosition = e.pageY
-            this.saveMousePosition(e)
-        })
-        window.addEventListener('click', (e)=>{
-            // if video is playing
-            if (!this.isPaused()) {
-                e.preventDefault()
-                this.pauseVideo()
-            }
-        })
-        window.addEventListener('wheel', (e)=>{
-            // uncomment this to allow the scroll to control the video speed
-            // onWheelFlick(e, ()=>this.videoLabelData&&this.increaseVideoSpeed(), ()=>this.videoLabelData&&this.decreaseVideoSpeed())
-        })
-        window.addEventListener('keydown', (e)=>{
-            if (this.allowedToCaptureWindowKeypresses) {
-                if (e.code == 'Space') {
-                    e.preventDefault()
-                    this.togglePlayPause()
-                } else if (e.code == 'ArrowLeft' || e.key == 'a') {
-                    e.preventDefault()
-                    this.skipBack()
-                } else if (e.code == 'ArrowRight') {
-                    e.preventDefault()
-                } else if (e.code == 'ArrowUp' || e.key == 'w') {
-                    e.preventDefault()
-                    this.increaseVideoSpeed()
-                } else if (e.code == 'ArrowDown' || e.key == 's') {
-                    e.preventDefault()
-                    this.decreaseVideoSpeed()
-                } else if (e.code == 'BracketRight') {
-                } else if (e.code == 'BracketLeft') {
-                    
-                }
-            }
         })
     },
     computed: {
