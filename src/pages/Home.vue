@@ -97,6 +97,7 @@ import HowTo from '../components/how-to'
 import Graph from '../components/graph'
 import { onWheelFlick, binSearch, once } from '../util/all'
 import LabelRecord from '../util/LabelRecord'
+import SettingsMixin from '../components/settings-manager'
 
 let   util    = require("util")
 const readdir = util.promisify(fs.readdir)
@@ -105,8 +106,6 @@ let   app     = remote.app
 
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
-
-let localSettingsLocation = "videoLabelerSettings"
 
 export let statelessData = {
     graph: {},
@@ -118,21 +117,12 @@ export let statelessData = {
 export default {
     name: "main-page",
     components: { VueJsonPretty, HowTo, Graph },
+    mixins: [ SettingsMixin ],
     data: ()=>({
         // Video data
         currentVideoFilePath: null,
         prevMousePageYPosition: 0,
         labels: {},
-        // saved settings
-        settings: {
-            currentFeatureName: "ExampleFeature1",
-            inputMode: "Mouse",
-            showGraph: false,
-            videoSpeedMultiplier: 1.4,
-            skipBackAmount: 5,          // seconds
-            graphRange: 10,             // seconds
-            graphHeight: 250,           // pixels
-        },
         // other
         init: true,
         allowedToCaptureWindowKeypresses: false,
@@ -202,7 +192,6 @@ export default {
                 }
             }
         })
-        this.loadSettings()
     },
     computed: {
         showLabels() {
@@ -229,12 +218,6 @@ export default {
         },
     },
     watch: {
-        settings: {
-            deep: true,
-            handler(val) {
-                this.saveSettings()
-            }   
-        },
         'settings.graphRange': function (newValue) {
             newValue && this.updateGraph({noDataChange:true})
         },
@@ -437,18 +420,6 @@ export default {
         // 
         // other methods
         // 
-            saveSettings() {
-                window.localStorage.setItem(
-                    localSettingsLocation,
-                    JSON.stringify(this.settings)
-                )
-            },
-            loadSettings() {
-                let settings = window.localStorage.getItem(localSettingsLocation)
-                if (typeof settings == 'string') {
-                    this.settings = JSON.parse(settings)
-                }
-            },
             bottomBarHeight() {
                 let output = '0'
                 if (this.$refs.bottomBar) {
@@ -560,14 +531,18 @@ export default {
         border-radius: 100vh;
     }
     
-    .wrapper {
-        background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
-        width: 100vw;
+    // variables for child elements
+    >>>,.wrapper {
         --bar-measure-width: 5rem;
         --unhovered-panel-amount: 2.8rem;
         --blue: #2196F3;
         --green: #64FFDA;
         --red: #EF5350;
+    }
+    
+    .wrapper {
+        background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
+        width: 100vw;
         
         .panel {
             position: fixed;
@@ -636,26 +611,6 @@ export default {
             .video-area {
                 height: -webkit-fill-available;
                 width: -webkit-fill-available;
-                
-                .bar-measure-container {
-                    min-width: 3rem;
-                    height: 100%;
-                    background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);
-                    
-                    .bar-cursor {
-                        z-index: 1;
-                        width: fit-content;
-                        height: fit-content;
-                        padding: 0.5rem 1rem 0.5rem calc(0.5rem + var(--unhovered-panel-amount));
-                        background: var(--red);
-                        border: white 4px solid;
-                        border-radius: 100vh;
-                        box-sizing: content-box;
-                        left: 0;
-                        color: white;
-                        transform: translateY(-50%);
-                    }
-                }
             }
             
             .bottom-bar {
