@@ -37,6 +37,12 @@ export default {
                 this.recordValue(newCurrentValue)
             }
         })
+        // every 1 second of play time, add a record even if the user hasnt done anything
+        setInterval(() => {
+            if (!videoComponent.paused) {
+                this.recordValue(barMeasure.currentValue())
+            }
+        }, 1000)
     },
     computed: {
         jsonFilePath() {

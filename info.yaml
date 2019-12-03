@@ -19,6 +19,7 @@
     
     todo:
         - have the recording method use two seperate keys, one for mouse, one for keyboard
+        - bug after toggling current feature, seems to create duplicates
         
         - remap controls, make them external:
             shift + back arrow: slow down

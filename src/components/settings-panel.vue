@@ -1,7 +1,11 @@
 <template>
     <column align-h="left" align-v="top" :class="['panel', { init }]" shadow="2">
         <div>
-            <slot name="header" />
+            <h5>Video</h5>
+            <column class="video-selector bubble" shadow="1">
+                <input class="file-picker" type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
+                <ui-textbox class="youtube-link-input" placeholder="Paste YouTube link" v-model="youtubeLink" />
+            </column>
 
             <br /><br /><br /><br />
             <h5>Features</h5>
@@ -54,6 +58,7 @@ export default {
         settingsPanel = this
     },
     data: () => ({
+        youtubeLink:"",
         settings: {
             currentFeatureName: "ExampleFeature1",
             inputMode: "Mouse",
@@ -87,6 +92,24 @@ export default {
                 this.saveSettings()
             },
         },
+        youtubeLink(url) {
+            if (typeof url == 'string') {
+                if (ytdl.validateURL(url)) {
+                    let localPath =  path.resolve(app.getPath("desktop"), "*Name for Downloaded Video*")
+                    let videoPath = dialog.showSaveDialog({ defaultPath: localPath })+'.mp4'
+                    let writeStream = fs.createWriteStream(videoPath)
+                    writeStream.on('close', ()=>{
+                        this.$toasted.show(`Finished download`).goAway(2500)
+                        setTimeout(() => {
+                            videoComponent.currentVideoFilePath = videoPath
+                            this.youtubeLink = null
+                        }, 0)
+                    })
+                    this.$toasted.show(`Starting youtube video download`).goAway(2500)
+                    ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
+                }
+            }
+        },
     },
     methods: {
         saveSettings() {
@@ -101,7 +124,10 @@ export default {
         },
         saveData(...args) {
             this.$emit("saveData",args)
-        }
+        },
+        chooseFile(e) {
+            videoComponent.currentVideoFilePath = e.target.files[0].path
+        },
     },
 }
 </script>
@@ -125,7 +151,30 @@ export default {
         padding: 1.5rem;
         border-radius: 1rem;
     }
+    
+    .video-selector {
+        background: var(--teal);
+        
+        .file-picker {
+            width: 16rem;
+            background-color: whitesmoke;
+            border: 0.8rem solid whitesmoke !important;
+            border-radius: 100vh;
+        }
 
+        .youtube-link-input {
+            margin: 0.8rem 1rem;
+        }
+
+        >>> .youtube-link-input {
+            input::placeholder {
+                color: white;
+            }
+            label {
+                border-bottom: white solid;
+            }
+        }
+    }
 
     .labels-bubble {
         background: white;

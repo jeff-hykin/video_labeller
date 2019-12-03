@@ -2,14 +2,6 @@
     <row class=wrapper align-h=left align-v=top>
         <!-- Settings Panel -->
         <settings-panel>
-            <!-- Open Video -->
-            <template v-slot:header>
-                <h5>Video</h5>
-                <column class="video-selector bubble" shadow="1">
-                    <input class="file-picker" type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
-                    <ui-textbox class="youtube-link-input" placeholder="Paste YouTube link" v-model="youtubeLink" />
-                </column>
-            </template>
             <!-- Labels -->
             <template v-slot:labels>
                 <!-- Labels to display -->
@@ -72,7 +64,7 @@ document.body.style.overflow = 'hidden'
 // create window listeners
 let windowListeners$ = {
      keydown(eventObj) {
-        if (this.allowedToCaptureWindowKeypresses) {
+        if (window.allowedToCaptureWindowKeypresses) {
             if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
                 eventObj.preventDefault()
             } else if (eventObj.code == 'ArrowRight') {
@@ -101,8 +93,6 @@ export default {
         videoComponent,
         // other
         allowedToCaptureWindowKeypresses: false,
-        youtubeLink: "",
-        
         windowListeners$
     }),
     mounted() {
@@ -122,51 +112,13 @@ export default {
             }
         },
     },
-    watch: {
-        youtubeLink(url) {
-            if (typeof url == 'string') {
-                if (ytdl.validateURL(url)) {
-                    let localPath =  path.resolve(app.getPath("desktop"), "*Name for Downloaded Video*")
-                    let videoPath = dialog.showSaveDialog({ defaultPath: localPath })+'.mp4'
-                    let writeStream = fs.createWriteStream(videoPath)
-                    writeStream.on('close', ()=>{
-                        this.$toasted.show(`Finished download`).goAway(2500)
-                        setTimeout(() => {
-                            videoComponent.currentVideoFilePath = videoPath
-                            this.youtubeLink = null
-                        }, 0)
-                    })
-                    this.$toasted.show(`Starting youtube video download`).goAway(2500)
-                    ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
-                }
-            }
-        },
-    },
     methods: {
-            mouseEnter() {
-                this.allowedToCaptureWindowKeypresses = true
-                window.allowedToCaptureWindowKeypresses = true
-            },
-            mouseExit() {
-                this.allowedToCaptureWindowKeypresses = false
-                window.allowedToCaptureWindowKeypresses = false
-            },
-        // 
-        // other methods
-        // 
-            chooseFile(e) {
-                videoComponent.currentVideoFilePath = e.target.files[0].path
-            },
-            async openFolder(e) {
-                let folderPath = e.target.files[0].path
-                let files = await readdir(folderPath)
-                let imagePaths = []
-                for (let eachFilePath of files) {
-                    if (eachFilePath.match(/\.png$/)) {
-                        imagePaths.push(eachFilePath)
-                    }
-                }
-            },
+        mouseEnter() {
+            window.allowedToCaptureWindowKeypresses = true
+        },
+        mouseExit() {
+            window.allowedToCaptureWindowKeypresses = false
+        },
     },
 }
 
@@ -187,13 +139,6 @@ export default {
     
     .ui-button {
         padding: 0.8em 1.7em;
-    } 
-    
-    .file-picker {
-        width: 16rem;
-        background-color: whitesmoke;
-        border: 0.8rem solid whitesmoke !important;
-        border-radius: 100vh;
     }
     
     // variables for child elements
@@ -209,22 +154,6 @@ export default {
         background: radial-gradient( ellipse at top left, rgba(255, 255, 255, 1) 40%, rgba(229, 229, 229, .9) 100%);
         width: 100vw;
         
-        .video-selector {
-            background: var(--teal);
-
-            .youtube-link-input {
-                margin: 0.8rem 1rem;
-            }
-
-            >>> .youtube-link-input {
-                input::placeholder {
-                    color: white;
-                }
-                label {
-                    border-bottom: white solid;
-                }
-            }
-        }
         
         .bubble {
             width: 100%;
