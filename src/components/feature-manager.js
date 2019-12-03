@@ -16,6 +16,6 @@ export default {
     watch: {
     },
     mounted() {
-        
+        console.log(`blah`)
     },
 }

@@ -1,6 +1,6 @@
 <template>
     <column ref=barMeasure class=bar-measure-container shadow=2>
-        <div class=bar-cursor :style="`position: absolute; top: ${barCursorPosition}px;`" >
+        <div :class='["bar-cursor",{Keyboard:settings.inputMode=="Keyboard", Mouse:settings.inputMode=="Mouse"}]' :style="`position: absolute; top: ${barCursorPosition()}px;`" >
             {{barCursorContent}}
         </div>
     </column>
@@ -18,12 +18,11 @@ export default {
         barMeasure = this
     },
     data: ()=>({
-        // bar data
-        barCursorHeightPercent: 0,
-        barCursorContent: "",
         // recording 
         mouseHeightPercent: 0,
         arrowValue: 0,
+        // misc
+        settings: {},
         // listeners
         listenFor$: {
             updateBar({barCursorHeightPercent, barCursorContent}) {
@@ -50,7 +49,7 @@ export default {
             },
             keydown(eventObj) {
                 // only in keyboard mode, keep track of arrowValue position
-                if (settingsPanel.settings.inputMode == "Mouse") {
+                if (settingsPanel.settings.inputMode == "Keyboard") {
                     // TODO: improve this
                     // basically if not inside of an input box
                     if (window.allowedToCaptureWindowKeypresses) {
@@ -67,32 +66,57 @@ export default {
         }
     }),
     mounted() {
-        // 
+        this.settings = settingsPanel.settings
+        //
         //  connect to settings
-        // 
-        if (settingsPanel.settings.inputMode == "Mouse") {
-            console.log(`inputMode = Mouse`)
-        }
+        //
         settingsPanel.$watch('settings.inputMode',  (newValue) => {
             // reset the arrow value
-            this.arrowValue = 0
+            if (settingsPanel.settings.inputMode == "Keyboard") {
+                this.arrowValue = 0
+            }
         })
-    },
-    watch: {
-        arrowValue() {
-            console.log(`arrowValue is:`,this.arrowValue)
-        },
-        mouseHeightPercent() {
-            console.log(`mouseHeightPercent is:`,this.mouseHeightPercent)
-        }
+        
+        // the DOM changes a bit after the first load
+        // this is needed for barCursorPosition to get the right clientHeight
+        setTimeout(() => { this.$forceUpdate() }, 0)
     },
     computed: {
-        barCursorPosition() {
-            try {
-                return (1-this.barCursorHeightPercent) * this.$refs.barMeasure.$el.clientHeight
-            } catch (e) {
-                return 0
+        // the external-facing value of the current label
+        recordValue() {
+            if (settingsPanel.settings.inputMode == "Mouse") {
+                return this.mouseHeightPercent
+            } else if (settingsPanel.settings.inputMode == "Keyboard") {
+                // the sigmoid value of the arrow value
+                // https://en.wikipedia.org/wiki/Sigmoid_function
+                return 1/(1 + Math.E**(-this.arrowValue))
+            } else {
+                console.error("settingsPanel.settings.inputMode not recognized 9048540843")
             }
+        },
+        // internal property for computing position
+        // internal property for computing content
+        barCursorContent() {
+            if (settingsPanel.settings.inputMode == "Mouse") {
+                return `${(this.mouseHeightPercent * 100).toFixed(0)}%`
+            } else if (settingsPanel.settings.inputMode == "Keyboard") {
+                return `${this.arrowValue}`
+            } else {
+                console.error("settingsPanel.settings.inputMode not recognized 9048540843")
+            }
+        }
+    },
+    methods: {
+        // this has to be a method because it uses external data (clientHeight)
+        barCursorPosition() {
+            let output = 0
+            let height
+            try {
+                output = (1-this.recordValue) * this.$refs.barMeasure.$el.clientHeight
+            } catch (e) {
+                output = 0
+            }
+            return output
         }
     }
 }
@@ -116,6 +140,12 @@ export default {
         left: 0;
         color: white;
         transform: translateY(-50%);
+    }
+    .bar-cursor.Mouse {
+        transition: top 20ms linear;
+    }
+    .bar-cursor.Keyboard {
+        transition: all 150ms ease;
     }
 }
 </style>
