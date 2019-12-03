@@ -16,50 +16,44 @@
         - remove the chunk storage
         - fix the proportions to work on a smaller screen
         - add a controls-explaination section
-    
-    todo:
-        - toggle recording mode with R
-        - bugs:
-            - calling allRecords repeatedly creates duplicate features
-            - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
-            
-        - add a start/stop click event inside feature manager:
-            - figure out how to merge window listeners
-        
-        - fill out feature-manager:
-            - move videoLabelData into the manager
-            - create external facing method for replacing temp datapoints in this.pendingRecords[]
-            - pull in the code from openVideo, load data from file, create method for saving data on button click
-            - add loop for recording previous value every 1 sec
-        
         - ask about saving before opening new video
-        - start/stop recording in LabelRecord
-        - convert start/stop to null in graph, extract out graph operations
-        - add marker
-        - eraser feature in LabelRecord
-        - eraser feature keybinding
-        - optimize graph display by having non-active features stored in graph-display form
-    
-    objectives:
-        - labels with three keys positive negative or neutral
-        - fix moving to next video without saving
-        - recording mechanizism
-        - show only current feature option
-        - add a help section
-        - fix the performance issues with >= 3 features:
-            - do this by having one static graph in the background (just scrolling)
-            - and then another graph that is getting the real time recorded data
-            - or do the stretched out method with CSS scrolling
         - graph:
             - allow toggling the displayed features
-            - filter the feature names to be ones that are numbers
-        - make save button hide again
+        - make everything modular
+        
+    todo:
+        - bugs:
+            - when a new label is added, the switch for it is not generated in the Features option
+            - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
+        
+        - redo LabelRecord:
+            - fix calling allRecords repeatedly creates duplicate features (edgecase equality)
+            - allow mixing in temp values
+            - allow null features, save duplicate actual value right before adding null
+            - add saftey:
+                - remove triple nulls in a row
+                - check that values are pairwise in order, throw error/sort if theyre not
+        
+        - allow saving null values for feature-doesnt-exist:
+            - have a hold-down option
+            - have a toggle option
+        
+        - add marker feature:
+            - have pressing key instantly place markers
+            - store markers seperately on videoLabelData
+        
+        - update the how-to
+        - add a help button/dialog
+        - improve performance:
+            - have the non-active features be stored in their graph form so mapping isnt needed
+            - have the use-temp-value perform efficiently (push & pop instead of rebuilding list)
+        
+        - improve robust data loading:
+            - filter the feature names to be ones that are formatted correctly for marker/graphs
     
     later:
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
-        - ability to enter a Null value
-        - ability to have a "instant" value or a marker (maybe an M)
         - have the ability to add a list of videos to evaluate in order
     
     commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
