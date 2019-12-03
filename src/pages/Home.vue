@@ -27,26 +27,24 @@
                 <bar-measure />
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
-                    <how-to v-if='!currentVideoFilePath' />
-                    <video ref=video @pause=onPauseVideo @play=onPlayVideo @click=videoClicked @seeking=onVideoSeek controls>
-                        <source :src="videoFileUrl" type="video/mp4">
-                    </video>
+                    <how-to v-if='!videoComponent.currentVideoFilePath' />
+                    <video-component />
                 </column>
             </row>
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
                 <!-- Graph -->
                 <div v-if='settings.showGraph' class=graph-container >
-                    <graph ref=graph :getData='getGraphData' :height='settings.graphHeight' />
+                    <graph ref=graph :height='settings.graphHeight' />
                 </div>
             </column>
         </div>
     </row>
 </template>
 <script>
-import fs, { write } from "fs"
 import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
+import fs, { write } from "fs"
 import path from 'path'
 import ytdl from 'ytdl-core'
 
@@ -56,9 +54,10 @@ import LabelRecord from '@/util/LabelRecord'
 
 // components/mixins
 import HowTo from '@/components/how-to'
-import Graph from '@/components/graph'
+import Graph, {graph} from '@/components/graph'
+import VideoComponent, {videoComponent} from '@/components/video-component'
 import SettingsPanel, {settingsPanel} from "@/components/settings-panel"
-import BarMeasure from '@/components/bar-measure'
+import BarMeasure, {barMeasure} from '@/components/bar-measure'
 import FeatureMixin from '@/components/feature-manager'
 
 
@@ -70,49 +69,25 @@ let   app     = remote.app
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
-export let statelessData = {
-    graph: {},
-    labels: {},
-    graphMin: 0,
-    graphMax: 10,
-}
-
 export default {
     name: "main-page",
-    components: { VueJsonPretty, HowTo, Graph, BarMeasure, SettingsPanel },
+    components: { VueJsonPretty, HowTo, Graph, BarMeasure, SettingsPanel, VideoComponent },
     mixins: [ FeatureMixin ],
     data: ()=>({
-        settings:{},
+        settings: {},
         // Video data
-        currentVideoFilePath: null,
-        prevMousePageYPosition: 0,
-        labels: {},
+        videoComponent,
         // other
         allowedToCaptureWindowKeypresses: false,
-        mouseHeightPercentage: 0,
         youtubeLink: "",
-        videoLabelData: null,
-        graphFrameRate: 30, // fps
-        getGraphData: ()=>statelessData.graph,
         
         windowListeners$: {
             mousemove(eventObj) {
-                this.prevMousePageYPosition = eventObj.pageY
                 this.saveMousePosition(eventObj)
-            },
-            click(eventObj) {
-                // if video is playing
-                if (!this.isPaused()) {
-                    e.preventDefault()
-                    this.pauseVideo()
-                }
             },
             keydown(eventObj) {
                 if (this.allowedToCaptureWindowKeypresses) {
-                    if (eventObj.code == 'Space') {
-                        eventObj.preventDefault()
-                        this.togglePlayPause()
-                    } else if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
+                    if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
                         eventObj.preventDefault()
                         this.skipBack()
                     } else if (eventObj.code == 'ArrowRight') {
@@ -139,20 +114,16 @@ export default {
         // 
         this.settings = settingsPanel.settings
         settingsPanel.$watch('settings.graphRange',  (newValue) => {
-            newValue && this.updateGraph({noDataChange:true})
+            newValue && graph.update({noDataChange:true})
         })
         settingsPanel.$watch('settings.showGraph', (newValue) => {
-            setTimeout(()=>newValue && this.updateGraph({noDataChange:true}), 0)
+            setTimeout(()=>newValue && graph.update({noDataChange:true}), 0)
         })
         
-        
-        this.pendingRecords = []
-        // set the rate for the graph to be updated
-        setInterval(()=>this.updateGraph({force: false}), 1000/this.graphFrameRate)
-        // pause the video whenever the mouse goes outside of the frame
-        document.body.addEventListener('mouseleave', (e)=>{
-            this.pauseVideo()
-        })
+        // 
+        // connect the video
+        // 
+        this.videoComponent = videoComponent
     },
     computed: {
         showLabels() {
@@ -162,27 +133,8 @@ export default {
                 return false
             }
         },
-        jsonFilePath() {
-            let directory = path.dirname(this.currentVideoFilePath)
-            let basename = path.basename(this.currentVideoFilePath)
-            return path.join(directory, basename+".features.json")
-        },
-        videoFileUrl() {
-            if (this.currentVideoFilePath) {
-                return `file://${this.currentVideoFilePath}`
-            }
-        },
     },
     watch: {
-        currentVideoFilePath(newValue) {
-            if (this.$refs.video) {
-                if (newValue) {
-                    this.$refs.video.style.visibility = 'visible'
-                } else {
-                    this.$refs.video.style.visibility = 'hidden'
-                }
-            }
-        },
         youtubeLink(url) {
             if (typeof url == 'string') {
                 if (ytdl.validateURL(url)) {
@@ -192,9 +144,7 @@ export default {
                     writeStream.on('close', ()=>{
                         this.$toasted.show(`Finished download`).goAway(2500)
                         setTimeout(() => {
-                            // chop off the first character
-                            this.currentVideoFilePath = videoPath
-                            this.openVideo()
+                            videoComponent.currentVideoFilePath = videoPath
                             this.youtubeLink = null
                         }, 0)
                     })
@@ -203,13 +153,6 @@ export default {
                 }
             }
         },
-        labels: {
-            deep: true,
-            handler(val) {
-                statelessData.labels = val
-                this.updateGraph()
-            }   
-        }
     },
     methods: {
             mouseEnter() {
@@ -220,126 +163,20 @@ export default {
                 this.allowedToCaptureWindowKeypresses = false
                 window.allowedToCaptureWindowKeypresses = false
             },
-        // 
-        // Data recording methods
-        // 
-            updateGraph(input) {
-                let force = true
-                let noDataChange = false
-                if (input != null) {
-                    if (input.force != null) {
-                        force = input.force
-                    }
-                    if (input.noDataChange != null) {
-                        noDataChange = input.noDataChange
-                    }
-                }
-                
-                let videoExists = this.$refs.video && this.videoLabelData
-                let notPaused = !this.isPaused()
-                if (videoExists && (force || notPaused)) {
-                    let currentTime  = this.$refs.video.currentTime
-                    if (!noDataChange) {
-                        if (this.pendingRecords.length > 0) {
-                            let lastValue = this.pendingRecords[this.pendingRecords.length-1][1]
-                            // add (ficticiously) the last/current data point
-                            // this datapoint will be removed with the next mouse movement
-                            // and if it is never removed it won't harm anything since it is a duplicate
-                            let tempRecord = this.pendingRecords.concat([[currentTime, lastValue]])
-                            // commit the pending changes
-                            this.updateRecordsWith(tempRecord)
-                        }
-                        // get the data into a graph-digestible form
-                        statelessData.graph = {}
-                        for (let each in this.videoLabelData) {
-                            statelessData.graph[each] = this.videoLabelData[each].records
-                        }
-                    }
-                    // extract the time segment from the labels
-                    statelessData.graphMin = currentTime - this.settings.graphRange/2
-                    statelessData.graphMax = currentTime + this.settings.graphRange/2
-                    this.getGraphData = ()=>statelessData.graph
-                }
-            },
-            startRecordingFeature() {
-                this.pendingRecords = []
-            },
-            stopRecoringFeature() {
-                this.updateRecordsWith(this.pendingRecords)
-            },
-            updateRecordsWith(records) {
-                // if the label doesn't exist yet
-                if (!(this.videoLabelData[this.settings.currentFeatureName] instanceof LabelRecord)) {
-                    // create a LabelRecord for it
-                    this.videoLabelData[this.settings.currentFeatureName] = new LabelRecord({
-                        records: records
-                    })
-                // if the label is a LabelRecord
-                } else {
-                    // then just add the new data
-                    this.videoLabelData[this.settings.currentFeatureName].addNewRecordSegment(records)
-                }
-            },
             saveMousePosition(e) {
-                let videoElement = this.$refs.video
-                let yPosition = (e.pageY == null) ? this.prevMousePageYPosition : e.pageY
-                if (this.$refs.barMeasure) {
-                    let range = this.$refs.barMeasure.$el.clientHeight
-                    if (yPosition > range) {
-                        this.mouseHeightPercentage = 0
-                    } else {
-                        this.mouseHeightPercentage = 1 - (yPosition / range)
-                    }
-                }
-                if (videoElement && !videoElement.paused) {
-                    let time = videoElement.currentTime
-                    this.pendingRecords.push([ time, this.mouseHeightPercentage ])
+                if (!videoComponent.paused) {
+                    let time = videoComponent.currentTime
+                    this.pendingRecords.push([ time, barMeasure.recordValue ])
                 }
             },
         // 
         // Video Methods
         //
-            isPaused() {
-                try {
-                    return this.$refs.video.paused
-                } catch (e) {
-                    return true
-                }
-            },
-            togglePlayPause() {
-                let videoElement = this.$refs.video
-                if (videoElement) {
-                    if (videoElement.paused) {
-                        videoElement.play()
-                    } else {
-                        videoElement.pause()
-                    }
-                }
-            },
-            pauseVideo() {
-                try {
-                    this.$refs.video.pause()
-                } catch (e) {
-                    
-                }
-            },
             onVideoSeek() {
-                this.updateGraph({noDataChange: true})
+                graph.update({noDataChange: true})
             },
             onPlayVideo(e) {
-                this.startRecordingFeature()
                 this.saveMousePosition(e)
-            },
-            onPauseVideo() {
-                this.stopRecoringFeature()
-            },
-            onVideoEnd() {
-                this.stopRecoringFeature()
-            },
-            videoClicked(e) {
-                // catch the event and prevent it from going up to the window-clicked event
-                e.stopPropagation()
-                this.togglePlayPause()
             },
             skipBack() {
                 let video = this.$refs.video
@@ -372,77 +209,8 @@ export default {
         // 
         // other methods
         // 
-            bottomBarHeight() {
-                let output = '0'
-                if (this.$refs.bottomBar) {
-                    output = `${this.$refs.bottomBar.$el.clientHeight}px`
-                } else {
-                    setTimeout(_=>this.$forceUpdate(),0)
-                }
-                return output
-            },
-            saveData() {
-                // 
-                // Save the file
-                // 
-                let jsonFilePath = this.jsonFilePath
-                fs.writeFile(jsonFilePath, JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
-                this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
-            },
-            open(link) {
-                this.$electron.shell.openExternal(link)
-            },
             chooseFile(e) {
-                this.currentVideoFilePath = e.target.files[0].path
-                this.openVideo()
-            },
-            openVideo() {
-                // reset the video-specific data
-                this.videoLabelData = {}
-                this.pendingRecords = []
-                // for some reason the source doesn't update itself so this manually updates it if needed
-                this.$refs.video && (this.$refs.video.src = this.videoFileUrl)
-                this.$forceUpdate()
-                // try loading any existing data
-                let filePath = this.jsonFilePath
-                let newVideoData = {}
-                if (fs.existsSync(filePath)) {
-                    try {
-                        newVideoData = JSON.parse(fs.readFileSync(filePath))
-                        this.$toasted.show(`Previous data file loaded`).goAway(2500)
-                    } catch (err) {
-                    }
-                }
-                // wait for the video Element to load
-                once({
-                    isTrue: _=> {
-                        let currentPlayingPath = this.$refs.video.currentSrc.replace(/file:\/*/, "")
-                        let currentVariablePath = this.videoFileUrl.replace(/file:\/*/, "")
-                        return (this.$refs.video != null) && (currentPlayingPath == currentVariablePath)
-                    },
-                    then: _=> {
-                        // load up the labels
-                        for (let eachKey in newVideoData) {
-                            let labelData = JSON.parse( JSON.stringify( newVideoData[eachKey]))
-                            // if its at least kind of formatted correctly
-                            if (labelData instanceof Array) {
-                                // then convert it to being a LabelRecord
-                                newVideoData[eachKey] = new LabelRecord({
-                                    records: labelData
-                                })
-                            }
-                        }
-                        // once all the LabelRecords are created, update the video data
-                        this.videoLabelData = newVideoData
-                        let labels = {}
-                        for (let each in newVideoData) {
-                            labels[each] = true
-                        }
-                        this.labels = labels
-                        this.updateGraph()
-                    },
-                })
-               
+                videoComponent.currentVideoFilePath = e.target.files[0].path
             },
             async openFolder(e) {
                 let folderPath = e.target.files[0].path

@@ -10,7 +10,7 @@
 import { settingsPanel } from "@/components/settings-panel"
 
 
-export let barMeasure
+export let barMeasure = {}
 export default {
     name: 'barMeasure',
     beforeCreate() {

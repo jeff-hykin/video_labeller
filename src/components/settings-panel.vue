@@ -45,9 +45,9 @@
 </template>
 
 <script>
-export let settingsPanel
-
 let localSettingsLocation = "videoLabelerSettings"
+
+export let settingsPanel = {}
 export default {
     name: "settingsPanel",
     beforeCreate() {

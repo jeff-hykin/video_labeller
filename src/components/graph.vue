@@ -4,12 +4,21 @@
 
 <script>
 import LabelRecord from '../util/LabelRecord'
-import {statelessData} from "../pages/Home"
+import { videoComponent } from '@/components/video-component'
+import { featureManager } from '../components/feature-manager'
+import { settingsPanel } from './settings-panel.vue'
 
+export let graph
 export default {
-    props: ['getData', 'height' ],
+    props: [ 'height' ],
+    beforeCreate() {
+        graph = this
+    },
     data: ()=>({
+        data: {},
+        graphFrameRate: 30, // fps
         series: [],
+        
         chartOptions: {
             dataLabels: {
                 enabled: false,
@@ -86,34 +95,44 @@ export default {
             },
         },
     }),
+    mounted() {
+        // set the rate for the graph to be updated
+        setInterval(()=>graph.update({force: false}), 1000/this.graphFrameRate)
+    },
     computed: {
     },
     watch: {
-        getData(newValue, prevValue) {
+        data(newValue) {            
             // convert min and max into numbers
-            this.chartOptions.xaxis.min = statelessData.graphMin-0
-            this.chartOptions.xaxis.max = statelessData.graphMax-0
-            if (newValue instanceof Function) {
-                let data = statelessData.graph
-                let series = []
-                if (data instanceof Object) {
-                    for (let each in data) {
-                        // if the label for it is turned on
-                        if (statelessData.labels[each] !== false) {
-                            series.push({
-                                name: each,
-                                data: data[each]
-                            })
-                        }
+            let series = []
+            if (this.data instanceof Object) {
+                for (let each in this.data) {
+                    // if the label for it is turned on
+                    if (featureManager.labels[each] != false) {
+                        series.push({
+                            name: each,
+                            data: this.data[each]
+                        })
                     }
                 }
-                this.series = series
             }
+            this.series = series
         },
     },
     methods: {
-    },
-    mounted() {
+        update({force=true, noDataChange=false}) {
+            let dataWasChanged = !noDataChange
+            if (videoComponent.exists && featureManager.videoLabelData && (force || !videoComponent.paused)) {
+                let currentTime  = videoComponent.currentTime
+                // update the graph if needed
+                if (dataWasChanged) {
+                    this.data = {...featureManager.allRecords}
+                }
+                // extract the time segment from the labels
+                this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2
+                this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2
+            }
+        }
     },
 }
 </script>
