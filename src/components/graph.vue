@@ -33,13 +33,6 @@ export default {
                     fontSize: "14px",
                 },
             },
-            markers: {
-                size: 6,
-                hover: {
-                    size: 10,
-                },
-                strokeWidth: 0,
-            },
             xaxis: {
                 min: 0,
                 axisBorder: {
@@ -146,11 +139,13 @@ export default {
             let currentTime  = videoComponent.currentTime-0
             this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2;
             this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2;
+            
             // force a refresh
             this.chartOptions = {...this.chartOptions}
+            
         },
         updateData() {
-            let data = featureManager.allRecords
+            let data = featureManager.allRecords()
             let series = []
             for (let each in data) {
                 // if the label for it is turned on

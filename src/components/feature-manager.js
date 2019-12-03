@@ -22,16 +22,20 @@ export default {
         this.pendingRecords = []
         videoComponent.$on("play" , (eventObj)=>{
             this.startRecordingFeature()
-            this.recordCurrentValue()
+            this.recordValue(barMeasure.currentValue())
         })
         videoComponent.$on("pause", (eventObj)=>{
             this.stopRecoringFeature()
         })
-        videoComponent.$on("seek" , (eventObj)=>{})
-        videoComponent.$on("click", (eventObj)=>{})
         // when the video source changes
         videoComponent.$watch("currentVideoFilePath", (eventObj)=>{
             this.loadData()
+        })
+        // whenever the input changes
+        barMeasure.$on('newCurrentValue', (newCurrentValue)=>{
+            if (!videoComponent.paused) {
+                this.recordValue(newCurrentValue)
+            }
         })
     },
     computed: {
@@ -40,6 +44,8 @@ export default {
             let basename = path.basename(videoComponent.currentVideoFilePath)
             return path.join(directory, basename+".features.json")
         },
+    },
+    methods: {
         allRecords() {
             let currentTime  = videoComponent.currentTime
             if (this.pendingRecords.length > 0) {
@@ -56,12 +62,10 @@ export default {
                 dataCopy[each] = dataCopy[each].records
             }
             return dataCopy
-        }
-    },
-    methods: {
-        recordCurrentValue() {
+        },
+        recordValue(value) {
             let time = videoComponent.currentTime-0
-            this.pendingRecords.push([ time, barMeasure.currentValue ])
+            this.pendingRecords.push([ time, value ])
         },
         startRecordingFeature() {
             this.pendingRecords = []

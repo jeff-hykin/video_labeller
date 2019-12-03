@@ -1,7 +1,7 @@
 <template>
     <column ref=barMeasure class=bar-measure-container shadow=2>
         <div :class='["bar-cursor",{Keyboard:settings.inputMode=="Keyboard", Mouse:settings.inputMode=="Mouse"}]' :style="`position: absolute; top: ${barCursorPosition()}px;`" >
-            {{barCursorContent}}
+            {{barCursorContent()}}
         </div>
     </column>
 </template>
@@ -24,12 +24,6 @@ export default {
         // misc
         settings: {},
         // listeners
-        listenFor$: {
-            updateBar({barCursorHeightPercent, barCursorContent}) {
-                this.barCursorHeightPercent = barCursorHeightPercent
-                this.barCursorContent = barCursorContent
-            }
-        },
         windowListeners$: {
             // save the location of the mouse
             mousemove(eventObj) {
@@ -65,6 +59,14 @@ export default {
             },
         }
     }),
+    watch: {
+        arrowValue() {
+            this.$emit("newCurrentValue", this.currentValue())
+        },
+        mouseHeightPercent() {
+            this.$emit("newCurrentValue", this.currentValue())
+        }
+    },
     mounted() {
         this.settings = settingsPanel.settings
         //
@@ -81,7 +83,7 @@ export default {
         // this is needed for barCursorPosition to get the right clientHeight
         setTimeout(() => { this.$forceUpdate() }, 0)
     },
-    computed: {
+    methods: {
         // the external-facing value of the current label
         currentValue() {
             if (settingsPanel.settings.inputMode == "Mouse") {
@@ -104,15 +106,13 @@ export default {
             } else {
                 console.error("settingsPanel.settings.inputMode not recognized 9048540843")
             }
-        }
-    },
-    methods: {
+        },
         // this has to be a method because it uses external data (clientHeight)
         barCursorPosition() {
             let output = 0
             let height
             try {
-                output = (1-this.currentValue) * this.$refs.barMeasure.$el.clientHeight
+                output = (1-this.currentValue()) * this.$refs.barMeasure.$el.clientHeight
             } catch (e) {
                 output = 0
             }
