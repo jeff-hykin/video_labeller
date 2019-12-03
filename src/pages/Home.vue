@@ -520,6 +520,10 @@ export default {
             border-radius: 1rem;
         }
         
+        .labels-bubble {
+            background: white;
+        }
+        
         .panel-ghost {
             min-width: var(--unhovered-panel-amount);
         }
