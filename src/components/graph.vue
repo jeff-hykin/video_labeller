@@ -33,6 +33,13 @@ export default {
                     fontSize: "14px",
                 },
             },
+            markers: {
+                size: 6,
+                hover: {
+                    size: 10,
+                },
+                strokeWidth: 0,
+            },
             xaxis: {
                 min: 0,
                 axisBorder: {

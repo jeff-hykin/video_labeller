@@ -18,10 +18,7 @@
         - add a controls-explaination section
     
     todo:
-        - fix up barMeasure:
-            - have it set the recorder value
-        
-        - have the recording method use two seperate keys, one for mouse, one for 
+        - have the recording method use two seperate keys, one for mouse, one for keyboard
         
         - remap controls, make them external:
             shift + back arrow: slow down
@@ -34,10 +31,6 @@
             
         - add a start/stop click event inside feature manager:
             - figure out how to merge window listeners
-        
-        - extract video events into seperate singlton component:
-            - trigger the start/stop/play
-            - trigger finishedOpening and extract the callback out of openVideo()
         
         - fill out feature-manager:
             - move videoLabelData into the manager
