@@ -50,6 +50,7 @@
 
 <script>
 import { videoComponent } from '@/components/video-component'
+import { featureManager } from './feature-manager'
 
 let localSettingsLocation = "videoLabelerSettings"
 
@@ -128,7 +129,33 @@ export default {
             this.$emit("saveData",args)
         },
         chooseFile(e) {
-            videoComponent.currentVideoFilePath = e.target.files[0].path
+            
+            let setVideoPath = ()=>videoComponent.currentVideoFilePath = e.target.files[0].path
+            
+            if (featureManager.dataIsSaved) {
+                setVideoPath()
+            } else {
+                let timeout = 9500
+                this.$toasted.show(`Data not saved`, {
+                    action:[
+                        {
+                            text : 'Save Now',
+                            onClick : (e, toastObject) => {
+                                toastObject.goAway(0)
+                                this.$emit("saveDataThenLoad", ()=>setVideoPath())
+                            },
+                        },
+                        {
+                            text : 'Open Anyways',
+                            onClick : (e, toastObject) => {
+                                setVideoPath()
+                                toastObject.goAway(0)
+                            },
+                        },
+                    ]
+                })
+            }
+            
         },
     },
 }

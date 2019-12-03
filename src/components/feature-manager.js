@@ -6,6 +6,7 @@ import LabelRecord from '@/util/LabelRecord'
 import { barMeasure } from '@/components/bar-measure'
 import { videoComponent } from '@/components/video-component'
 import { statelessData } from '@/pages/Home.vue'
+import { settingsPanel } from "@/components/settings-panel"
 
 export let featureManager = {}
 export default {
@@ -16,10 +17,21 @@ export default {
         return {
             labels: {},
             videoLabelData: null,
+            dataIsSaved: true,
         }
     },
     mounted() {
         this.pendingRecords = []
+        
+        // when user tries to save the data
+        settingsPanel.$on("saveData" , (eventObj)=>{
+            this.saveData()
+        })
+        // when open new video
+        settingsPanel.$on("saveDataThenLoad" , (eventObj)=>{
+            eventObj()
+        })
+        // when video starts playing, make sure to start recording
         videoComponent.$on("play" , (eventObj)=>{
             this.startRecordingFeature()
             this.recordValue(barMeasure.currentValue())
@@ -75,6 +87,7 @@ export default {
         },
         startRecordingFeature() {
             this.pendingRecords = []
+            this.dataIsSaved = false
         },
         stopRecoringFeature() {
             this.updateRecordsWith(this.pendingRecords)
@@ -99,6 +112,7 @@ export default {
             let jsonFilePath = this.jsonFilePath
             fs.writeFile(jsonFilePath, JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
             this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
+            this.dataIsSaved = true
         },
         loadData() {
             this.videoLabelData = {}
@@ -131,6 +145,7 @@ export default {
             }
             this.labels = labels
             this.videoLabelData = newVideoData
+            this.dataIsSaved = true
         }
     }
 }

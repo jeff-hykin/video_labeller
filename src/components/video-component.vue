@@ -101,7 +101,7 @@ export default {
         changeVideoSpeed(multiplier) {
             if (this.exists) {
                 // increase the speed by the videoSpeedMultiplier
-                let currentRate = video.playbackRate
+                let currentRate = this.$refs.video.playbackRate
                 let newRate = currentRate * multiplier
                 // if the rate is close to 1, then round it to 1 to prevent weird precision errors
                 if (newRate+0.05 > 1 && newRate-0.05 < 1) {

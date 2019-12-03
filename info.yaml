@@ -22,15 +22,6 @@
         - bugs:
             - calling allRecords repeatedly creates duplicate features
             - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
-        
-        - remap controls, make them external:
-            shift + back arrow: slow down
-            shift + forward arrow: speed up
-            back arrow: go back 5 seconds
-            forward arrow: go forward 5 sec
-            up arrow: value up
-            down arrow: value down
-            spacebar: play/pause
             
         - add a start/stop click event inside feature manager:
             - figure out how to merge window listeners
