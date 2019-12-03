@@ -34,8 +34,8 @@
             <!-- The bottom bar -->
             <column class=bottom-bar ref=bottomBar align-h=center >
                 <!-- Graph -->
-                <div v-if='settings.showGraph' class=graph-container >
-                    <graph ref=graph :height='settings.graphHeight' />
+                <div v-show='settings.showGraph' class=graph-container >
+                    <graph :height='settings.graphHeight' />
                 </div>
             </column>
         </div>
@@ -58,7 +58,7 @@ import Graph, {graph} from '@/components/graph'
 import VideoComponent, {videoComponent} from '@/components/video-component'
 import SettingsPanel, {settingsPanel} from "@/components/settings-panel"
 import BarMeasure, {barMeasure} from '@/components/bar-measure'
-import FeatureMixin from '@/components/feature-manager'
+import FeatureMixin, {featureManager} from '@/components/feature-manager'
 
 
 let   util    = require("util")
@@ -68,6 +68,28 @@ let   app     = remote.app
 
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
+
+// create window listeners
+let windowListeners$ = {
+     keydown(eventObj) {
+        if (this.allowedToCaptureWindowKeypresses) {
+            if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
+                eventObj.preventDefault()
+            } else if (eventObj.code == 'ArrowRight') {
+                eventObj.preventDefault()
+            } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
+                // eventObj.preventDefault()
+                // this.increaseVideoSpeed()
+            } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
+                // eventObj.preventDefault()
+                // this.decreaseVideoSpeed()
+            } else if (eventObj.code == 'BracketRight') {
+            } else if (eventObj.code == 'BracketLeft') {
+                
+            }
+        }
+    }
+}
 
 export default {
     name: "main-page",
@@ -81,48 +103,14 @@ export default {
         allowedToCaptureWindowKeypresses: false,
         youtubeLink: "",
         
-        windowListeners$: {
-            mousemove(eventObj) {
-                this.saveMousePosition(eventObj)
-            },
-            keydown(eventObj) {
-                if (this.allowedToCaptureWindowKeypresses) {
-                    if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
-                        eventObj.preventDefault()
-                        this.skipBack()
-                    } else if (eventObj.code == 'ArrowRight') {
-                        eventObj.preventDefault()
-                    } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
-                        // eventObj.preventDefault()
-                        // this.increaseVideoSpeed()
-                    } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
-                        // eventObj.preventDefault()
-                        // this.decreaseVideoSpeed()
-                    } else if (eventObj.code == 'BracketRight') {
-                    } else if (eventObj.code == 'BracketLeft') {
-                        
-                    }
-                }
-            }
-        }
+        windowListeners$
     }),
     mounted() {
-        window.main = this // debugging
-        
-        // 
+        // debugging
+        window.main = this 
         // connect the settings panel
-        // 
         this.settings = settingsPanel.settings
-        settingsPanel.$watch('settings.graphRange',  (newValue) => {
-            newValue && graph.update({noDataChange:true})
-        })
-        settingsPanel.$watch('settings.showGraph', (newValue) => {
-            setTimeout(()=>newValue && graph.update({noDataChange:true}), 0)
-        })
-        
-        // 
         // connect the video
-        // 
         this.videoComponent = videoComponent
     },
     computed: {
@@ -162,49 +150,6 @@ export default {
             mouseExit() {
                 this.allowedToCaptureWindowKeypresses = false
                 window.allowedToCaptureWindowKeypresses = false
-            },
-            saveMousePosition(e) {
-                if (!videoComponent.paused) {
-                    let time = videoComponent.currentTime
-                    this.pendingRecords.push([ time, barMeasure.recordValue ])
-                }
-            },
-        // 
-        // Video Methods
-        //
-            onVideoSeek() {
-                graph.update({noDataChange: true})
-            },
-            onPlayVideo(e) {
-                this.saveMousePosition(e)
-            },
-            skipBack() {
-                let video = this.$refs.video
-                if (video) {
-                    this.stopRecoringFeature()
-                    video.currentTime -= this.settings.skipBackAmount
-                    this.startRecordingFeature()
-                }
-            },
-            changeVideoSpeed(multiplier) {
-                let video = this.$refs.video
-                if (video) {
-                    // increase the speed by the videoSpeedMultiplier
-                    let currentRate = video.playbackRate
-                    let newRate = currentRate * multiplier
-                    // if the rate is close to 1, then round it to 1 to prevent weird precision errors
-                    if (newRate+0.05 > 1 && newRate-0.05 < 1) {
-                        newRate = 1
-                    }
-                    video.playbackRate = newRate
-                    this.$toasted.show(`Speed x${newRate.toFixed(2)}`).goAway(1000)
-                }
-            },
-            increaseVideoSpeed() {
-                this.changeVideoSpeed(this.settings.videoSpeedMultiplier)
-            },
-            decreaseVideoSpeed() {
-                this.changeVideoSpeed(1/this.settings.videoSpeedMultiplier)
             },
         // 
         // other methods

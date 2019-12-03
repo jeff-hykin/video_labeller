@@ -8,6 +8,7 @@
 import path from 'path'
 
 import { featureManager } from "@/components/feature-manager"
+import { settingsPanel } from './settings-panel.vue'
 
 export let videoComponent = {}
 export default {
@@ -89,7 +90,33 @@ export default {
                     videoElement.pause()
                 }
             }
-        }
+        },
+        skipBack() {
+            if (this.exists) {
+                this.togglePlayPause()
+                this.$refs.video.currentTime -= settingsPanel.settings.skipBackAmount
+                this.togglePlayPause()
+            }
+        },
+        changeVideoSpeed(multiplier) {
+            if (this.exists) {
+                // increase the speed by the videoSpeedMultiplier
+                let currentRate = video.playbackRate
+                let newRate = currentRate * multiplier
+                // if the rate is close to 1, then round it to 1 to prevent weird precision errors
+                if (newRate+0.05 > 1 && newRate-0.05 < 1) {
+                    newRate = 1
+                }
+                this.$refs.video.playbackRate = newRate
+                this.$toasted.show(`Speed x${newRate.toFixed(2)}`).goAway(1000)
+            }
+        },
+        increaseVideoSpeed() {
+            this.changeVideoSpeed(settingsPanel.settings.videoSpeedMultiplier)
+        },
+        decreaseVideoSpeed() {
+            this.changeVideoSpeed(1/settingsPanel.settings.videoSpeedMultiplier)
+        },
     },
 }
 </script>

@@ -83,7 +83,7 @@ export default {
     },
     computed: {
         // the external-facing value of the current label
-        recordValue() {
+        currentValue() {
             if (settingsPanel.settings.inputMode == "Mouse") {
                 return this.mouseHeightPercent
             } else if (settingsPanel.settings.inputMode == "Keyboard") {
@@ -112,7 +112,7 @@ export default {
             let output = 0
             let height
             try {
-                output = (1-this.recordValue) * this.$refs.barMeasure.$el.clientHeight
+                output = (1-this.currentValue) * this.$refs.barMeasure.$el.clientHeight
             } catch (e) {
                 output = 0
             }

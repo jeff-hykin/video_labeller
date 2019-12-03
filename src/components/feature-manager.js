@@ -3,7 +3,6 @@ import fs, { write } from "fs"
 import path from 'path'
 
 import LabelRecord from '@/util/LabelRecord'
-import { graph } from '@/components/graph'
 import { barMeasure } from '@/components/bar-measure'
 import { videoComponent } from '@/components/video-component'
 import { statelessData } from '@/pages/Home.vue'
@@ -23,6 +22,7 @@ export default {
         this.pendingRecords = []
         videoComponent.$on("play" , (eventObj)=>{
             this.startRecordingFeature()
+            this.recordCurrentValue()
         })
         videoComponent.$on("pause", (eventObj)=>{
             this.stopRecoringFeature()
@@ -33,18 +33,6 @@ export default {
         videoComponent.$watch("currentVideoFilePath", (eventObj)=>{
             this.loadData()
         })
-    },
-    watch: {
-        // whenever there is a top-level change is videoLabelData, update the graph
-        videoLabelData() {
-            graph.update({force: true})
-        },
-        labels: {
-            deep: true,
-            handler(val) {
-                graph.update({})
-            }   
-        }
     },
     computed: {
         jsonFilePath() {
@@ -71,6 +59,10 @@ export default {
         }
     },
     methods: {
+        recordCurrentValue() {
+            let time = videoComponent.currentTime-0
+            this.pendingRecords.push([ time, barMeasure.currentValue ])
+        },
         startRecordingFeature() {
             this.pendingRecords = []
         },
