@@ -20,9 +20,12 @@
             Mouse movements are automatically recorded when the video is playing<br>
             Controls:<br>
             - spacebar: plays/pauses the video<br>
-            - up arrow / w: speeds up the video<br>
-            - down arrow / s: slows down the video<br>
             - left arrow / a: jumps backwards a few seconds<br>
+            - right arrow / d: jumps forwards a few seconds<br>
+            - shift + left arrow / a: slows down the video<br>
+            - shift + right arrow / d: speeds up the video<br>
+            - up arrow / w: increment the recorded value<br>
+            - down arrow / s: decrement the recorded value<br>
         </p>
         <p>
             5. Press the blue save button to save the data for that video

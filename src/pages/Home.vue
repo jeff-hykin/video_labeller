@@ -61,23 +61,54 @@ let   app     = remote.app
 // prevent scrollbars that shouldn't be there
 document.body.style.overflow = 'hidden'
 
-// create window listeners
+// 
+// Controls
+// 
 let windowListeners$ = {
-     keydown(eventObj) {
+    mousemove(eventObj) {
+        barMeasure.updateMouseValue(eventObj)
+    },
+    keydown(eventObj) {
+        let shiftKeyIsPressed = eventObj.shiftKey
         if (window.allowedToCaptureWindowKeypresses) {
-            if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
+            // [Space]
+            if (eventObj.code == 'Space') {
                 eventObj.preventDefault()
-            } else if (eventObj.code == 'ArrowRight') {
-                eventObj.preventDefault()
+                videoComponent.togglePlayPause()
+            // <-
+            } else if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
+                if (shiftKeyIsPressed) {
+                    eventObj.preventDefault()
+                    videoComponent.decreaseVideoSpeed()
+                } else {
+                    eventObj.preventDefault()
+                    videoComponent.skipBack()
+                }
+            // ->
+            } else if (eventObj.code == 'ArrowRight' || eventObj.key == 'd') {
+                if (shiftKeyIsPressed) {
+                    eventObj.preventDefault()
+                    videoComponent.increaseVideoSpeed()
+                } else {
+                    eventObj.preventDefault()
+                    videoComponent.skipForward()
+                }
+            // ↑
             } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
-                // eventObj.preventDefault()
-                // this.increaseVideoSpeed()
+                eventObj.preventDefault()
+                barMeasure.incrementKeyboardValue()
+            // ↓
             } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
-                // eventObj.preventDefault()
-                // this.decreaseVideoSpeed()
-            } else if (eventObj.code == 'BracketRight') {
+                eventObj.preventDefault()
+                barMeasure.decrementKeyboardValue()
+            // [
             } else if (eventObj.code == 'BracketLeft') {
-                
+                eventObj.preventDefault()
+                videoComponent.decreaseVideoSpeed()
+            // ]
+            } else if (eventObj.code == 'BracketRight') {
+                eventObj.preventDefault()
+                videoComponent.increaseVideoSpeed()
             }
         }
     }

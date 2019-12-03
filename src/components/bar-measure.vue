@@ -23,41 +23,6 @@ export default {
         arrowValue: 0,
         // misc
         settings: {},
-        // listeners
-        windowListeners$: {
-            // save the location of the mouse
-            mousemove(eventObj) {
-                // only in mouse mode, keep track of mouse position
-                if (settingsPanel.settings.inputMode == "Mouse") {
-                    let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
-                    if (newMouseHeightPercent > 1) {
-                        newMouseHeightPercent = 1
-                    } else if (newMouseHeightPercent < 0) {
-                        newMouseHeightPercent = 0
-                    }
-                    // if there was a change
-                    if (newMouseHeightPercent !== this.mouseHeightPercent) {
-                        this.mouseHeightPercent = newMouseHeightPercent
-                    }
-                }
-            },
-            keydown(eventObj) {
-                // only in keyboard mode, keep track of arrowValue position
-                if (settingsPanel.settings.inputMode == "Keyboard") {
-                    // TODO: improve this
-                    // basically if not inside of an input box
-                    if (window.allowedToCaptureWindowKeypresses) {
-                        if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
-                            eventObj.preventDefault()
-                            this.arrowValue += 1
-                        } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
-                            eventObj.preventDefault()
-                            this.arrowValue -= 1
-                        }
-                    }
-                }
-            },
-        }
     }),
     watch: {
         arrowValue() {
@@ -68,10 +33,10 @@ export default {
         }
     },
     mounted() {
-        this.settings = settingsPanel.settings
         //
         //  connect to settings
         //
+        this.settings = settingsPanel.settings
         settingsPanel.$watch('settings.inputMode',  (newValue) => {
             // reset the arrow value
             if (settingsPanel.settings.inputMode == "Keyboard") {
@@ -84,6 +49,30 @@ export default {
         setTimeout(() => { this.$forceUpdate() }, 0)
     },
     methods: {
+        updateMouseValue(eventObj) {
+            if (settingsPanel.settings.inputMode == "Mouse") {
+                let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
+                if (newMouseHeightPercent > 1) {
+                    newMouseHeightPercent = 1
+                } else if (newMouseHeightPercent < 0) {
+                    newMouseHeightPercent = 0
+                }
+                // if there was a change
+                if (newMouseHeightPercent !== this.mouseHeightPercent) {
+                    this.mouseHeightPercent = newMouseHeightPercent
+                }
+            }
+        },
+        decrementKeyboardValue() {
+            if (settingsPanel.settings.inputMode == "Keyboard") {
+                this.arrowValue -= 1
+            }
+        },
+        incrementKeyboardValue() {
+            if (settingsPanel.settings.inputMode == "Keyboard") {
+                this.arrowValue += 1
+            }
+        },
         // the external-facing value of the current label
         currentValue() {
             if (settingsPanel.settings.inputMode == "Mouse") {

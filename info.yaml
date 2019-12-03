@@ -18,8 +18,10 @@
         - add a controls-explaination section
     
     todo:
-        - have the recording method use two seperate keys, one for mouse, one for keyboard
-        - bug after toggling current feature, seems to create duplicates
+        - toggle recording mode with R
+        - bugs:
+            - calling allRecords repeatedly creates duplicate features
+            - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         
         - remap controls, make them external:
             shift + back arrow: slow down

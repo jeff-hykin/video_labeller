@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { videoComponent } from '@/components/video-component'
+
 let localSettingsLocation = "videoLabelerSettings"
 
 export let settingsPanel = {}

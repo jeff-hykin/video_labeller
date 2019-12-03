@@ -15,6 +15,9 @@ export default {
     name: "videoComponent",
     beforeCreate() {
         videoComponent = this
+        // 
+        // create getters
+        // 
         Object.defineProperties(this,{
             paused: {get() {
                 try {
@@ -37,16 +40,6 @@ export default {
     },
     data: ()=>({
         currentVideoFilePath: null,
-        windowListeners$: {
-            keydown(eventObj) {
-                if (window.allowedToCaptureWindowKeypresses) {
-                    if (eventObj.code == 'Space') {
-                        eventObj.preventDefault()
-                        this.togglePlayPause()
-                    }
-                }
-            }
-        }
     }),
     watch: {
         // when the path updates, then open up the new video
@@ -81,21 +74,28 @@ export default {
         onClick(eventObj) {
             this.$emit("click", eventObj)
         },
-        togglePlayPause() {
+        async togglePlayPause() {
             let videoElement = this.$refs.video
             if (videoElement) {
                 if (videoElement.paused) {
-                    videoElement.play()
+                    return videoElement.play()
                 } else {
-                    videoElement.pause()
+                    return videoElement.pause()
                 }
             }
         },
-        skipBack() {
+        async skipBack() {
             if (this.exists) {
-                this.togglePlayPause()
+                await this.togglePlayPause()
                 this.$refs.video.currentTime -= settingsPanel.settings.skipBackAmount
-                this.togglePlayPause()
+                return await this.togglePlayPause()
+            }
+        },
+        async skipForward() {
+            if (this.exists) {
+                await this.togglePlayPause()
+                this.$refs.video.currentTime += settingsPanel.settings.skipBackAmount
+                return await this.togglePlayPause()
             }
         },
         changeVideoSpeed(multiplier) {
