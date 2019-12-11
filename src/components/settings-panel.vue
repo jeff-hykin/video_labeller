@@ -166,7 +166,7 @@ export default {
     position: fixed;
     min-width: 22rem;
     transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
-    transition: all 500ms ease-out;
+    transition: transform 500ms ease-out;
     background-color: whitesmoke;
     height: 100vh;
     overflow: auto;
