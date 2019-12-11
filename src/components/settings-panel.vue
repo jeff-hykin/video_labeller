@@ -63,7 +63,7 @@ export default {
     data: () => ({
         youtubeLink:"",
         settings: {
-            currentLabelName: "ExampleFeature1",
+            currentLabelName: "ExampleLabel1",
             inputMode: "Mouse",
             showGraph: false,
             videoSpeedMultiplier: 1.4,
