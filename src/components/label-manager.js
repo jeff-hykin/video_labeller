@@ -8,6 +8,8 @@ import { videoComponent } from '@/components/video-component'
 import { statelessData } from '@/pages/Home.vue'
 import { settingsPanel } from "@/components/settings-panel"
 
+let streak = []
+
 export let labelManager = {}
 export default {
     beforeCreate() {
@@ -15,14 +17,13 @@ export default {
     },
     data() {
         return {
-            labels: {},
-            videoLabelData: null,
+            streak: [],
+            labelToggles: {},
+            labels: [],
             dataIsSaved: true,
         }
     },
     mounted() {
-        this.pendingRecords = []
-        
         // when user tries to save the data
         settingsPanel.$on("saveData" , (eventObj)=>{
             this.saveData()
@@ -56,14 +57,12 @@ export default {
             }
         }, 1000)
     },
-    computed: {
+    methods: {
         jsonFilePath() {
             let directory = path.dirname(videoComponent.currentVideoFilePath)
             let basename = path.basename(videoComponent.currentVideoFilePath)
             return path.join(directory, basename+".labels.json")
         },
-    },
-    methods: {
         allRecords() {
             let currentTime  = videoComponent.currentTime
             if (this.pendingRecords.length > 0) {
@@ -109,7 +108,7 @@ export default {
             // 
             // Save the file
             // 
-            let jsonFilePath = this.jsonFilePath
+            let jsonFilePath = this.jsonFilePath()
             fs.writeFile(jsonFilePath, JSON.stringify(this.videoLabelData), _=>console.log(`data written to ${jsonFilePath}`))
             this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
             this.dataIsSaved = true
@@ -118,7 +117,7 @@ export default {
             this.videoLabelData = {}
             this.pendingRecords = []
             // try loading any existing data
-            let filePath = this.jsonFilePath
+            let filePath = this.jsonFilePath()
             let newVideoData = {}
             if (fs.existsSync(filePath)) {
                 try {
@@ -139,11 +138,11 @@ export default {
                 }
             }
             // once all the LabelRecords are created, update the video data
-            let labels = {}
+            let labelToggles = {}
             for (let each in newVideoData) {
-                labels[each] = true
+                labelToggles[each] = true
             }
-            this.labels = labels
+            this.labelToggles = labelToggles
             this.videoLabelData = newVideoData
             this.dataIsSaved = true
         }

@@ -6,7 +6,7 @@
             <template v-slot:labels>
                 <!-- Labels to display -->
                 <column v-if="showLabels" class="labels-bubble bubble" shadow="1" align-h="left">
-                    <ui-switch v-for="(eachLabel, eachIndex) in labels" :key="eachIndex" v-model="labels[eachIndex]" :label="eachIndex"></ui-switch>
+                    <ui-switch v-for="(eachLabel, eachIndex) in labelToggles" :key="eachIndex" v-model="labelToggles[eachIndex]" :label="eachIndex"></ui-switch>
                 </column>
             </template>
         </settings-panel>
@@ -136,7 +136,7 @@ export default {
     },
     computed: {
         showLabels() {
-            if (Object.keys(this.labels).length > 0) {
+            if (Object.keys(this.labelToggles).length > 0) {
                 return true
             } else {
                 return false

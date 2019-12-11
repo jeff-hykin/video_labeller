@@ -118,7 +118,7 @@ export default {
             this.updateData()
         })
         // update whenever the labels deeply change
-        labelManager.$watch('labels', {
+        labelManager.$watch('labelToggles', {
             deep: true,
             handler: (val)=>{
                 this.updateData()
@@ -149,7 +149,7 @@ export default {
             let series = []
             for (let each in data) {
                 // if the label for it is turned on
-                if (labelManager.labels[each] != false) {
+                if (labelManager.labelToggles[each] != false) {
                     series.push({
                         name: each,
                         data: data[each]
