@@ -7,7 +7,7 @@
 <script>
 import path from 'path'
 
-import { featureManager } from "@/components/feature-manager"
+import { labelManager } from "@/components/label-manager"
 import { settingsPanel } from './settings-panel.vue'
 
 export let videoComponent = {}

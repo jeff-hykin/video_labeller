@@ -8,9 +8,9 @@
             </column>
 
             <br /><br /><br /><br />
-            <h5>Features</h5>
+            <h5>Labels</h5>
             <row align-h="space-between" width="100%" padding="1rem 0rem">
-                <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentFeatureName" />
+                <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentLabelName" />
                 <ui-button @click="saveData" class="save-button" color="primary" raised :style="{ marginLeft: '0rem' }">
                     Save
                 </ui-button>
@@ -50,7 +50,7 @@
 
 <script>
 import { videoComponent } from '@/components/video-component'
-import { featureManager } from './feature-manager'
+import { labelManager } from './label-manager'
 
 let localSettingsLocation = "videoLabelerSettings"
 
@@ -63,7 +63,7 @@ export default {
     data: () => ({
         youtubeLink:"",
         settings: {
-            currentFeatureName: "ExampleFeature1",
+            currentLabelName: "ExampleFeature1",
             inputMode: "Mouse",
             showGraph: false,
             videoSpeedMultiplier: 1.4,
@@ -132,7 +132,7 @@ export default {
             
             let setVideoPath = ()=>videoComponent.currentVideoFilePath = e.target.files[0].path
             
-            if (featureManager.dataIsSaved) {
+            if (labelManager.dataIsSaved) {
                 setVideoPath()
             } else {
                 let timeout = 9500

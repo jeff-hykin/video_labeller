@@ -50,7 +50,7 @@ import Graph, {graph} from '@/components/graph'
 import VideoComponent, {videoComponent} from '@/components/video-component'
 import SettingsPanel, {settingsPanel} from "@/components/settings-panel"
 import BarMeasure, {barMeasure} from '@/components/bar-measure'
-import FeatureMixin, {featureManager} from '@/components/feature-manager'
+import LabelManagerMixin, {labelManager} from '@/components/label-manager'
 
 
 let   util    = require("util")
@@ -117,7 +117,7 @@ let windowListeners$ = {
 export default {
     name: "main-page",
     components: { VueJsonPretty, HowTo, Graph, BarMeasure, SettingsPanel, VideoComponent },
-    mixins: [ FeatureMixin ],
+    mixins: [ LabelManagerMixin ],
     data: ()=>({
         settings: {},
         // Video data

@@ -8,10 +8,10 @@ import { videoComponent } from '@/components/video-component'
 import { statelessData } from '@/pages/Home.vue'
 import { settingsPanel } from "@/components/settings-panel"
 
-export let featureManager = {}
+export let labelManager = {}
 export default {
     beforeCreate() {
-        featureManager = this
+        labelManager = this
     },
     data() {
         return {
@@ -33,11 +33,11 @@ export default {
         })
         // when video starts playing, make sure to start recording
         videoComponent.$on("play" , (eventObj)=>{
-            this.startRecordingFeature()
+            this.startRecordingLabel()
             this.recordValue(barMeasure.currentValue())
         })
         videoComponent.$on("pause", (eventObj)=>{
-            this.stopRecoringFeature()
+            this.stopRecoringLabel()
         })
         // when the video source changes
         videoComponent.$watch("currentVideoFilePath", (eventObj)=>{
@@ -60,7 +60,7 @@ export default {
         jsonFilePath() {
             let directory = path.dirname(videoComponent.currentVideoFilePath)
             let basename = path.basename(videoComponent.currentVideoFilePath)
-            return path.join(directory, basename+".features.json")
+            return path.join(directory, basename+".labels.json")
         },
     },
     methods: {
@@ -85,24 +85,24 @@ export default {
             let time = videoComponent.currentTime-0
             this.pendingRecords.push([ time, value ])
         },
-        startRecordingFeature() {
+        startRecordingLabel() {
             this.pendingRecords = []
             this.dataIsSaved = false
         },
-        stopRecoringFeature() {
+        stopRecoringLabel() {
             this.updateRecordsWith(this.pendingRecords)
         },
         updateRecordsWith(records) {
             // if the label doesn't exist yet
-            if (!(this.videoLabelData[this.settings.currentFeatureName] instanceof LabelRecord)) {
+            if (!(this.videoLabelData[this.settings.currentLabelName] instanceof LabelRecord)) {
                 // create a LabelRecord for it
-                this.videoLabelData[this.settings.currentFeatureName] = new LabelRecord({
+                this.videoLabelData[this.settings.currentLabelName] = new LabelRecord({
                     records: records
                 })
             // if the label is a LabelRecord
             } else {
                 // then just add the new data
-                this.videoLabelData[this.settings.currentFeatureName].addNewRecordSegment(records)
+                this.videoLabelData[this.settings.currentLabelName].addNewRecordSegment(records)
             }
         },
         saveData() {

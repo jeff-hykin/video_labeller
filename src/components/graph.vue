@@ -5,7 +5,7 @@
 <script>
 import LabelRecord from '../util/LabelRecord'
 import { videoComponent } from '@/components/video-component'
-import { featureManager } from '../components/feature-manager'
+import { labelManager } from '../components/label-manager'
 import { settingsPanel } from './settings-panel.vue'
 
 export let graph
@@ -113,12 +113,12 @@ export default {
             }
         })
         // update whenever the videoLabelData shallow changes
-        featureManager.$watch('videoLabelData', (newValue) => {
+        labelManager.$watch('videoLabelData', (newValue) => {
             // actually update the data
             this.updateData()
         })
         // update whenever the labels deeply change
-        featureManager.$watch('labels', {
+        labelManager.$watch('labels', {
             deep: true,
             handler: (val)=>{
                 this.updateData()
@@ -145,11 +145,11 @@ export default {
             
         },
         updateData() {
-            let data = featureManager.allRecords()
+            let data = labelManager.allRecords()
             let series = []
             for (let each in data) {
                 // if the label for it is turned on
-                if (featureManager.labels[each] != false) {
+                if (labelManager.labels[each] != false) {
                     series.push({
                         name: each,
                         data: data[each]
