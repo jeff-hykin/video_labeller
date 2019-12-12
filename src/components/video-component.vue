@@ -1,5 +1,5 @@
 <template>
-    <video ref=video @pause=onPause @play=onPlay @click=onClick @seeking=onSeek controls>
+    <video ref=video @pause=onPause @play=onPlay @click=onClick @seeking=onSeek @ended=onEnded controls>
         <source :src="videoFileUrl" type="video/mp4">
     </video>
 </template>
@@ -73,6 +73,9 @@ export default {
         },
         onClick(eventObj) {
             this.$emit("click", eventObj)
+        },
+        onEnded(eventObj) {
+            this.$emit("ended", eventObj)
         },
         async togglePlayPause() {
             let videoElement = this.$refs.video

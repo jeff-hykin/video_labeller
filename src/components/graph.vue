@@ -3,16 +3,15 @@
 </template>
 
 <script>
-import LabelRecord from '../util/LabelRecord'
 import { videoComponent } from '@/components/video-component'
 import { labelManager } from '../components/label-manager'
 import { settingsPanel } from './settings-panel.vue'
 
-export let graph
+export let graphComponent
 export default {
     props: [ 'height' ],
     beforeCreate() {
-        graph = this
+        graphComponent = this
     },
     data: ()=>({
         graphFrameRate: 30, // fps
@@ -95,69 +94,70 @@ export default {
         },
     }),
     mounted() {
-        // update the graph whenever the video is being scubbed
-        videoComponent.$on("seek", (eventObj)=> {
-            // update the bounds when seeking
+        // 
+        // update bounds
+        // 
+        
+        // when the user seeks a video
+        videoComponent.$on("seek", (eventData) => {
             this.updateBounds()
         })
-        // update whenever the graphRange changes 
+        
+        // when the range changes
         settingsPanel.$watch('settings.graphRange',  (newValue) => {
             if (settingsPanel.settings.graphRange > 0) {
                 this.updateBounds()
             }
         })
-        // update whenever the graph gets toggled 
+        
+        // 
+        // update data
+        // 
+        
+        // when graph says to update
+        labelManager.$on("say:graphShouldUpdate", (eventData) => {
+            this.updateData()
+        })
+        
+        // when user toggles showGraph
         settingsPanel.$watch('settings.showGraph', (newValue) => {
             if (settingsPanel.settings.showGraph) {
                 this.updateData()
             }
         })
-        // update whenever the videoLabelData shallow changes
-        labelManager.$watch('videoLabelData', (newValue) => {
-            // actually update the data
-            this.updateData()
-        })
-        // update whenever the labels deeply change
+        
+        // when label toggle is changed or added (deep change of labelToggles)
         labelManager.$watch('labelToggles', {
             deep: true,
             handler: (val)=>{
                 this.updateData()
             }   
         })
+        
+        // 
+        // request update
+        // 
+        
         // update the graph when video is playing
         setInterval(()=>{
             if (!videoComponent.paused) {
-                // actually update the data
-                this.updateData()
+                this.$emit("say:graphUpdateRequest")
             }
         }, 1000/this.graphFrameRate)
-    },
-    computed: {
     },
     methods: {
         updateBounds() {
             let currentTime  = videoComponent.currentTime-0
-            this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2;
-            this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2;
+            this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2
+            this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2
             
             // force a refresh
             this.chartOptions = {...this.chartOptions}
             
         },
         updateData() {
-            let data = labelManager.allRecords()
-            let series = []
-            for (let each in data) {
-                // if the label for it is turned on
-                if (labelManager.labelToggles[each] != false) {
-                    series.push({
-                        name: each,
-                        data: data[each]
-                    })
-                }
-            }
-            this.series = series
-            // this.series = series
+            // remove all the labels that have a false toggle
+            this.series = labelManager.labels.filter(each => labelManager.labelToggles[each.name])
             this.updateBounds()
         }
     },

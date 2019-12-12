@@ -42,11 +42,10 @@ import ytdl from 'ytdl-core'
 
 // utils
 import { onWheelFlick, binSearch, once } from '@/util/all'
-import LabelRecord from '@/util/LabelRecord'
 
 // components/mixins
 import HowTo from '@/components/how-to'
-import Graph, {graph} from '@/components/graph'
+import Graph, {graphComponent} from '@/components/graph'
 import VideoComponent, {videoComponent} from '@/components/video-component'
 import SettingsPanel, {settingsPanel} from "@/components/settings-panel"
 import BarMeasure, {barMeasure} from '@/components/bar-measure'

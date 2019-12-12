@@ -125,31 +125,45 @@ export default {
                 this.settings = { ...this.settings, ...savedSettings }
             }
         },
-        saveData(...args) {
-            this.$emit("saveData",args)
+        saveData() {
+            this.$emit("say:saveDataToFile")
         },
         chooseFile(e) {
+            let pendingLoadPath = e.target.files[0].path
+            let setVideoPath = ()=>videoComponent.currentVideoFilePath = pendingLoadPath
             
-            let setVideoPath = ()=>videoComponent.currentVideoFilePath = e.target.files[0].path
-            
+            // ask labelManager if the data is saved 
             if (labelManager.dataIsSaved) {
+                // if the data is saved, then no further action needed, load new video
                 setVideoPath()
+            // if the data hasn't been saved, ask the user if they want to save it
             } else {
                 let timeout = 9500
                 this.$toasted.show(`Data not saved`, {
                     action:[
                         {
                             text : 'Save Now',
-                            onClick : (e, toastObject) => {
+                            onClick : (eventData, toastObject) => {
+                                // make the notification dissapear on click
                                 toastObject.goAway(0)
-                                this.$emit("saveDataThenLoad", ()=>setVideoPath())
+                                // once saved, then load the pending path
+                                labelManager.$once("finished:saveDataToFile", (eventData) => {
+                                    // if related to the say:saveDataToFile (not somehow a different finished:saveDataToFile event)
+                                    // (this could occur if there was)
+                                    if (eventData.pendingLoadPath == pendingLoadPath) {
+                                        // then load the pending video
+                                        setVideoPath()
+                                    }
+                                })
+                                // tell the labelManager that data needs to be saved
+                                this.$emit("say:saveDataToFile")
                             },
                         },
                         {
                             text : 'Open Anyways',
-                            onClick : (e, toastObject) => {
-                                setVideoPath()
+                            onClick : (eventData, toastObject) => {
                                 toastObject.goAway(0)
+                                setVideoPath()
                             },
                         },
                     ]
