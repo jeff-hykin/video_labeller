@@ -134,6 +134,11 @@ export default {
             }   
         })
         
+        // when the video ends (this is an edgecase)
+        videoComponent.$on("ended", ()=>{
+            this.updateData()
+        })
+        
         // 
         // request update
         // 

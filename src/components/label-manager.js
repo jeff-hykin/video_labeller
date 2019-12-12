@@ -10,6 +10,9 @@ import { statelessData } from '@/pages/Home.vue'
 import { settingsPanel } from "@/components/settings-panel"
 import { graphComponent } from "../components/graph.vue"
 
+// TODO:
+    // reset before skipBack/forwards 
+
 // 
 // summary
 // 
@@ -112,6 +115,9 @@ export default {
         })
         videoComponent.$on("pause", (eventData)=> {
             this.insertRecord(currentTime(), currentValue())
+        })
+        videoComponent.$on("ended", (eventData)=> {
+            this.insertRecord(eventData.target.duration, currentValue())
         })
         // this will be triggered after the video play event
         this.$on("finished:resetTheNextChonologicalRecord", ({ currentTime, currentValue })=> {
@@ -252,7 +258,7 @@ export default {
             // some buffer is added to reduce chance of precision errors
             let futureBoundary = currentTime + Number.MIN_VALUE*10
             for (let [eachTime, eachValue] of futureRecords) {
-                if (eachTime < futureBoundary) {
+                if (eachTime <= futureBoundary) {
                     numberToDelete++
                 } else {
                     break
