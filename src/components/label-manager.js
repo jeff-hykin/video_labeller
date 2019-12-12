@@ -193,8 +193,6 @@ export default {
             this.$emit("finished:saveDataToFile", {path:jsonFilePath, ...eventData})
         },
         loadData() {
-            // reset the label names
-            labelNamesThatMightNeedBeRemoved = {}
             // try loading any existing data
             let filePath = this.jsonFilePath()
             let labels = []
@@ -323,6 +321,7 @@ export default {
                 }
                 this.labels.push(currentLabel)
                 labelToggles[newCurrentLabelName] = true
+                labelNamesThatMightNeedBeRemoved[newCurrentLabelName] = true
             }
             this.labelToggles = labelToggles
         },
