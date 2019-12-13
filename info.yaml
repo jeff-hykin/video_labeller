@@ -42,7 +42,7 @@
         
     todo:
         - fix skip back to not always play the video upon resuming
-        - fix the interface of the labels and save button
+        - fix the interface of the labelToggles and save button
         - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         - update the how-to
         - add a help button/dialog
