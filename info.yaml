@@ -3,6 +3,20 @@
     name: Video Labeller
     description: An electron app designed to help people quickly label features on videos
     
+    commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
+        dev: npm run dev
+        package: npm run build
+        gco: git checkout video-image-labeller-stable
+        run_ruby: !language/ruby |
+            puts 'placeholder text'
+        (setup): ruby setup.rb
+    
+    paths: &paths
+        root: ./
+    
+    dependencies: &dependencies
+        atk: 0.0.1
+    
     done:
         - clean up the code
         - ability to slow down video
@@ -22,23 +36,20 @@
         - make everything modular
         
     todo:
+        - remove the "labels" sub key since the file is pretty giant anyways
         - features:
-            - allow renaming the labels by clicking on them
             - when a label is hidden, just hide the data, dont remove the name
               (that way the colors are kept)
             - add settings for bar measure exaggeration
             - add settings for graph-refresh rate
         
+        - update the how-to
+        - add a help button/dialog
+        
         - bugs:
             - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         
-        - redo LabelRecord:
-            - fix calling allRecords repeatedly creates duplicate features (edgecase equality)
-            - allow mixing in temp values
-            - allow null features, save duplicate actual value right before adding null
-            - add saftey:
-                - remove triple nulls in a row
-                - check that values are pairwise in order, throw error/sort if theyre not
+        - check that values are pairwise in order, throw error/sort if theyre not
         
         - allow saving null values for feature-doesnt-exist:
             - have a hold-down option
@@ -48,8 +59,6 @@
             - have pressing key instantly place markers
             - store markers seperately on videoLabelData
         
-        - update the how-to
-        - add a help button/dialog
         - improve performance:
             - have the non-active features be stored in their graph form so mapping isnt needed
             - have the use-temp-value perform efficiently (push & pop instead of rebuilding list)
@@ -58,23 +67,12 @@
             - filter the feature names to be ones that are formatted correctly for marker/graphs
     
     later:
+        - add setting for having formatted/minified json
+        - add feature that allows for
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
-        - have the ability to add a list of videos to evaluate in order
-    
-    commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
-        dev: npm run dev
-        package: npm run build
-        gco: git checkout video-image-labeller-stable
-        run_ruby: !language/ruby |
-            puts 'placeholder text'
-        (setup): ruby setup.rb
-    
-    paths: &paths
-        root: ./
-    
-    dependencies: &dependencies
-        atk: 0.0.1
+        - have the ability to add a list of youtube videos to evaluate in order
+        - allow renaming the labels by clicking on them
     
     (advanced_setup):
         (put_new_dependencies_under): [ '(project)', 'basic_info', 'dependencies' ]
