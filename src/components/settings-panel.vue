@@ -1,24 +1,30 @@
 <template>
     <column align-h="left" align-v="top" :class="['panel', { init }]" shadow="2">
         <div>
+            <!-- Video Opener -->
             <h5>Video</h5>
             <column class="video-selector bubble" shadow="1">
                 <input class="file-picker" type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
                 <ui-textbox class="youtube-link-input" placeholder="Paste YouTube link" v-model="youtubeLink" />
             </column>
-
-            <br /><br /><br /><br />
-            <h5>Labels</h5>
-            <row align-h="space-between" width="100%" padding="1rem 0rem">
-                <ui-textbox placeholder="Name of the feature being labelled" v-model="settings.currentLabelName" />
+            
+            <!-- Save button -->
+            <br/><br/><br/>
+            <row width=100%>
                 <ui-button @click="saveData" class="save-button" color="primary" raised :style="{ marginLeft: '0rem' }">
-                    Save
+                    Save All Changes
                 </ui-button>
             </row>
             
+            <!-- Labels -->
+            <br/><br/><br/>
+            <h5>Labels</h5>
+            <row align-h="space-between" width="100%" padding="1rem 0rem">
+                <ui-textbox label="Active Label" v-model="settings.currentLabelName" />
+            </row>
             <slot name="labels" />
             
-            
+            <!-- Graph Settings -->
             <br /><br /><br /><br />
             <h5>Graph Settings</h5>
             <column class="settings-bubble bubble" shadow="1" align-h="left">
@@ -34,7 +40,7 @@
                 <ui-textbox label="Graph frame rate (fps)" v-model="settings.graphFrameRate" /> -->
             </column>
             
-            <!-- Settings -->
+            <!-- General Settings -->
             <br /><br />
             <h5>General Settings</h5>
             <column class="settings-bubble bubble" shadow="1" align-h="left">

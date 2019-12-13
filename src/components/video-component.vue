@@ -10,7 +10,6 @@ import path from 'path'
 import { labelManager } from "@/components/label-manager"
 import { settingsPanel } from './settings-panel.vue'
 
-
 // 
 // summary
 // 

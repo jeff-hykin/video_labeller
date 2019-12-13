@@ -39,17 +39,29 @@
         - remove the "labels" sub key since the file is pretty giant anyways
         - when a label is hidden, just hide the data, dont remove the name (that way the colors are kept)
         - seperate out the graph settings
+        - fix skip back to not always play the video upon resuming
+        - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
+        - fix the interface of the save button
         
     todo:
-        - fix skip back to not always play the video upon resuming
-        - allow video speed to be modified directly
-        - fix the interface of the labelToggles and save button
-        - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         - update the how-to
-        - add a help button/dialog
-        - remove video element on help/start screen
         
-        - check that values are pairwise in order, throw error/sort if theyre not
+        - add more keybindings:
+            - cmd + O == open
+            - cmd + S == save
+        
+        - add a help button/dialog
+        - allow video speed to be modified directly
+        - remove video element on help/start screen
+        - add a only-show active toggle feature
+        
+        - document and clean:
+            - bar-measure
+            - home
+            - graph component
+            - settings panel
+            - utils
+            - standardize component file naming scheme
         
         - allow saving null values for feature-doesnt-exist:
             - have a hold-down option
@@ -59,10 +71,13 @@
             - have pressing key instantly place markers
             - store markers seperately on videoLabelData
     
+        - check that values are pairwise in order, throw error/sort if theyre not
+
     later:
         - make data-loading more robust, filter the feature names to be ones that are formatted correctly for marker/graphs
         - add setting for having formatted/minified json
         - allow renaming the labels by clicking on them
+        - change the label toggles to select an active one, or create a new one
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
         - have the ability to add a list of youtube videos to evaluate in order
