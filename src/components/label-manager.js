@@ -191,12 +191,11 @@ export default {
             for (let each of this.labels) {
                 formattedLabels[each.name] = each.data
             }
-            let combinedData = { ...oldData, labels: formattedLabels}
 
             // 
             // Save data to file
             // 
-            fs.writeFile(jsonFilePath, JSON.stringify({ ...oldData, labels: formattedLabels}), _=>console.log(`data written to ${jsonFilePath}`))
+            fs.writeFile(jsonFilePath, JSON.stringify({...oldData, ...formattedLabels}), _=>console.log(`data written to ${jsonFilePath}`))
             this.$toasted.show(`Data written to '${path.basename(jsonFilePath)}'`, {keepOnHover:true}).goAway(6500)
             this.dataIsSaved = true
             this.$emit("finished:saveDataToFile", {path:jsonFilePath, ...eventData})
@@ -209,7 +208,7 @@ export default {
             if (fs.existsSync(filePath)) {
                 let unformattedLabels
                 try {
-                    unformattedLabels = JSON.parse(fs.readFileSync(filePath)).labels
+                    unformattedLabels = JSON.parse(fs.readFileSync(filePath))
                     // tell the user there is previous data
                     this.$toasted.show(`Previous data file loaded`).goAway(2500)
                 } catch (error) {

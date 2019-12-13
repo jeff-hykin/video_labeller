@@ -35,25 +35,23 @@
             The data is in a JSON format like this.
 <pre>
 {
-    "labels": {
-        "your-feature-name": [
-            // first mouse position
-            [
-                0.0, // the video time (in seconds)
-                0.5  // the mouse position as a percent (this is 50%)
-            ],
-            // the next mouse movement
-            [
-                14.2, // the current video time (in seconds)
-                0.2   // the mouse position (this is 20% above the bottom)
-            ],
-            // the next mouse movement
-            [
-                15.7, // the current video time (in seconds)
-                0.3   // the mouse position (this is 30% above the bottom)
-            ],
-        ]
-    }
+    "your-feature-name": [
+        // first mouse position
+        [
+            0.0, // the video time (in seconds)
+            0.5  // the mouse position as a percent (this is 50%)
+        ],
+        // the next mouse movement
+        [
+            14.2, // the current video time (in seconds)
+            0.2   // the mouse position (this is 20% above the bottom)
+        ],
+        // the next mouse movement
+        [
+            15.7, // the current video time (in seconds)
+            0.3   // the mouse position (this is 30% above the bottom)
+        ],
+    ]
 }
 </pre>
         </p>
