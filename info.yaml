@@ -34,7 +34,7 @@
         - graph:
             - allow toggling the displayed features
         - make everything modular
-        - refactor the way labelManager works
+        - refactor the way labelManager works 
         - bug with pause and play
         
     todo:

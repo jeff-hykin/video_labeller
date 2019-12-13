@@ -38,7 +38,6 @@ import { remote } from "electron"
 import VueJsonPretty from 'vue-json-pretty'
 import fs, { write } from "fs"
 import path from 'path'
-import ytdl from 'ytdl-core'
 
 // utils
 import { onWheelFlick, binSearch, once } from '@/util/all'

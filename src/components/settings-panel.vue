@@ -57,6 +57,15 @@
 <script>
 import { videoComponent } from '@/components/video-component'
 import { labelManager } from './label-manager'
+import ytdl from 'ytdl-core'
+import fs, { write } from "fs"
+import path from 'path'
+import { remote } from "electron"
+
+let   util    = require("util")
+const readdir = util.promisify(fs.readdir)
+let   dialog  = remote.dialog
+let   app     = remote.app
 
 let localSettingsLocation = "videoLabelerSettings"
 
