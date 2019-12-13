@@ -22,6 +22,12 @@
         - make everything modular
         
     todo:
+        - features:
+            - allow renaming the labels by clicking on them
+            - when a label is hidden, just hide the data, dont remove the name
+              (that way the colors are kept)
+            - change the barMeasure to have a cap that is below the top and above the bottom so that mouse movements don't have to be so extreme
+        
         - bugs:
             - when a new label is added, the switch for it is not generated in the Features option
             - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)

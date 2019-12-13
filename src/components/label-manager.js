@@ -11,7 +11,6 @@ import { settingsPanel } from "@/components/settings-panel"
 import { graphComponent } from "../components/graph.vue"
 
 // TODO:
-    // reset before skipBack/forwards 
     // fix the edgecase of video start
 
 // 
@@ -98,7 +97,6 @@ export default {
         // saving/loading data
         // 
         settingsPanel.$on("say:saveDataToFile" , (eventData) => {
-            console.log(`settingsPanel: say:saveDataToFile`)
             this.saveDataToFile(eventData)
         })
         videoComponent.$watch("currentVideoFilePath", (eventData) => {

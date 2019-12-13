@@ -51,7 +51,20 @@ export default {
     methods: {
         updateMouseValue(eventObj) {
             if (settingsPanel.settings.inputMode == "Mouse") {
-                let newMouseHeightPercent = 1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight
+                let barHeight = this.$refs.barMeasure.$el.clientHeight
+                let mouseYPosition = eventObj.pageY
+                
+                let realNewMouseHeightPercent = (1 - eventObj.pageY / this.$refs.barMeasure.$el.clientHeight)
+                let newMouseHeightPercent = realNewMouseHeightPercent
+                // exaggerate the movement
+                // move down
+                newMouseHeightPercent -= 0.5
+                // expand
+                newMouseHeightPercent *= 3
+                // move back up
+                newMouseHeightPercent += 0.5
+                
+                // keep it inside  0 >= newMouseHeightPercent >= 1
                 if (newMouseHeightPercent > 1) {
                     newMouseHeightPercent = 1
                 } else if (newMouseHeightPercent < 0) {
