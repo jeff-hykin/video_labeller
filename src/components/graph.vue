@@ -14,7 +14,6 @@ export default {
         graphComponent = this
     },
     data: ()=>({
-        graphFrameRate: 30, // fps
         series: [],
         
         chartOptions: {
@@ -148,7 +147,7 @@ export default {
             if (!videoComponent.paused) {
                 this.$emit("say:graphUpdateRequest")
             }
-        }, 1000/this.graphFrameRate)
+        }, 1000/settingsPanel.settings.graphFrameRate)
     },
     methods: {
         updateBounds() {

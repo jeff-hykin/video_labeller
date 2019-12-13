@@ -40,8 +40,7 @@
         - features:
             - when a label is hidden, just hide the data, dont remove the name
               (that way the colors are kept)
-            - add settings for bar measure exaggeration
-            - add settings for graph-refresh rate
+            - add settings for graph-refresh rate (add listener to hot-change the setinterval)
         
         - update the how-to
         - add a help button/dialog

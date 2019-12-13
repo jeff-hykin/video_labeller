@@ -60,7 +60,7 @@ export default {
                 // move down
                 newMouseHeightPercent -= 0.5
                 // expand
-                newMouseHeightPercent *= 3
+                newMouseHeightPercent *= settingsPanel.settings.mouseExaggeration
                 // move back up
                 newMouseHeightPercent += 0.5
                 

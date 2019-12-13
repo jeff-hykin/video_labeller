@@ -32,6 +32,9 @@
                 </ui-radio-group>
                 <br />
                 <br />
+                <ui-textbox label="Mouse Exaggeration" v-model="settings.mouseExaggeration" />
+                <br />
+                <br />
                 <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
                 <br />
                 <br />
@@ -42,6 +45,9 @@
                 <br />
                 <br />
                 <ui-textbox label="Number of seconds graph should show" v-model="settings.graphRange" />
+                <!-- <br />
+                <br />
+                <ui-textbox label="Graph frame rate (fps)" v-model="settings.graphFrameRate" /> -->
             </column>
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </div>
@@ -65,11 +71,13 @@ export default {
         settings: {
             currentLabelName: "ExampleLabel1",
             inputMode: "Mouse",
+            mouseExaggeration: 3,
             showGraph: false,
             videoSpeedMultiplier: 1.4,
             skipBackAmount: 5, // seconds
             graphRange: 10, // seconds
             graphHeight: 250, // pixels
+            graphFrameRate: 30, // frames per second
         },
         modeOptions: [
             {
