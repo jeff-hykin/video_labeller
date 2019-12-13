@@ -317,6 +317,8 @@ export default {
                     }
                 }
             }
+            this.labels = filteredLabels
+            
             // if the currentLabel wasn't found
             if (currentLabel == null) {
                 // then create one

@@ -166,7 +166,19 @@ export default {
         },
         updateData() {
             // remove all the labels that have a false toggle
-            this.series = labelManager.labels.filter(each => each.data instanceof Array && labelManager.labelToggles[each.name])
+            this.series = labelManager.labels.map(each => {
+                if (each.data instanceof Array) {
+                    if (labelManager.labelToggles[each.name]) {
+                        return each
+                    // if the toggle is disabled, then don't show the data
+                    } else {
+                        return {
+                            ...each,
+                            data: []
+                        }
+                    }
+                }
+            })
             this.updateBounds()
         }
     },
