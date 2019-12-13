@@ -122,7 +122,7 @@ export default {
                     writeStream.on('close', ()=>{
                         this.$toasted.show(`Finished download`).goAway(2500)
                         setTimeout(() => {
-                            videoComponent.currentVideoFilePath = videoPath
+                            this.$emit("say:openVideo", {videoPath})
                             this.youtubeLink = null
                         }, 0)
                     })
@@ -148,12 +148,11 @@ export default {
         },
         chooseFile(e) {
             let pendingLoadPath = e.target.files[0].path
-            let setVideoPath = ()=>videoComponent.currentVideoFilePath = pendingLoadPath
             
             // ask labelManager if the data is saved 
             if (labelManager.dataIsSaved) {
                 // if the data is saved, then no further action needed, load new video
-                setVideoPath()
+                this.$emit("say:openVideo", {videoPath:pendingLoadPath})
             // if the data hasn't been saved, ask the user if they want to save it
             } else {
                 let timeout = 9500
@@ -170,7 +169,7 @@ export default {
                                     // (this could occur if there was)
                                     if (eventData.pendingLoadPath == pendingLoadPath) {
                                         // then load the pending video
-                                        setVideoPath()
+                                        this.$emit("say:openVideo", {videoPath:pendingLoadPath})
                                     }
                                 })
                                 // tell the labelManager that data needs to be saved
@@ -181,7 +180,7 @@ export default {
                             text : 'Open Anyways',
                             onClick : (eventData, toastObject) => {
                                 toastObject.goAway(0)
-                                setVideoPath()
+                                this.$emit("say:openVideo", {videoPath:pendingLoadPath})
                             },
                         },
                     ]

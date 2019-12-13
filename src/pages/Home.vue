@@ -72,7 +72,7 @@ let windowListeners$ = {
             // [Space]
             if (eventObj.code == 'Space') {
                 eventObj.preventDefault()
-                videoComponent.togglePlayPause()
+                videoComponent.scheduleTogglePlayPause()
             // <-
             } else if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
                 if (shiftKeyIsPressed) {

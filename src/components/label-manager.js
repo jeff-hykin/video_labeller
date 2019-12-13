@@ -10,9 +10,6 @@ import { statelessData } from '@/pages/Home.vue'
 import { settingsPanel } from "@/components/settings-panel"
 import { graphComponent } from "../components/graph.vue"
 
-// TODO:
-    // fix the edgecase of video start
-
 // 
 // summary
 // 
@@ -136,13 +133,13 @@ export default {
             // reset the value
             this.resetTheNextChonologicalRecord(currentTime(), currentValue())
         })
-        videoComponent.$on("say:skipBack" , (eventData)=> {
+        videoComponent.$on("say:skipBack" , ({ currentTime })=> {
             // reset the value
-            this.resetTheNextChonologicalRecord(currentTime(), currentValue())
+            this.resetTheNextChonologicalRecord(currentTime, currentValue())
         })
-        videoComponent.$on("say:skipForward" , (eventData)=> {
+        videoComponent.$on("say:skipForward" , ({ currentTime })=> {
             // reset the value
-            this.resetTheNextChonologicalRecord(currentTime(), currentValue())
+            this.resetTheNextChonologicalRecord(currentTime, currentValue())
         })
         
         // 
