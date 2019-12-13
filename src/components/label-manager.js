@@ -309,11 +309,7 @@ export default {
             let filteredLabels = []
             let labelToggles = {}
             for (let each of this.labels) {
-                // if 1. label doesnt have data and 2. it is in the hashmap of user-typed-out-names 
-                if (each.data.length == 0) {
-                    // then ignore it 
-                    // these empty/temp values occur as intermediate words while the user is typing the name of a label
-                } else {
+                if (each.data.length != 0) {
                     filteredLabels.push(each)
                     labelToggles[each.name] = this.labelToggles[each.name]
                     // if the name matches, then update the current label
