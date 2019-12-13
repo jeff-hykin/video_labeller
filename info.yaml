@@ -48,6 +48,7 @@
         - bugs:
             - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         
+        - seperate out the graph settings
         - check that values are pairwise in order, throw error/sort if theyre not
         
         - allow saving null values for feature-doesnt-exist:
