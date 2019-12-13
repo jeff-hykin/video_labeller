@@ -76,7 +76,6 @@ const OPTIMIZER_LIMIT = 0.5 // seconds
 let currentTime = () => videoComponent.currentTime-0
 let currentValue = () => barMeasure.currentValue()
 let currentLabel = null
-let labelNamesThatMightNeedBeRemoved = {}
 let nextChronologicalRecordIndex = 0
 
 export let labelManager = {}
@@ -229,7 +228,6 @@ export default {
             
             // reset variables
             currentLabel = null
-            labelNamesThatMightNeedBeRemoved = {}
             nextChronologicalRecordIndex = 0
             // update data
             this.labelToggles = labelToggles
@@ -312,7 +310,7 @@ export default {
             let labelToggles = {}
             for (let each of this.labels) {
                 // if 1. label doesnt have data and 2. it is in the hashmap of user-typed-out-names 
-                if (each.data.length == 0 && labelNamesThatMightNeedBeRemoved[each.name] == true) {
+                if (each.data.length == 0) {
                     // then ignore it 
                     // these empty/temp values occur as intermediate words while the user is typing the name of a label
                 } else {
@@ -333,7 +331,6 @@ export default {
                 }
                 this.labels.push(currentLabel)
                 labelToggles[newCurrentLabelName] = true
-                labelNamesThatMightNeedBeRemoved[newCurrentLabelName] = true
             }
             this.labelToggles = labelToggles
         },
