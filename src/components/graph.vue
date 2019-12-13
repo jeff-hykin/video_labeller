@@ -12,6 +12,7 @@ export default {
     props: [ 'height' ],
     beforeCreate() {
         graphComponent = this
+        window.graphComponent = graphComponent
     },
     data: ()=>({
         series: [],
@@ -152,16 +153,20 @@ export default {
     methods: {
         updateBounds() {
             let currentTime  = videoComponent.currentTime-0
-            this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2
-            this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2
-            
-            // force a refresh
-            this.chartOptions = {...this.chartOptions}
-            
+            let chart = graphComponent.$refs.chart.chart
+            let config = chart.zoomPanSelection.w.config
+            let ctx = chart.zoomPanSelection.ctx
+            let options = {
+                xaxis: {
+                    min: this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2,
+                    max: this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2,
+                },
+            }
+            ctx._updateOptions(options, false, false)
         },
         updateData() {
             // remove all the labels that have a false toggle
-            this.series = labelManager.labels.filter(each => labelManager.labelToggles[each.name])
+            this.series = labelManager.labels.filter(each => each.data instanceof Array && labelManager.labelToggles[each.name])
             this.updateBounds()
         }
     },
