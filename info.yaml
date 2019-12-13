@@ -37,11 +37,7 @@
         
     todo:
         - remove the "labels" sub key since the file is pretty giant anyways
-        - features:
-            - when a label is hidden, just hide the data, dont remove the name
-              (that way the colors are kept)
-            - add settings for graph-refresh rate (add listener to hot-change the setinterval)
-        
+        - when a label is hidden, just hide the data, dont remove the name (that way the colors are kept)
         - update the how-to
         - add a help button/dialog
         
@@ -58,21 +54,15 @@
         - add marker feature:
             - have pressing key instantly place markers
             - store markers seperately on videoLabelData
-        
-        - improve performance:
-            - have the non-active features be stored in their graph form so mapping isnt needed
-            - have the use-temp-value perform efficiently (push & pop instead of rebuilding list)
-        
-        - improve robust data loading:
-            - filter the feature names to be ones that are formatted correctly for marker/graphs
     
     later:
+        - make data-loading more robust, filter the feature names to be ones that are formatted correctly for marker/graphs
         - add setting for having formatted/minified json
-        - add feature that allows for
+        - allow renaming the labels by clicking on them
         - add ability to change the save-as name
         - ability to open a folder and recursively get all videos
         - have the ability to add a list of youtube videos to evaluate in order
-        - allow renaming the labels by clicking on them
+        - add settings for graph-refresh rate (add listener to hot-change the setinterval)
     
     (advanced_setup):
         (put_new_dependencies_under): [ '(project)', 'basic_info', 'dependencies' ]
