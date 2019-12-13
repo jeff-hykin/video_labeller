@@ -36,17 +36,17 @@
         - make everything modular
         - refactor the way labelManager works 
         - bug with pause and play
-        
-    todo:
         - remove the "labels" sub key since the file is pretty giant anyways
         - when a label is hidden, just hide the data, dont remove the name (that way the colors are kept)
+        - seperate out the graph settings
+        
+    todo:
+        - fix skip back to not always play the video upon resuming
+        - fix the interface of the labels and save button
+        - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         - update the how-to
         - add a help button/dialog
         
-        - bugs:
-            - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
-        
-        - seperate out the graph settings
         - check that values are pairwise in order, throw error/sort if theyre not
         
         - allow saving null values for feature-doesnt-exist:

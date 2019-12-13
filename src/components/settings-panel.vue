@@ -18,37 +18,38 @@
             
             <slot name="labels" />
             
-            <!-- Settings -->
+            
             <br /><br /><br /><br />
-            <h5>Settings</h5>
+            <h5>Graph Settings</h5>
             <column class="settings-bubble bubble" shadow="1" align-h="left">
                 <ui-switch v-model="settings.showGraph">
                     Show Graph
                 </ui-switch>
                 <br />
-                <br />
-                <ui-radio-group name="Input Mode" :options="modeOptions" v-model="settings.inputMode">
-                    Input Mode
-                </ui-radio-group>
-                <br />
-                <br />
-                <ui-textbox label="Mouse Exaggeration" v-model="settings.mouseExaggeration" />
-                <br />
-                <br />
                 <ui-textbox label="Graph Height" v-model="settings.graphHeight" />
-                <br />
-                <br />
-                <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
-                <br />
-                <br />
-                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
-                <br />
                 <br />
                 <ui-textbox label="Number of seconds graph should show" v-model="settings.graphRange" />
                 <!-- <br />
                 <br />
                 <ui-textbox label="Graph frame rate (fps)" v-model="settings.graphFrameRate" /> -->
             </column>
+            
+            <!-- Settings -->
+            <br /><br />
+            <h5>General Settings</h5>
+            <column class="settings-bubble bubble" shadow="1" align-h="left">
+                <ui-radio-group name="Input Mode" :options="modeOptions" v-model="settings.inputMode">
+                    Input Mode
+                </ui-radio-group>
+                <br />
+                <ui-textbox label="Mouse Exaggeration" v-model="settings.mouseExaggeration" />
+                <br />
+                <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
+                <br />
+                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
+            </column>
+            
+            
             <!-- <ui-textbox style="margin-top: 1.5rem" :multi-line="true" label="Videos" v-model="videoList" /> -->
         </div>
     </column>
