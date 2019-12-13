@@ -248,7 +248,7 @@ export default {
             }
             // if no index was found, that means there are no future values to overwrite
             if (nextChronologicalRecordIndex == null) {
-                nextChronologicalRecordIndex = 0
+                nextChronologicalRecordIndex = currentLabel.data.length-1
             }
             // tell everyone the nextChronologicalRecordIndex was just reset
             this.$emit("finished:resetTheNextChonologicalRecord", {currentTime, currentValue})

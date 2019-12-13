@@ -34,9 +34,10 @@
         - graph:
             - allow toggling the displayed features
         - make everything modular
+        - refactor the way labelManager works
+        - bug with pause and play
         
     todo:
-        - bug with pause and play
         - remove the "labels" sub key since the file is pretty giant anyways
         - when a label is hidden, just hide the data, dont remove the name (that way the colors are kept)
         - update the how-to
