@@ -68,6 +68,9 @@ import { graphComponent } from "../components/graph.vue"
     //       it removes any previous empty names (likely intermediate as-user-was-typing names)
     //       it then retreives or generates a label object
 
+// the optimizer removes duplicate values
+// this limit will prevent it from revoving duplicates if they are far enough away in time
+const OPTIMIZER_LIMIT = 0.5 // seconds
 
 // helpers
 let currentTime = () => videoComponent.currentTime-0
@@ -275,10 +278,12 @@ export default {
                 let [ previousTime      , previousValue       ] = previousRecord
                 let [ beforePreviousTime, beforePreviousValue ] = recordBeforePrevious
                 // if the last three values are equal
-                if (recordBeforePrevious == currentValue && previousValue == currentValue) {
-                    // then don't insert a new value, just change the time of the previous one
-                    previousRecord[0] = currentTime
-                    optimizationUtilized = true
+                if (beforePreviousValue == currentValue && previousValue == currentValue) {
+                    if ((currentTime - beforePreviousTime) < OPTIMIZER_LIMIT) {
+                        // then don't insert a new value, just change the time of the previous one
+                        previousRecord[0] = currentTime
+                        optimizationUtilized = true
+                    }
                 }
             }
             
