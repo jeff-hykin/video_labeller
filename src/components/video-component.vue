@@ -9,6 +9,7 @@ import path from 'path'
 
 import { labelManager } from "@/components/label-manager"
 import { settingsPanel } from './settings-panel.vue'
+import { graphComponent } from './graph.vue'
 
 export let videoComponent = {}
 export default {
@@ -41,6 +42,8 @@ export default {
     data: ()=>({
         currentVideoFilePath: null,
     }),
+    mounted() {
+    },
     watch: {
         // when the path updates, then open up the new video
         currentVideoFilePath(newVal) {
@@ -89,16 +92,30 @@ export default {
         },
         async skipBack() {
             if (this.exists) {
-                await this.togglePlayPause()
+                // wait for labelManager to confirm before resuming
+                labelManager.$once("finished:resetTheNextChonologicalRecord", ()=> {
+                    this.$refs.video.play()
+                })
+                // pause the video
+                this.$refs.video.pause()
+                // turn back the time
                 this.$refs.video.currentTime -= settingsPanel.settings.skipBackAmount
-                return await this.togglePlayPause()
+                // say what happened
+                this.$emit("say:skipBack")
             }
         },
         async skipForward() {
             if (this.exists) {
-                await this.togglePlayPause()
+                // wait for labelManager to confirm before resuming
+                labelManager.$once("finished:resetTheNextChonologicalRecord", ()=> {
+                    this.$refs.video.play()
+                })
+                // pause the video
+                this.$refs.video.pause()
+                // jump forward in time 
                 this.$refs.video.currentTime += settingsPanel.settings.skipBackAmount
-                return await this.togglePlayPause()
+                // say what happened
+                this.$emit("say:skipForward")
             }
         },
         changeVideoSpeed(multiplier) {

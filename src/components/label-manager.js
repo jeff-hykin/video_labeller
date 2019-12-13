@@ -12,6 +12,7 @@ import { graphComponent } from "../components/graph.vue"
 
 // TODO:
     // reset before skipBack/forwards 
+    // fix the edgecase of video start
 
 // 
 // summary
@@ -135,6 +136,14 @@ export default {
         // reseting nextChronologicalRecordIndex
         // 
         videoComponent.$on("play" , (eventData)=> {
+            // reset the value
+            this.resetTheNextChonologicalRecord(currentTime(), currentValue())
+        })
+        videoComponent.$on("say:skipBack" , (eventData)=> {
+            // reset the value
+            this.resetTheNextChonologicalRecord(currentTime(), currentValue())
+        })
+        videoComponent.$on("say:skipForward" , (eventData)=> {
             // reset the value
             this.resetTheNextChonologicalRecord(currentTime(), currentValue())
         })
