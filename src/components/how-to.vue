@@ -2,8 +2,8 @@
     <column align-h=left align-v=top margin='1rem 5rem' min-height=fit-content>
         <h4>What does this app do?</h4>
         <p>
-            It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video.
-            For example, you could label a video with mouse movements that corrispond to how happy you think the person in the video is.
+            It records the height of your mouse (as a percent) while a video is playing so that you can continuously label a video. <br>
+            For example, you could label a video with mouse movements that correspond to how happy you think the person in the video is.
         </p>
         <h4>How exactly do I use it?</h4>
         <p>
@@ -13,17 +13,17 @@
             2. Then add the name of the feature you are labelling
         </p>
         <p>
-            3. Open up a video file (bottom bar)
+            3. Open up a video file (at the top of the <code>settings panel</code>)
         </p>
         <p>
             4. Play the video<br>
             Mouse movements are automatically recorded when the video is playing<br>
             Controls:<br>
             - spacebar: plays/pauses the video<br>
-            - left arrow / a: jumps backwards a few seconds<br>
-            - right arrow / d: jumps forwards a few seconds<br>
             - shift + left arrow / a: slows down the video<br>
             - shift + right arrow / d: speeds up the video<br>
+            - left arrow / a: jumps backwards a few seconds<br>
+            - right arrow / d: jumps forwards a few seconds<br>
             - up arrow / w: increment the recorded value<br>
             - down arrow / s: decrement the recorded value<br>
         </p>

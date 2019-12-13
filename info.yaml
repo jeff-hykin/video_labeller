@@ -46,6 +46,7 @@
         - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         - update the how-to
         - add a help button/dialog
+        - remove video element on help/start screen
         
         - check that values are pairwise in order, throw error/sort if theyre not
         
