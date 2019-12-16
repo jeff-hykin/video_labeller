@@ -1,6 +1,6 @@
 <template>
     <column class=how-to align-h=left align-v=top :wrap='true'>
-        <newspaper-layout width='calc(100vw - var(--unhovered-panel-amount))' columnWidth=25rem>
+        <newspaper-layout width='calc(90vw - var(--unhovered-panel-amount))' columnWidth=25rem>
             <!-- What is this app for? -->
             <div class=card>
                 <h4>What is this app for?</h4>
@@ -16,28 +16,52 @@
             <div class=card>
                 <h4>How exactly do I use it?</h4>
                 <p>
-                    1. First open up the <code>settings panel</code> all the way over to the &lt;- left (just hover your mouse over it)
+                    <b>1. First open up the <code>settings panel</code><br></b>
+                    It is all the way over to the &lt;- left (just hover your mouse over it)
                 </p>
                 <p>
-                    2. Then add the name of the feature you are labelling
+                    <b>2. Find "Active Label"</b><br>
+                    Change it to be the name of whatever feature you would like to label.
                 </p>
                 <p>
-                    3. Open up a video file (at the top of the <code>settings panel</code>)
+                    <b>3. Open up a video file</b><br>
+                    (at the top of the <code>settings panel</code>)
                 </p>
                 <p>
-                    4. Play the video<br>
-                    Mouse movements are automatically recorded when the video is playing<br>
-                    Controls:<br>
-                    - spacebar: plays/pauses the video<br>
-                    - shift + left arrow / a: slows down the video<br>
-                    - shift + right arrow / d: speeds up the video<br>
-                    - left arrow / a: jumps backwards a few seconds<br>
-                    - right arrow / d: jumps forwards a few seconds<br>
-                    - up arrow / w: increment the recorded value<br>
-                    - down arrow / s: decrement the recorded value<br>
+                    <b>4. Play the video</b><br>
+                    There are two modes, <code>mouse mode</code> and <code>keyboard mode</code>. You can toggle them in the setting panel.<br>
+                    <br>
+                    In mouse mode, as soon as you play the video, mouse movements are automatically recorded.<br>
+                    Same is true for keyboard mode.<br>
+                    <br>
+                    <b>Controls:</b><br>
+                    <div style="padding-left: 1rem">
+                        <div class=underline>spacebar</div>
+                        plays/pauses the video<br>
+                        <br>
+                        <div class=underline>shift + left arrow / shift + A</div>
+                        slows down the video<br>
+                        <br>
+                        <div class=underline>shift + right arrow / shift + D</div>
+                        speeds up the video<br>
+                        <br>
+                        <div class=underline>left arrow / A</div>
+                        jumps backwards a few seconds<br>
+                        <br>
+                        <div class=underline>right arrow / D</div>
+                        jumps forwards a few seconds<br>
+                        <br>
+                        <div class=underline>up arrow / W</div>
+                        increment the recorded value <br>(in keyboard mode)<br>
+                        <br>
+                        <div class=underline>down arrow / S</div>
+                        decrement the recorded value <br>(in keyboard mode)<br>
+                        <br>
+                    </div>
                 </p>
                 <p>
-                    5. Press the blue save button to save the data for that video
+                    <b>5. Save your changes</b><br>
+                    Use the blue "Save All Changes" button inside of the settings panel
                 </p>
             </div>
             
@@ -93,6 +117,14 @@ export default {
         h4 {
             margin-top: 1.8rem;
             margin-bottom: 0.8rem;
+        }
+        
+        p {
+            padding: 0.4rem;
+        }
+        
+        .underline {
+            text-decoration: underline;
         }
         
         .card {

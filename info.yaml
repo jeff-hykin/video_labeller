@@ -45,9 +45,8 @@
         
     todo:
         - update the how-to:
-            - fix the over-all width
+            - fix the over-all width of 90vw
             - fix the column width
-            - allow a list of column widths
             - allow for a function to specify the column width
         
         - bugs:
