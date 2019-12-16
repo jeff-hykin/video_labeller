@@ -1,9 +1,20 @@
 <script>
 
+// TODO:
+    // improve the init
+    // use resize observer for parent element
+    //     https://developers.google.com/web/updates/2016/10/resizeobserver
+
 const PADDING = 20
 export default {
     data:()=>({
-       init: true 
+        init: true,
+        windowListeners$: {
+            // update whenever the window is resized
+            resize() {
+                this.$forceUpdate()
+            }
+        }
     }),
     render(createElement) {
         // 

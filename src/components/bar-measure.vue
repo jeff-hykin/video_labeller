@@ -23,6 +23,11 @@ export default {
         arrowValue: 0,
         // misc
         settings: {},
+        windowListeners$: {
+            resize() {
+                this.$forceUpdate()
+            }
+        }
     }),
     watch: {
         arrowValue() {
