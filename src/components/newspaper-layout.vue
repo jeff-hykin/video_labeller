@@ -16,13 +16,9 @@ export default {
                 this.$forceUpdate()
             }, 0)
             console.log(`init`)
-            return createElement(
-                "div",
-                { class:"newspaper-layout", style:{width: this.$props.width} },
-                [
-                    createElement("div", { class:"newspaper-column", style:{width: this.$props.columnWidth, height: '10rem'} }, [])
-                ]
-            )
+            return <div class="newspaper-layout" style={{width: this.$props.width}}>
+                <div class="newspaper-layout" style={{width: this.$props.columnWidth, height: '10rem'}} />
+            </div>
         }
         
         
