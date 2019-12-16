@@ -20,7 +20,7 @@
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
                     <how-to v-if='!videoComponent.currentVideoFilePath' />
-                    <video-component />
+                    <video-component v-if='videoComponent.currentVideoFilePath' />
                 </column>
             </row>
             <!-- The bottom bar -->
