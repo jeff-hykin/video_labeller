@@ -93,24 +93,14 @@ export default {
             }
         }
         console.log(`columns is:`,columns)
-        return createElement(
-            "div",
-            { class:"newspaper-layout", style:{width: this.$props.width, display:'flex', flexDirection: 'row',} },
-            columns.map(columnChildren=>{
-                // create columns
-                return createElement(
-                    "div",
-                    {
-                        class:"newspaper-column",
-                        style:{
-                            width: this.$props.columnWidth,
-                            padding: `${PADDING}px`,
-                        }
-                    },
-                    columnChildren
-                )
-            })
-        )
+        
+        return <div class="newspaper-layout" style={{width: this.$props.width, display:'flex', flexDirection: 'row'}}>
+            {columns.map(columnChildren=>
+                <div class="newspaper-column" style={{   width: this.$props.columnWidth,padding: `${PADDING}px`,} }>
+                    {columnChildren}
+                </div>
+            )}
+        </div>
     },
     props: {
         columnWidth: {

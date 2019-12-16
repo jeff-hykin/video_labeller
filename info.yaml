@@ -44,7 +44,11 @@
         - fix the interface of the save button
         
     todo:
-        - update the how-to
+        - update the how-to:
+            - fix the over-all width
+            - fix the column width
+            - allow a list of column widths
+            - allow for a function to specify the column width
         
         - bugs:
             - negative value when skipping back to start
