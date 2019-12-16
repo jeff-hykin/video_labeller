@@ -46,6 +46,10 @@
     todo:
         - update the how-to
         
+        - bugs:
+            - negative value when skipping back to start
+            - recoding mouse movements when hovering over settings panel
+        
         - add more keybindings:
             - cmd + O == open
             - cmd + S == save

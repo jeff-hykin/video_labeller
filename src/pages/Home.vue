@@ -162,7 +162,7 @@ export default {
     }
     
     video {
-        height: -webkit-fill-available;
+        height: 100%;
         width: auto;
     }
     
@@ -210,7 +210,7 @@ export default {
             margin: 0;
             
             .video-area {
-                height: -webkit-fill-available;
+                height: 100%;
                 width: -webkit-fill-available;
             }
             

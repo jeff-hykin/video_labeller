@@ -22,6 +22,7 @@ let appActions = {
             useContentSize: true,
             webPreferences: {
                 webSecurity: false, // allows opening local files
+                nodeIntegration: true,
             },
         })
 

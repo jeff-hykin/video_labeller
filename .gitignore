@@ -10,6 +10,8 @@ thumbs.db
 !.gitkeep
 
 
+
+
 # 
 # My own
 # 
@@ -31,6 +33,28 @@ thumbs.db
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+.DS_Store
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 
 # 
