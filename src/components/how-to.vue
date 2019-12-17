@@ -1,13 +1,11 @@
 <template>
     <column class=how-to align-h=left align-v=top :wrap='true'>
-        <newspaper-layout width='calc(90vw - var(--unhovered-panel-amount))' columnWidth=25rem>
+        <newspaper-layout width='100%' :columnStyle="{ width:'25rem', margin: '1rem' }">
             <!-- What is this app for? -->
             <div class=card>
                 <h4>What is this app for?</h4>
                 <p>
-                    If you need to hand label a video, that is what this app is created for.
-                    <br>
-                    It lets you record continuous values using either your mouse or keyboard.
+                    If you need to hand-label a video, that is what this app is created for. It lets you record continuous values using either your mouse or keyboard.
                 </p>
             </div>
             
@@ -106,17 +104,19 @@ export default {
 
 <style lang="scss" scoped>
     .how-to {
-        margin: 1rem 5rem;
         min-height: fit-content;
         width: 100%;
+        background: var(--gray-dark);
+        color: whitesmoke;
         
         pre, code {
-            color: var(--pink);
+            color: var(--cyan);
         }
         
         h4 {
             margin-top: 1.8rem;
             margin-bottom: 0.8rem;
+            color: white;
         }
         
         p {
@@ -131,7 +131,7 @@ export default {
             margin-top: 1.5rem;
             padding: 1.5rem;
             box-shadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 3px 1px -2px, rgba(0, 0, 0, 0.2) 0px 1px 5px 0px;
-            background: white;
+            background: var(--gray);
             border-radius: 1rem;
             max-width: 30rem;
             
