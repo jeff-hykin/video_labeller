@@ -51,7 +51,7 @@ setTimeout(()=>(new (Vue.extend(App))).$mount('#app'),0)
 export default App
 </script>
 
-<style>
+<style lang='scss'>
 :root {
     --blue: #007bff;
     --indigo: #6610f2;
@@ -60,9 +60,9 @@ export default App
     --red: #dc3545;
     --orange: #fd7e14;
     --yellow: #ffc107;
-    --green: #28a745;
+    --green: #28a745; // somewhere this is being overriden
     --teal: #20c997;
-    --cyan: #17a2b8;
+    --cyan: #64ffda;
     --white: #fff;
     --gray: #6c757d;
     --gray-dark: #343a40;
