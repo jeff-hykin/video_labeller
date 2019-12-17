@@ -5,7 +5,8 @@
     // use resize observer for parent element
     //     https://developers.google.com/web/updates/2016/10/resizeobserver
 
-const PADDING = 20
+let pxToInt = (value) => value.replace(/px/,"")-0
+
 export default {
     data:()=>({
         init: true,
@@ -16,95 +17,105 @@ export default {
             }
         }
     }),
-    render(createElement) {
-        // 
-        // on first render be empty
-        // 
-        if (this.init) {
-            this.init = false
-            // immediately call another render
-            setTimeout(() => {
-                this.$forceUpdate()
-            }, 0)
-            console.log(`init`)
-            return <div class="newspaper-layout" style={{width: this.$props.width}}>
-                <div class="newspaper-layout" style={{width: this.$props.columnWidth, height: '10rem'}} />
-            </div>
-        }
+    render() {
         
+        let createColumn = (columnChildren=[]) => <div
+            class="newspaper-column"
+            style={{
+                ...this.$props.columnStyle
+            }}
+            >
+            {columnChildren}
+        </div>
         
-        let columnsElements = [
-            // first column
-            createElement("div", { class:"newspaper-column", style:{width: this.$props.columnWidth} }, [])
-        ]
-        let mainContainer = createElement("div", { class:"newspaper-layout", style:{width: this.$props.width} }, columnsElements)
-        
+        let createContainer = (children=[]) => <div
+            class="newspaper-layout"
+            style={{
+                width: this.$props.width,
+                display:'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-evenly'
+            }}
+            >
+            {children}
+        </div>
         
         // 
-        // generate columns
+        // try to look at the size of the existing element 
         // 
-        console.log(`this.$el is:`,this.$el)
         try {
-            var mainContainerWidthInPixels = window.getComputedStyle(this.$el).width.replace(/px/,"")-0
-            var columnWidth = window.getComputedStyle(this.$el.children[0]).width.replace(/px/,"")-0
-            console.log(`mainContainerWidthInPixels is:`,mainContainerWidthInPixels)
-            console.log(`columnWidth is:`,columnWidth)
+            // retrive the actual widths
+            var mainContainerStyles = window.getComputedStyle(this.$el)
+            var columnStyles        = window.getComputedStyle(this.$el.children[0])
+            window.columnStyles = columnStyles
+        // 
+        // if the element doesn't exist, then create one with the correct widths and retry
+        // 
         } catch (error) {
-            setTimeout(() => {
-                console.log(`$forceUpdating`)
-                this.$forceUpdate()
-            }, 1000)
-            console.log(`hit error`)
-            return createElement(
-                "div",
-                { class:"newspaper-layout", style:{width: this.$props.width} },
-                [
-                    createElement("div", { class:"newspaper-column", style:{width: this.$props.columnWidth, height: "10rem"} }, [ "child elem"  ])
-                ]
-            )
+            // immediately reload element
+            setTimeout(() => { this.$forceUpdate() }, 0)
+            return createContainer(createColumn())
         }
         
+        let avalibleWidth = pxToInt(mainContainerStyles.width)
+        let columnWidth   = 0
+        columnWidth += pxToInt(columnStyles.width)
+        columnWidth += pxToInt(columnStyles.marginLeft)
+        columnWidth += pxToInt(columnStyles.marginRight)
+        if (columnStyles.boxSizing == 'content-box') {
+            columnWidth += pxToInt(columnStyles.paddingLeft)
+            columnWidth += pxToInt(columnStyles.paddingRight)
+        }
         
-        let numberOfRows = mainContainerWidthInPixels / columnWidth
-        let remainingSpace = mainContainerWidthInPixels
-        let columns = []
-        while (remainingSpace > columnWidth) {
-            remainingSpace -= (columnWidth + PADDING * 2)
+        // 
+        // calculate how many columns
+        // 
+        avalibleWidth -= columnWidth // ensure there's always at least one column
+        let columns = [ [] ]
+        while (avalibleWidth > columnWidth) {
+            avalibleWidth -= columnWidth
             columns.push([])
         }
-        console.log(`columns length is:`,columns.length)
         
         // 
-        // distribute elements evenly among columns
+        // distribute elements
         // 
+        // right-to-left, then top-to-bottom
         let children = [...this.$slots.default]
         while (children.length > 0) {
             for (let eachColumn of columns) {
-                while (children.length > 0) {
-                    let child = children.shift()
-                    if (child instanceof Object && child.tag != undefined) {
-                        eachColumn.push(child)
+                while (true) {
+                    // if none left, then break
+                    if (children.length == 0) {
                         break
                     }
+                    
+                    let child = children.shift()
+                    
+                    // if child is invalid, try again
+                    if (!(child instanceof Object) || child.tag == undefined) {
+                        continue
+                    }
+                    
+                    // put it in the column
+                    eachColumn.push(child)
+                    // move to the next column
+                    break
                 }
                 if (children.length == 0) {
                     break 
                 }
             }
         }
-        console.log(`columns is:`,columns)
         
-        return <div class="newspaper-layout" style={{width: this.$props.width, display:'flex', flexDirection: 'row'}}>
-            {columns.map(columnChildren=>
-                <div class="newspaper-column" style={{   width: this.$props.columnWidth,padding: `${PADDING}px`,} }>
-                    {columnChildren}
-                </div>
-            )}
-        </div>
+        // 
+        // render the main vue
+        // 
+        return createContainer(columns.map(createColumn))
     },
     props: {
-        columnWidth: {
-            type: String,
+        columnStyle: {
+            type: Object,
             required: true,
         },
         width: {
