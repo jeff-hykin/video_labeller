@@ -50,18 +50,16 @@
         - fix negative value when skipping back to start
         - recoding mouse movements when hovering over settings panel
         - standardize component file naming scheme
-
+        - add a help button/dialog
+        - allow video speed to be modified directly
         
     todo:
-        - add a help button/dialog
+        - add a only-show active toggle feature
         - convert to a fullscreen (video only) or non-fullscreen (graph and settings panel viewable)
         
         - add more keybindings:
             - cmd + O == open
             - cmd + S == save
-        
-        - add a only-show active toggle feature
-        - allow video speed to be modified directly
         
         - document and clean:
             - barMeasure
