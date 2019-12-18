@@ -1,15 +1,13 @@
 <script>
 
 // TODO:
-    // improve the init
-    // use resize observer for parent element
+    // use resize observer for parent element instead of window resize
     //     https://developers.google.com/web/updates/2016/10/resizeobserver
 
 let pxToInt = (value) => value.replace(/px/,"")-0
 
 export default {
     data:()=>({
-        init: true,
         windowListeners$: {
             // update whenever the window is resized
             resize() {
