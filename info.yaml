@@ -54,6 +54,7 @@
         
     todo:
         - add a help button/dialog
+        - convert to a fullscreen (video only) or non-fullscreen (graph and settings panel viewable)
         
         - add more keybindings:
             - cmd + O == open

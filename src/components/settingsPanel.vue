@@ -1,7 +1,22 @@
 <template>
     <column align-h="left" align-v="top" :class="['panel', { init }]" shadow="2">
         <div>
+            <!-- the 90° rotated title -->
             <div class=settings-panel-name>Settings Panel</div>
+            
+            <!-- Show Help -->
+            <row>
+                <ui-button size=large style='background-color: var(--gray); color: white' @click="showHelp('modal1')">
+                    Show Help
+                </ui-button>
+            </row>
+            <ui-modal ref="modal1" title="Help / Show Controls" transition="scale-up">
+                <helpMenu />
+            </ui-modal>
+            
+            <br>
+            <br>
+            
             <!-- Video Opener -->
             <h5>Video</h5>
             <column class="video-selector bubble" shadow="1">
@@ -13,16 +28,14 @@
                     Open A Video
                     <ui-icon slot="icon">videocam</ui-icon>
                 </ui-fileupload>
+                <!-- YouTube -->
                 <ui-textbox class="youtube-link-input" placeholder="Paste YouTube link" v-model="youtubeLink" />
-            </column>
-            
-            <!-- Save button -->
-            <br/><br/><br/>
-            <row width=100%>
-                <ui-button @click="saveData" class="save-button" color="primary" raised :style="{ marginLeft: '0rem' }">
+                <br>
+                <!-- Save button -->
+                <ui-button @click="saveData" class="save-button" style='background-color: var(--blue); color: white; border-radius: 3rem; border: 2px white solid; font-size: 12pt;' raised :style="{ marginLeft: '0rem' }">
                     Save All Changes
                 </ui-button>
-            </row>
+            </column>
             
             <!-- Labels -->
             <br/><br/><br/>
@@ -73,7 +86,8 @@
 
 <script>
 import { videoComponent } from '@/components/videoWrapper'
-import { labelManager } from './labelManager'
+import { labelManager } from '@/components/labelManager'
+import helpMenu from '@/components/helpMenu'
 import ytdl from 'ytdl-core'
 import fs, { write } from "fs"
 import path from 'path'
@@ -89,6 +103,7 @@ let localSettingsLocation = "videoLabelerSettings"
 export let settingsPanelComponent = {}
 export default {
     name: "settingsPanel",
+    components: { helpMenu },
     beforeCreate() {
         settingsPanelComponent = this
     },
@@ -156,6 +171,10 @@ export default {
         },
     },
     methods: {
+        showHelp(ref) {
+            this.$refs[ref].open()
+            window.document.body.appendChild(this.$refs[ref].$el)
+        },
         saveSettings() {
             window.localStorage.setItem(localSettingsLocation, JSON.stringify(this.settings))
         },
