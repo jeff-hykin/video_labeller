@@ -42,12 +42,13 @@
         - fix skip back to not always play the video upon resuming
         - skipBack/forward quickly messes up play/pause because too fast (switch to not play/pause and instead emit events for feature manager to update)
         - fix the interface of the save button
-        
-    todo:
+        - remove video element on help/start screen
         - update the how-to:
             - fix the over-all width of 90vw
             - fix the column width
-            - allow for a function to specify the column width
+        
+    todo:
+        - add a help button/dialog
         
         - bugs:
             - negative value when skipping back to start
@@ -57,10 +58,9 @@
             - cmd + O == open
             - cmd + S == save
         
-        - add a help button/dialog
-        - allow video speed to be modified directly
-        - remove video element on help/start screen
         - add a only-show active toggle feature
+        - allow video speed to be modified directly
+        
         
         - document and clean:
             - barMeasure
