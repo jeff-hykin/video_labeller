@@ -54,7 +54,13 @@ export default {
         // 
         Object.defineProperties(this,{
             paused: {get() {
-                return this.$refs.video && this.$refs.video.paused
+                if (this.pendingPause) {
+                    return true
+                } else if (this.pendingPlay != null) {
+                    return false
+                } else {
+                    return this.$refs.video && this.$refs.video.paused
+                }
             }},
             currentTime: {get() {
                 return this.$refs.video && this.$refs.video.currentTime
