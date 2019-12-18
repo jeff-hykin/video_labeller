@@ -54,7 +54,7 @@ export default {
         // 
         Object.defineProperties(this,{
             paused: {get() {
-                return this.mostRecentlyScheduledIsPause
+                return this.$refs.video && this.$refs.video.paused
             }},
             currentTime: {get() {
                 return this.$refs.video && this.$refs.video.currentTime
@@ -66,8 +66,8 @@ export default {
     },
     data: ()=>({
         currentVideoFilePath: null,
-        mostRecentlyScheduledIsPause: true,
         pendingPlay: null,
+        pendingPause: null,
     }),
     mounted() {
         // whenever settings wants to open a video
@@ -175,28 +175,19 @@ export default {
         //     even if it hasn't had time to take effect
 
         schedulePlay() {
-            this.mostRecentlyScheduledIsPause = false
-            // if no play has been scheduled, then schedule one
-            if (!(this.pendingPlay instanceof Promise)) {
-                this.pendingPlay = this.$refs.video.play()
-                // as soon as pending play is resolved, remove it
-                this.pendingPlay.then(eventObj=>this.pendingPlay = null)
-            }
+            this.pendingPlay = this.$refs.video.play()
         },
         schedulePause() {
-            this.mostRecentlyScheduledIsPause = true
-            // await play if needed before pausing
-            if (this.pendingPlay instanceof Promise) {
-                this.pendingPlay.then(()=>{
-                    this.$refs.video.pause()
-                })
+            // if waiting on play, then schedule a pause
+            if (this.pendingPlay) {
+                this.pendingPause = true
             } else {
                 this.$refs.video.pause()
             }
         },
         scheduleTogglePlayPause() {
             // await play and pause before toggle
-            if (this.mostRecentlyScheduledIsPause) {
+            if (this.paused) {
                 this.schedulePlay()
             } else {
                 this.schedulePause()
@@ -208,10 +199,16 @@ export default {
         // 
         
         onPause(eventObj) {
+            this.pendingPause = null
             this.$emit("pause", eventObj)
         },
         onPlay(eventObj) {
-            this.$emit("play", eventObj)
+            this.pendingPlay = null
+            if (this.pendingPause) {
+                this.$refs.video.pause()
+            } else {
+                this.$emit("play", eventObj)
+            }
         },
         onSeek(eventObj) {
             this.$emit("seek", eventObj)

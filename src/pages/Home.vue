@@ -72,7 +72,13 @@ let windowListeners$ = {
             // [Space]
             if (eventObj.code == 'Space') {
                 eventObj.preventDefault()
-                videoComponent.scheduleTogglePlayPause()
+                // if the videoComponent is active, then it will handle space==toggle
+                // AND triggering the toggle here will double-toggle the video, which would cause problems
+                // preventing the default (even closer to the video) doesn't work, even on keypress and keyup 
+                // this could be a bug with this particular version of electron
+                if (document.activeElement != videoComponent.$el) {
+                    videoComponent.scheduleTogglePlayPause()
+                }
             // <-
             } else if (eventObj.code == 'ArrowLeft' || eventObj.key == 'a') {
                 if (shiftKeyIsPressed) {
