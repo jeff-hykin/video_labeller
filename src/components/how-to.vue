@@ -1,9 +1,12 @@
 <template>
     <column class=how-to align-h=left align-v=top :wrap='true'>
         <newspaper-layout width='100%' :columnStyle="{ width:'25rem', margin: '1rem' }">
+            
+            
             <!-- What is this app for? -->
             <div class=card>
                 <h4>What is this app for?</h4>
+                <hello-component thing=10 />
                 <p>
                     If you need to hand-label a video, that is what this app is created for. It lets you record continuous values using either your mouse or keyboard.
                 </p>
@@ -13,60 +16,180 @@
             <!-- How to use it -->
             <div class=card>
                 <h4>How exactly do I use it?</h4>
-                <p>
-                    <b>1. First open up the <code>settings panel</code><br></b>
-                    It is all the way over to the &lt;- left (just hover your mouse over it)
-                </p>
-                <p>
-                    <b>2. Find "Active Label"</b><br>
-                    Change it to be the name of whatever feature you would like to label.
-                </p>
-                <p>
-                    <b>3. Open up a video file</b><br>
-                    (at the top of the <code>settings panel</code>)
-                </p>
-                <p>
-                    <b>4. Play the video</b><br>
-                    There are two modes, <code>mouse mode</code> and <code>keyboard mode</code>. You can toggle them in the setting panel.<br>
-                    <br>
-                    In mouse mode, as soon as you play the video, mouse movements are automatically recorded.<br>
-                    Same is true for keyboard mode.<br>
-                    <br>
-                    <b>Controls:</b><br>
-                    <div style="padding-left: 1rem">
-                        <div class=underline>spacebar</div>
-                        plays/pauses the video<br>
-                        <br>
-                        <div class=underline>shift + left arrow / shift + A</div>
-                        slows down the video<br>
-                        <br>
-                        <div class=underline>shift + right arrow / shift + D</div>
-                        speeds up the video<br>
-                        <br>
-                        <div class=underline>left arrow / A</div>
-                        jumps backwards a few seconds<br>
-                        <br>
-                        <div class=underline>right arrow / D</div>
-                        jumps forwards a few seconds<br>
-                        <br>
-                        <div class=underline>up arrow / W</div>
-                        increment the recorded value <br>(in keyboard mode)<br>
-                        <br>
-                        <div class=underline>down arrow / S</div>
-                        decrement the recorded value <br>(in keyboard mode)<br>
-                        <br>
+                <ol>
+                    <li>
+                        1. First open up the <code>settings panel</code>
+                    </li>
+                    <div>
+                        It is all the way over to the &lt;- left (just hover your mouse over it)
                     </div>
-                </p>
-                <p>
-                    <b>5. Save your changes</b><br>
-                    Use the blue "Save All Changes" button inside of the settings panel
-                </p>
+                    
+                    
+                    <li>
+                        2. Find "Active Label"
+                    </li>
+                    <div>
+                        Change it to be the name of whatever aspect of the video(s) you would like to label.
+                    </div>
+                    
+                    
+                    <li>
+                        3. Open up a video file
+                    </li>
+                    <div>
+                        (at the top of the <code>settings panel</code>)
+                    </div>
+                    
+                    
+                    <li>
+                        4. Play the video
+                    </li>
+                    <div>
+                        As soon as the video starts playing, values will be recorded.
+                        <br>
+                        <br>
+                        If you're in <code>keyboard mode</code> you can use the up/down arrow keys to change the recorded value
+                        <br>
+                        <br>
+                        If you're in <code>mouse mode</code> you can use the mouse movement to change the recorded value
+                        <br>
+                        <br>
+                        See the "What are the controls?" for more info on controlling the playback
+                    </div>
+                    
+                    <li>
+                        5. Save your changes
+                    </li>
+                    <div>
+                        Use the blue "Save All Changes" button inside of the settings panel
+                    </div>
+                </ol>
             </div>
             
-        <div class=card>
-            <h4>How is the data formatted?</h4>
-            <p>
-                The data is in a JSON format like this.
+            <!-- Controls -->
+            <div class=card>
+                <h4>What are the controls?</h4>
+                <br>
+                <div>
+                    
+                    <!-- Directions -->
+                    <row transform=scale(0.8)>
+                        <column position=relative tran>
+                            <key name=W />
+                            <row>
+                                <key name=A />
+                                <key name=S />
+                                <key name=D />
+                            </row>
+                        </column>
+                        <row
+                            color='var(--gray-dark)'
+                            background-color=whitesmoke
+                            width=fit-content
+                            padding=0.28rem
+                            border-radius=0.7rem
+                            margin=0.7rem
+                            font-weight=bold
+                            >
+                            OR
+                        </row>
+                        <column position=relative>
+                            <key name=↑ />
+                            <row>
+                                <key name=← />
+                                <key name=↓ />
+                                <key name=→ />
+                            </row>
+                        </column>
+                    </row>
+                    
+                    <br>
+                    <br>
+                    
+                    <!-- Key mapping -->
+                    <column position=relative>
+                        <!-- UP -->
+                        <column>
+                            <div style='margin-bottom: 0.5rem; width: 8rem; text-align: center;'>
+                                Increment recorded value
+                            </div>
+                            <key name=↑ />
+                        </column>
+                            
+                        <row align-v=top>
+                            <!-- LEFT -->
+                            <row>
+                                <div style='margin-left: 1rem; width: 5rem; text-align: right;'>
+                                    Jump<br>Back
+                                </div>
+                                <key name=← />
+                            </row>
+                            
+                            <!-- DOWN -->
+                            <column>
+                                <key name=↓ />
+                                <row width=0>
+                                    <div style='margin-top: 0.5rem; width: 8rem; text-align: center;'>
+                                        Decrement recorded value
+                                    </div>
+                                </row>
+                            </column>
+                            
+                            <!-- RIGHT -->
+                            <row>
+                                <key name=→ />
+                                <div style='margin-right: 1rem; width: 5rem; text-align: left;'>
+                                    Jump<br>Forward
+                                </div>
+                            </row>
+                        </row>
+                    </column>
+                    
+                    <br>
+                    <br>
+                    
+                    <row align-h=space-between>
+                        
+                        <!-- Slow down video  -->
+                        <column class=shift-mapping align-h=center >
+                            decrease speed
+                            <row align-h=left>
+                                <key name=shift />
+                                +
+                                <key name=← />
+                            </row>
+                        </column>
+                        
+                        <!-- Speed up  -->
+                        <column class=shift-mapping align-h=center >
+                            increase speed
+                            <row align-h=left>
+                                <key name=shift />
+                                +
+                                <key name=→ />
+                            </row>
+                        </column>
+                        
+                    </row>
+                    
+                    <br>
+                    <br>
+                    
+                    <!-- spacebar -->
+                    <column>
+                        Toggle play / pause
+                        <key name=spacebar >
+                            <pre>              </pre>
+                        </key>
+                    </column>
+                    
+                </div>
+            </div>
+            
+            <div class=card>
+                <h4>How is the data formatted?</h4>
+                <p>
+                    The data is in a JSON format like this.
 <pre>
 {
     "your-feature-name": [
@@ -88,8 +211,8 @@
     ]
 }
 </pre>
-            </p>
-        </div>
+                </p>
+            </div>
         </newspaper-layout>
         
     </column>
@@ -97,15 +220,26 @@
 
 <script>
 import NewspaperLayout from "./newspaper-layout"
+import Vue from 'vue'
+
 export default {
-    components: { NewspaperLayout },
+    components: { 
+        NewspaperLayout, 
+        // the key component (like arrow key)
+        key: Vue.extend((h, {children}, {name})=> 
+            <div class='key'>
+                {[name, ...children]}
+            </div>
+        )
+    },
 }
 </script>
 
 <style lang="scss" scoped>
     .how-to {
-        min-height: fit-content;
         width: 100%;
+        height: 100%;
+        overflow: auto;
         background: var(--gray-dark);
         color: whitesmoke;
         
@@ -121,6 +255,46 @@ export default {
         
         p {
             padding: 0.4rem;
+        }
+        
+        .key {
+            width: fit-content;
+            border-radius: 0.4rem;
+            background: var(--gray-dark);
+            box-shadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 3px 1px -2px, rgba(0, 0, 0, 0.2) 0px 1px 5px 0px;
+            margin: 0.25rem 0.5rem;
+            height: 2.8rem;
+            display: flex;
+            padding: 0.8rem;
+            align-content: center;
+            align-items: center;
+            justify-items: center;
+            justify-content: center;
+            text-align: center;
+            min-width: 3rem;
+            position: relative;
+        }
+        
+        .shift-mapping {
+            border: 2px whitesmoke solid;
+            border-radius: 0.5rem;
+            width: fit-content;
+            padding: 0.4rem;
+            padding-bottom: 0.2rem;
+            padding-top: 0.7rem;
+        }
+        
+        ol  {
+            li {
+                margin-top: 0.7rem;
+                margin-bottom: 0.3rem;
+                text-decoration: underline;
+                font-size: 13pt;
+            }
+            
+            & div {
+                margin-left: 1rem;
+            }
         }
         
         .underline {

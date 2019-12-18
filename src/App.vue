@@ -33,6 +33,7 @@ import './plugins/vue-apexcharts'
 import './plugins/vue-toasted'
 import './plugins/self-listener'
 import './plugins/window-listener'
+import './plugins/simple-functional-components'
 import { Router } from './plugins/vue-router'
 
 // routes
