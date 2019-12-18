@@ -113,9 +113,19 @@ let windowListeners$ = {
             } else if (eventObj.code == 'BracketRight') {
                 eventObj.preventDefault()
                 videoComponent.increaseVideoSpeed()
+            } else if (eventObj.key == 'e') {
+                this.eraserMode = true
             }
         }
-    }
+    },
+    keyup(eventObj) {
+        if (window.allowedToCaptureWindowKeypresses) {
+            // stop eraseing as soon as key is lifted
+            if (eventObj.key == 'e') {
+                this.eraserMode = false
+            }
+        }
+    },
 }
 
 export default {

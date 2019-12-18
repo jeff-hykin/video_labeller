@@ -182,6 +182,15 @@
                         </keyboardKey>
                     </column>
                     
+                    <br>
+                    <br>
+                    
+                    <!-- erase -->
+                    <row>
+                        <keyboardKey name=e />
+                        Eraser (hold down)
+                    </row>
+                    
                 </div>
             </div>
             

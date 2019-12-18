@@ -85,6 +85,7 @@ export default {
             labels: [],
             labelToggles: {},
             dataIsSaved: true,
+            eraserMode: false,
         }
     },
     mounted() {
@@ -250,6 +251,10 @@ export default {
             this.$emit("finished:resetTheNextChonologicalRecord", {currentTime, currentValue})
         },
         insertRecord(currentTime, currentValue) {
+            if (this.eraserMode == true) {
+                currentValue = null
+            }
+
             this.dataIsSaved = false
             let futureRecords = currentLabel.data.slice(nextChronologicalRecordIndex, Infinity)
             // NOTE: while its possible binary search could be faster here, linear search
