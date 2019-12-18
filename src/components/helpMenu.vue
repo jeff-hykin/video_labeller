@@ -72,7 +72,7 @@
                 <div>
                     
                     <!-- Directions -->
-                    <row transform=scale(0.8)>
+                    <row transform=scale(0.7)>
                         <column position=relative tran>
                             <keyboardKey name=W />
                             <row>
@@ -89,6 +89,8 @@
                             border-radius=0.7rem
                             margin=0.7rem
                             font-weight=bold
+                            position=relative
+                            top=-1rem
                             >
                             OR
                         </row>
