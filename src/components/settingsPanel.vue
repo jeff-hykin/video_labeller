@@ -4,7 +4,14 @@
             <!-- Video Opener -->
             <h5>Video</h5>
             <column class="video-selector bubble" shadow="1">
-                <input class="file-picker" type="file" tabIndex="-1" accept=".mp4,.mov,.avi,.flv,.wmv" @change="chooseFile" placeholder="Choose Video" />
+                <ui-fileupload
+                        name="video-file"
+                        label="Open Video"
+                        @change="chooseFile"
+                    >
+                    Open A Video
+                    <ui-icon slot="icon">videocam</ui-icon>
+                </ui-fileupload>
                 <ui-textbox class="youtube-link-input" placeholder="Paste YouTube link" v-model="youtubeLink" />
             </column>
             
@@ -162,7 +169,7 @@ export default {
             this.$emit("say:saveDataToFile")
         },
         chooseFile(e) {
-            let pendingLoadPath = e.target.files[0].path
+            let pendingLoadPath = e[0].path
             
             // ask labelManager if the data is saved 
             if (labelManager.dataIsSaved) {
@@ -212,13 +219,14 @@ export default {
     position: fixed;
     min-width: 22rem;
     transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
-    transition: transform 500ms ease-out;
+    transition: all 500ms ease-out;
     background-color: whitesmoke;
     height: 100vh;
     overflow: auto;
     left: 0;
     z-index: 11;
     padding: 2rem 3rem;
+    padding-right: calc(var(--unhovered-panel-amount) + 1rem);
 
     .bubble {
         width: 100%;
@@ -264,5 +272,6 @@ export default {
 }
 .panel:hover {
     transform: translateX(0);
+    padding: 2rem 2rem;
 }
 </style>

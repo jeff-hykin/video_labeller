@@ -81,6 +81,7 @@
         "multispinner": "^0.2.1",
         "node-sass": "^4.13.0",
         "npm": "^6.13.4",
+        "url-loader": "^3.0.0",
         "vue": "^2.6.11",
         "vue-apexcharts": "^1.5.1",
         "vue-electron": "^1.0.6",

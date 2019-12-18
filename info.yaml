@@ -80,10 +80,10 @@
         - check that values are pairwise in order, throw error/sort if theyre not
         - add error if the youtube video is not avalible for download as an mp4
         
-        - consider: a game controller
-        - consider: pick a baseline neutral face and measure things off of it 
 
     later:
+        - consider: a game controller
+        - consider: pick a baseline neutral face and measure things off of it 
         - make data-loading more robust, filter the feature names to be ones that are formatted correctly for marker/graphs
         - add setting for having formatted/minified json
         - allow renaming the labels by clicking on them
