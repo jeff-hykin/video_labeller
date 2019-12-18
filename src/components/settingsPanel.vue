@@ -1,6 +1,7 @@
 <template>
     <column align-h="left" align-v="top" :class="['panel', { init }]" shadow="2">
         <div>
+            <div class=settings-panel-name>Settings Panel</div>
             <!-- Video Opener -->
             <h5>Video</h5>
             <column class="video-selector bubble" shadow="1">
@@ -227,6 +228,13 @@ export default {
     z-index: 11;
     padding: 2rem 3rem;
     padding-right: calc(var(--unhovered-panel-amount) + 1rem);
+    
+    .settings-panel-name {
+        position: absolute;
+        transform: translateX(19.1rem) rotate(90deg) translateX(50%);
+        font-size: 14pt;
+        color: var(--gray);
+    }
 
     .bubble {
         width: 100%;
