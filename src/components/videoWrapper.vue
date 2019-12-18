@@ -110,6 +110,14 @@ export default {
                 } else if (skipBackOrForwards == "skipForward") {
                     newCurrentTime += settingsPanelComponent.settings.skipBackAmount
                 }
+                
+                // keep in bounds
+                if (newCurrentTime < 0) {
+                    newCurrentTime = 0
+                } else if (newCurrentTime > this.$refs.video.duration) {
+                    newCurrentTime = this.$refs.video.duration
+                }
+                
                 this.$refs.video.currentTime = newCurrentTime
                 // tell the labelManager that we just teleported to a specific time
                 this.$emit(`say:${skipBackOrForwards}`, { currentTime: newCurrentTime })

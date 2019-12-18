@@ -47,13 +47,13 @@
             - fix the over-all width of 90vw
             - fix the column width
         - fix pause/play with video controls
+        - fix negative value when skipping back to start
+        - recoding mouse movements when hovering over settings panel
+        - standardize component file naming scheme
+
         
     todo:
         - add a help button/dialog
-        
-        - bugs:
-            - negative value when skipping back to start
-            - recoding mouse movements when hovering over settings panel
         
         - add more keybindings:
             - cmd + O == open
@@ -62,14 +62,12 @@
         - add a only-show active toggle feature
         - allow video speed to be modified directly
         
-        
         - document and clean:
             - barMeasure
             - home
             - graph component
             - settings panel
             - utils
-            - standardize component file naming scheme
         
         - allow saving null values for feature-doesnt-exist:
             - have a hold-down option
