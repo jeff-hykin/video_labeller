@@ -52,6 +52,8 @@
         - standardize component file naming scheme
         - add a help button/dialog
         - allow video speed to be modified directly
+        - allow saving null values for feature-doesnt-exist:
+            - have a hold-down option
         
     todo:
         - add a only-show active toggle feature
