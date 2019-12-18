@@ -43,7 +43,7 @@ import routes from './routes'
 // App
 // 
 let App = {
-    name: 'video_labeller',
+    name: 'video_labeler',
     components: { App },
     router: new Router({ routes }),
 }

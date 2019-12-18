@@ -1,5 +1,5 @@
 {
-    "name": "video_labeller",
+    "name": "video_labeler",
     "version": "1.0.0",
     "author": "Jeff Hykin <jeff.hykin@gmail.com>",
     "description": "An electron-vue project",
@@ -15,7 +15,7 @@
         "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
         "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
         "postinstall": "",
-        "package": "npx electron-packager . --no-prune --overwrite ; mv video_labeller-darwin-x64 app.nosync"
+        "package": "npx electron-packager . --no-prune --overwrite ; mv video_labeler-darwin-x64 app.nosync"
     },
     "vueElectronSettings": {
         "devPortNumber": 9080
@@ -24,8 +24,8 @@
     "nodeGypRebuild": false,
     "npmRebuild": false,
     "build": {
-        "productName": "video_labeller",
-        "appId": "jeffhykin.video_labeller",
+        "productName": "video_labeler",
+        "appId": "jeffhykin.video_labeler",
         "directories": {
             "output": "build"
         },
