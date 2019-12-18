@@ -48,11 +48,13 @@
                     Input Mode
                 </ui-radio-group>
                 <br />
-                <ui-textbox label="Mouse Exaggeration" v-model="settings.mouseExaggeration" />
+                <ui-textbox label="Video Speed" v-model="settings.videoSpeed" />
+                <br />
+                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
                 <br />
                 <ui-textbox label="Skip Back Amount (Seconds)" v-model="settings.skipBackAmount" />
                 <br />
-                <ui-textbox label="Video Speed Multiplier" v-model="settings.videoSpeedMultiplier" />
+                <ui-textbox label="Mouse Exaggeration" v-model="settings.mouseExaggeration" />
             </column>
             
             
@@ -87,6 +89,7 @@ export default {
         settings: {
             currentLabelName: "ExampleLabel1",
             inputMode: "Mouse",
+            videoSpeed: 1,
             mouseExaggeration: 3,
             showGraph: false,
             videoSpeedMultiplier: 1.4,

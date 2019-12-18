@@ -81,12 +81,23 @@ export default {
             // just change the path (when the path changes, it changes the video element)
             this.currentVideoFilePath = videoPath
         })
+        
+        // whenever the speed setting changes
+        settingsPanelComponent.$watch("settings.videoSpeed", ()=>{    
+            this.$refs.video.playbackRate = settingsPanelComponent.settings.videoSpeed
+            this.$toasted.show(`Speed x${settingsPanelComponent.settings.videoSpeed.toFixed(2)}`).goAway(1000)
+        })
     },
     watch: {
         // when the path updates, then open up the new video
         currentVideoFilePath(newVal) {
             if (this.exists) {
                 this.$refs.video.src = this.videoFileUrl
+                
+                // set the playback speed when the video is opened
+                if (settingsPanelComponent.settings.videoSpeed > 0) {
+                    this.$refs.video.playbackRate = settingsPanelComponent.settings.videoSpeed
+                }
             }
         }
     },
@@ -143,8 +154,7 @@ export default {
                 if (newRate+0.05 > 1 && newRate-0.05 < 1) {
                     newRate = 1
                 }
-                this.$refs.video.playbackRate = newRate
-                this.$toasted.show(`Speed x${newRate.toFixed(2)}`).goAway(1000)
+                settingsPanelComponent.settings.videoSpeed = newRate
             }
         },
         increaseVideoSpeed() {
