@@ -63,7 +63,7 @@
         - add a only-show active toggle feature
         
         - document and clean:
-            - bar-measure
+            - barMeasure
             - home
             - graph component
             - settings panel
@@ -79,6 +79,7 @@
             - store markers seperately on videoLabelData
     
         - check that values are pairwise in order, throw error/sort if theyre not
+        - add error if the youtube video is not avalible for download as an mp4
 
     later:
         - make data-loading more robust, filter the feature names to be ones that are formatted correctly for marker/graphs

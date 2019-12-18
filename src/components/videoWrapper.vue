@@ -7,8 +7,8 @@
 <script>
 import path from 'path'
 
-import { labelManager } from "@/components/label-manager"
-import { settingsPanel } from './settings-panel.vue'
+import { labelManager } from "@/components/labelManager"
+import { settingsPanelComponent } from "@/components/settingsPanel"
 
 // 
 // summary
@@ -71,7 +71,7 @@ export default {
     }),
     mounted() {
         // whenever settings wants to open a video
-        settingsPanel.$on("say:openVideo", ({ videoPath })=> {
+        settingsPanelComponent.$on("say:openVideo", ({ videoPath })=> {
             // just change the path (when the path changes, it changes the video element)
             this.currentVideoFilePath = videoPath
         })
@@ -100,9 +100,9 @@ export default {
                 // change the time to be the correct final time
                 let newCurrentTime = this.currentTime
                 if (skipBackOrForwards == "skipBack") {
-                    newCurrentTime -= settingsPanel.settings.skipBackAmount
+                    newCurrentTime -= settingsPanelComponent.settings.skipBackAmount
                 } else if (skipBackOrForwards == "skipForward") {
-                    newCurrentTime += settingsPanel.settings.skipBackAmount
+                    newCurrentTime += settingsPanelComponent.settings.skipBackAmount
                 }
                 this.$refs.video.currentTime = newCurrentTime
                 // tell the labelManager that we just teleported to a specific time
@@ -134,10 +134,10 @@ export default {
             }
         },
         increaseVideoSpeed() {
-            this.changeVideoSpeed(settingsPanel.settings.videoSpeedMultiplier)
+            this.changeVideoSpeed(settingsPanelComponent.settings.videoSpeedMultiplier)
         },
         decreaseVideoSpeed() {
-            this.changeVideoSpeed(1/settingsPanel.settings.videoSpeedMultiplier)
+            this.changeVideoSpeed(1/settingsPanelComponent.settings.videoSpeedMultiplier)
         },
         
         // 

@@ -27,7 +27,7 @@ export default {
         </div>
         
         let createContainer = (children=[]) => <div
-            class="newspaper-layout"
+            class="newspaperLayout"
             style={{
                 width: this.$props.width,
                 display:'flex',
@@ -125,7 +125,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.newspaper-layout {
+.newspaperLayout {
     .newspaper-column {
         height: 'fit-content'
     }

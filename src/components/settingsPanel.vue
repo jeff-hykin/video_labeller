@@ -62,8 +62,8 @@
 </template>
 
 <script>
-import { videoComponent } from '@/components/video-component'
-import { labelManager } from './label-manager'
+import { videoComponent } from '@/components/videoWrapper'
+import { labelManager } from './labelManager'
 import ytdl from 'ytdl-core'
 import fs, { write } from "fs"
 import path from 'path'
@@ -76,11 +76,11 @@ let   app     = remote.app
 
 let localSettingsLocation = "videoLabelerSettings"
 
-export let settingsPanel = {}
+export let settingsPanelComponent = {}
 export default {
     name: "settingsPanel",
     beforeCreate() {
-        settingsPanel = this
+        settingsPanelComponent = this
     },
     data: () => ({
         youtubeLink:"",
@@ -119,12 +119,16 @@ export default {
                 this.saveSettings()
             },
         },
-        youtubeLink(url) {
+        async youtubeLink(url) {
             if (typeof url == 'string') {
                 if (ytdl.validateURL(url)) {
                     let localPath =  path.resolve(app.getPath("desktop"), "*Name for Downloaded Video*")
-                    let videoPath = dialog.showSaveDialog({ defaultPath: localPath })+'.mp4'
+                    let answer = await dialog.showSaveDialog({ defaultPath: localPath })
+                    if (answer && answer.filePath) {
+                        var videoPath = answer.filePath+'.mp4'
+                    }
                     let writeStream = fs.createWriteStream(videoPath)
+                    writeStream.on('error', error=>console.error('there was an error with downloading the video: ', error))
                     writeStream.on('close', ()=>{
                         this.$toasted.show(`Finished download`).goAway(2500)
                         setTimeout(() => {
@@ -133,7 +137,9 @@ export default {
                         }, 0)
                     })
                     this.$toasted.show(`Starting youtube video download`).goAway(2500)
-                    ytdl(url, { filter: (format) => format.container === 'mp4' }).pipe(writeStream)
+                    ytdl(url, { 
+                        filter: (format) => format.container === 'mp4'
+                    }).pipe(writeStream)
                 }
             }
         },

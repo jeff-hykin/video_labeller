@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import { videoComponent } from '@/components/video-component'
-import { labelManager } from '../components/label-manager'
-import { settingsPanel } from './settings-panel.vue'
+import { videoComponent } from '@/components/videoWrapper'
+import { labelManager } from '@/components/labelManager'
+import { settingsPanelComponent } from '@/components/settingsPanel'
 
 export let graphComponent
 export default {
@@ -104,8 +104,8 @@ export default {
         })
         
         // when the range changes
-        settingsPanel.$watch('settings.graphRange',  (newValue) => {
-            if (settingsPanel.settings.graphRange > 0) {
+        settingsPanelComponent.$watch('settings.graphRange',  (newValue) => {
+            if (settingsPanelComponent.settings.graphRange > 0) {
                 this.updateBounds()
             }
         })
@@ -120,8 +120,8 @@ export default {
         })
         
         // when user toggles showGraph
-        settingsPanel.$watch('settings.showGraph', (newValue) => {
-            if (settingsPanel.settings.showGraph) {
+        settingsPanelComponent.$watch('settings.showGraph', (newValue) => {
+            if (settingsPanelComponent.settings.showGraph) {
                 this.updateData()
             }
         })
@@ -148,7 +148,7 @@ export default {
             if (!videoComponent.paused) {
                 this.$emit("say:graphUpdateRequest")
             }
-        }, 1000/settingsPanel.settings.graphFrameRate)
+        }, 1000/settingsPanelComponent.settings.graphFrameRate)
     },
     methods: {
         updateBounds() {
@@ -158,8 +158,8 @@ export default {
             let ctx = chart.zoomPanSelection.ctx
             let options = {
                 xaxis: {
-                    min: this.chartOptions.xaxis.min = currentTime - settingsPanel.settings.graphRange/2,
-                    max: this.chartOptions.xaxis.max = currentTime + settingsPanel.settings.graphRange/2,
+                    min: this.chartOptions.xaxis.min = currentTime - settingsPanelComponent.settings.graphRange/2,
+                    max: this.chartOptions.xaxis.max = currentTime + settingsPanelComponent.settings.graphRange/2,
                 },
             }
             ctx._updateOptions(options, false, false)

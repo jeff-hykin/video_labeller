@@ -1,5 +1,5 @@
 <template>
-    <column ref=barMeasure class=bar-measure-container shadow=2>
+    <column ref=barMeasure class=barMeasure-container shadow=2>
         <div :class='["bar-cursor",{Keyboard:settings.inputMode=="Keyboard", Mouse:settings.inputMode=="Mouse"}]' :style="`position: absolute; top: ${barCursorPosition()}px;`" >
             {{barCursorContent()}}
         </div>
@@ -7,15 +7,15 @@
 </template>
 
 <script>
-import { settingsPanel } from "@/components/settings-panel"
+import { settingsPanelComponent } from "@/components/settingsPanel"
 
 
-export let barMeasure = {}
+export let barMeasureComponent = {}
 export default {
     name: 'barMeasure',
     beforeCreate() {
         // attach to variable since this component is a singleton
-        barMeasure = this
+        barMeasureComponent = this
     },
     data: ()=>({
         // recording 
@@ -41,10 +41,10 @@ export default {
         //
         //  connect to settings
         //
-        this.settings = settingsPanel.settings
-        settingsPanel.$watch('settings.inputMode',  (newValue) => {
+        this.settings = settingsPanelComponent.settings
+        settingsPanelComponent.$watch('settings.inputMode',  (newValue) => {
             // reset the arrow value
-            if (settingsPanel.settings.inputMode == "Keyboard") {
+            if (settingsPanelComponent.settings.inputMode == "Keyboard") {
                 this.arrowValue = 0
             }
         })
@@ -55,7 +55,7 @@ export default {
     },
     methods: {
         updateMouseValue(eventObj) {
-            if (settingsPanel.settings.inputMode == "Mouse") {
+            if (settingsPanelComponent.settings.inputMode == "Mouse") {
                 let barHeight = this.$refs.barMeasure.$el.clientHeight
                 let mouseYPosition = eventObj.pageY
                 
@@ -65,7 +65,7 @@ export default {
                 // move down
                 newMouseHeightPercent -= 0.5
                 // expand
-                newMouseHeightPercent *= settingsPanel.settings.mouseExaggeration
+                newMouseHeightPercent *= settingsPanelComponent.settings.mouseExaggeration
                 // move back up
                 newMouseHeightPercent += 0.5
                 
@@ -82,36 +82,36 @@ export default {
             }
         },
         decrementKeyboardValue() {
-            if (settingsPanel.settings.inputMode == "Keyboard") {
+            if (settingsPanelComponent.settings.inputMode == "Keyboard") {
                 this.arrowValue -= 1
             }
         },
         incrementKeyboardValue() {
-            if (settingsPanel.settings.inputMode == "Keyboard") {
+            if (settingsPanelComponent.settings.inputMode == "Keyboard") {
                 this.arrowValue += 1
             }
         },
         // the external-facing value of the current label
         currentValue() {
-            if (settingsPanel.settings.inputMode == "Mouse") {
+            if (settingsPanelComponent.settings.inputMode == "Mouse") {
                 return this.mouseHeightPercent
-            } else if (settingsPanel.settings.inputMode == "Keyboard") {
+            } else if (settingsPanelComponent.settings.inputMode == "Keyboard") {
                 // the sigmoid value of the arrow value
                 // https://en.wikipedia.org/wiki/Sigmoid_function
                 return 1/(1 + Math.E**(-this.arrowValue))
             } else {
-                console.error("settingsPanel.settings.inputMode not recognized 9048540843")
+                console.error("settingsPanelComponent.settings.inputMode not recognized 9048540843")
             }
         },
         // internal property for computing position
         // internal property for computing content
         barCursorContent() {
-            if (settingsPanel.settings.inputMode == "Mouse") {
+            if (settingsPanelComponent.settings.inputMode == "Mouse") {
                 return `${(this.mouseHeightPercent * 100).toFixed(0)}%`
-            } else if (settingsPanel.settings.inputMode == "Keyboard") {
+            } else if (settingsPanelComponent.settings.inputMode == "Keyboard") {
                 return `${this.arrowValue}`
             } else {
-                console.error("settingsPanel.settings.inputMode not recognized 9048540843")
+                console.error("settingsPanelComponent.settings.inputMode not recognized 9048540843")
             }
         },
         // this has to be a method because it uses external data (clientHeight)
@@ -130,7 +130,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.bar-measure-container {
+.barMeasure-container {
     min-width: 3rem;
     height: 100%;
     background: linear-gradient(0deg, rgba(255,104,100,1) 0%, rgba(73,227,203,1) 52%, rgba(0,114,255,1) 100%);

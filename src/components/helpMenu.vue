@@ -1,12 +1,11 @@
 <template>
-    <column class=how-to align-h=left align-v=top :wrap='true'>
-        <newspaper-layout width='100%' :columnStyle="{ width:'25rem', margin: '1rem' }">
+    <column class=help-menu align-h=left align-v=top :wrap='true'>
+        <newspaperLayout width='100%' :columnStyle="{ width:'25rem', margin: '1rem' }">
             
             
             <!-- What is this app for? -->
             <div class=card>
                 <h4>What is this app for?</h4>
-                <hello-component thing=10 />
                 <p>
                     If you need to hand-label a video, that is what this app is created for. It lets you record continuous values using either your mouse or keyboard.
                 </p>
@@ -75,11 +74,11 @@
                     <!-- Directions -->
                     <row transform=scale(0.8)>
                         <column position=relative tran>
-                            <key name=W />
+                            <keyboardKey name=W />
                             <row>
-                                <key name=A />
-                                <key name=S />
-                                <key name=D />
+                                <keyboardKey name=A />
+                                <keyboardKey name=S />
+                                <keyboardKey name=D />
                             </row>
                         </column>
                         <row
@@ -94,11 +93,11 @@
                             OR
                         </row>
                         <column position=relative>
-                            <key name=↑ />
+                            <keyboardKey name=↑ />
                             <row>
-                                <key name=← />
-                                <key name=↓ />
-                                <key name=→ />
+                                <keyboardKey name=← />
+                                <keyboardKey name=↓ />
+                                <keyboardKey name=→ />
                             </row>
                         </column>
                     </row>
@@ -113,7 +112,7 @@
                             <div style='margin-bottom: 0.5rem; width: 8rem; text-align: center;'>
                                 Increment recorded value
                             </div>
-                            <key name=↑ />
+                            <keyboardKey name=↑ />
                         </column>
                             
                         <row align-v=top>
@@ -122,12 +121,12 @@
                                 <div style='margin-left: 1rem; width: 5rem; text-align: right;'>
                                     Jump<br>Back
                                 </div>
-                                <key name=← />
+                                <keyboardKey name=← />
                             </row>
                             
                             <!-- DOWN -->
                             <column>
-                                <key name=↓ />
+                                <keyboardKey name=↓ />
                                 <row width=0>
                                     <div style='margin-top: 0.5rem; width: 8rem; text-align: center;'>
                                         Decrement recorded value
@@ -137,7 +136,7 @@
                             
                             <!-- RIGHT -->
                             <row>
-                                <key name=→ />
+                                <keyboardKey name=→ />
                                 <div style='margin-right: 1rem; width: 5rem; text-align: left;'>
                                     Jump<br>Forward
                                 </div>
@@ -154,9 +153,9 @@
                         <column class=shift-mapping align-h=center >
                             decrease speed
                             <row align-h=left>
-                                <key name=shift />
+                                <keyboardKey name=shift />
                                 +
-                                <key name=← />
+                                <keyboardKey name=← />
                             </row>
                         </column>
                         
@@ -164,9 +163,9 @@
                         <column class=shift-mapping align-h=center >
                             increase speed
                             <row align-h=left>
-                                <key name=shift />
+                                <keyboardKey name=shift />
                                 +
-                                <key name=→ />
+                                <keyboardKey name=→ />
                             </row>
                         </column>
                         
@@ -178,9 +177,9 @@
                     <!-- spacebar -->
                     <column>
                         Toggle play / pause
-                        <key name=spacebar >
+                        <keyboardKey name=spacebar >
                             <pre>              </pre>
-                        </key>
+                        </keyboardKey>
                     </column>
                     
                 </div>
@@ -213,20 +212,20 @@
 </pre>
                 </p>
             </div>
-        </newspaper-layout>
+        </newspaperLayout>
         
     </column>
 </template>
 
 <script>
-import NewspaperLayout from "./newspaper-layout"
+import NewspaperLayout from "./newspaperLayout"
 import Vue from 'vue'
 
 export default {
     components: { 
         NewspaperLayout, 
         // the key component (like arrow key)
-        key: Vue.extend((h, {children}, {name})=> 
+        keyboardKey: Vue.extend((h, {children}, {name})=> 
             <div class='key'>
                 {[name, ...children]}
             </div>
@@ -236,7 +235,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .how-to {
+    .help-menu {
         width: 100%;
         height: 100%;
         overflow: auto;

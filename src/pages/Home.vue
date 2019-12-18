@@ -1,7 +1,7 @@
 <template>
     <row class=wrapper align-h=left align-v=top>
         <!-- Settings Panel -->
-        <settings-panel>
+        <settingsPanel>
             <!-- Labels -->
             <template v-slot:labels>
                 <!-- Labels to display -->
@@ -9,18 +9,18 @@
                     <ui-switch v-for="(eachLabel, eachIndex) in labelToggles" :key="eachIndex" v-model="labelToggles[eachIndex]" :label="eachIndex"></ui-switch>
                 </column>
             </template>
-        </settings-panel>
+        </settingsPanel>
         <!-- Settings panel gost -->
         <div class=panel-ghost ></div>
         <!-- Main Section -->
         <div class=main-area @mouseenter="mouseEnter" @mouseleave="mouseExit">
             <row class=video-area align-h=left align-v=top>
                 <!-- Mouse Height-Measure Bar -->
-                <bar-measure />
+                <barMeasure />
                 <!-- Current Video -->
                 <column align-h=left align-v=top overflow=auto height=100% flex-grow=1>
-                    <how-to v-if='!videoComponent.currentVideoFilePath' />
-                    <video-component v-show='videoComponent.currentVideoFilePath' />
+                    <helpMenu v-if='!videoComponent.currentVideoFilePath' />
+                    <videoWrapper v-show='videoComponent.currentVideoFilePath' />
                 </column>
             </row>
             <!-- The bottom bar -->
@@ -43,12 +43,12 @@ import path from 'path'
 import { onWheelFlick, binSearch, once } from '@/util/all'
 
 // components/mixins
-import HowTo from '@/components/how-to'
+import helpMenu from '@/components/helpMenu'
 import Graph, {graphComponent} from '@/components/graph'
-import VideoComponent, {videoComponent} from '@/components/video-component'
-import SettingsPanel, {settingsPanel} from "@/components/settings-panel"
-import BarMeasure, {barMeasure} from '@/components/bar-measure'
-import LabelManagerMixin, {labelManager} from '@/components/label-manager'
+import videoWrapper, {videoComponent} from '@/components/videoWrapper'
+import settingsPanel, {settingsPanelComponent} from "@/components/settingsPanel"
+import barMeasure, {barMeasureComponent} from '@/components/barMeasure'
+import labelManager from '@/components/labelManager'
 
 
 let   util    = require("util")
@@ -64,7 +64,7 @@ document.body.style.overflow = 'hidden'
 // 
 let windowListeners$ = {
     mousemove(eventObj) {
-        barMeasure.updateMouseValue(eventObj)
+        barMeasureComponent.updateMouseValue(eventObj)
     },
     keydown(eventObj) {
         let shiftKeyIsPressed = eventObj.shiftKey
@@ -94,11 +94,11 @@ let windowListeners$ = {
             // ↑
             } else if (eventObj.code == 'ArrowUp' || eventObj.key == 'w') {
                 eventObj.preventDefault()
-                barMeasure.incrementKeyboardValue()
+                barMeasureComponent.incrementKeyboardValue()
             // ↓
             } else if (eventObj.code == 'ArrowDown' || eventObj.key == 's') {
                 eventObj.preventDefault()
-                barMeasure.decrementKeyboardValue()
+                barMeasureComponent.decrementKeyboardValue()
             // [
             } else if (eventObj.code == 'BracketLeft') {
                 eventObj.preventDefault()
@@ -114,8 +114,15 @@ let windowListeners$ = {
 
 export default {
     name: "main-page",
-    components: { VueJsonPretty, HowTo, Graph, BarMeasure, SettingsPanel, VideoComponent },
-    mixins: [ LabelManagerMixin ],
+    components: {
+        VueJsonPretty,
+        helpMenu,
+        Graph,
+        barMeasure,
+        settingsPanel,
+        videoWrapper
+    },
+    mixins: [ labelManager ],
     data: ()=>({
         settings: {},
         // Video data
@@ -128,7 +135,7 @@ export default {
         // debugging
         window.main = this 
         // connect the settings panel
-        this.settings = settingsPanel.settings
+        this.settings = settingsPanelComponent.settings
         // connect the video
         this.videoComponent = videoComponent
     },
@@ -172,7 +179,7 @@ export default {
     
     // variables for child elements
     .wrapper , ::v-deep {
-        --bar-measure-width: 5rem;
+        --barMeasure-width: 5rem;
         --unhovered-panel-amount: 2.8rem;
         --blue: #2196F3;
         --green: #64FFDA;

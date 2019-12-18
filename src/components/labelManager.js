@@ -4,11 +4,10 @@ import path from 'path'
 
 import { binSearch } from '@/util/all'
 
-import { barMeasure } from '@/components/bar-measure'
-import { videoComponent } from '@/components/video-component'
-import { statelessData } from '@/pages/Home.vue'
-import { settingsPanel } from "@/components/settings-panel"
-import { graphComponent } from "../components/graph.vue"
+import { barMeasureComponent } from '@/components/barMeasure'
+import { videoComponent } from '@/components/videoWrapper'
+import { settingsPanelComponent } from "@/components/settingsPanel"
+import { graphComponent } from "@/components/graph"
 
 // 
 // summary
@@ -53,7 +52,7 @@ import { graphComponent } from "../components/graph.vue"
     //       then update chronologically next record to be the the record after the one that was just inserted
     // 
     // when are new values recorded?
-    //  - 1. every time barMeasure gets a `newCurrentValue` (caused by mouse/keyboard events)
+    //  - 1. every time barMeasureComponent gets a `newCurrentValue` (caused by mouse/keyboard events)
     //  - 2. every time the graph asks for all of the records `allRecords` method
     //  - 3. every time the user presses play (videoComponent `play` event)
     //  - 4. every time the user presses pause (videoComponent `pause` event)
@@ -61,7 +60,7 @@ import { graphComponent } from "../components/graph.vue"
     // how does the manager know what the current label is?
     //  - 1. it waits until a video is loaded by looking at `currentVideoFilePath`
     //       once a video is loaded it then retreives or generates a label object
-    //  - 2. whenever the settingsPanel `currentLabelName` changes
+    //  - 2. whenever the settingsPanelComponent `currentLabelName` changes
     //       it removes any previous empty names (likely intermediate as-user-was-typing names)
     //       it then retreives or generates a label object
 
@@ -71,7 +70,7 @@ const OPTIMIZER_LIMIT = 0.5 // seconds
 
 // helpers
 let currentTime = () => videoComponent.currentTime-0
-let currentValue = () => barMeasure.currentValue()
+let currentValue = () => barMeasureComponent.currentValue()
 let currentLabel = null
 let nextChronologicalRecordIndex = 0
 
@@ -92,7 +91,7 @@ export default {
         // 
         // saving/loading data
         // 
-        settingsPanel.$on("say:saveDataToFile" , (eventData) => {
+        settingsPanelComponent.$on("say:saveDataToFile" , (eventData) => {
             this.saveDataToFile(eventData)
         })
         videoComponent.$watch("currentVideoFilePath", (eventData) => {
@@ -104,7 +103,7 @@ export default {
         // 
         // inserting records
         // 
-        barMeasure.$on('newCurrentValue', (newCurrentValue)=>{
+        barMeasureComponent.$on('newCurrentValue', (newCurrentValue)=>{
             // if the video is playing
             if (!videoComponent.paused) {
                 // then record a new value
@@ -149,7 +148,7 @@ export default {
             // setup the current label
             this.labelNameChanged()
         })
-        settingsPanel.$watch("settings.currentLabelName", (eventData) => {
+        settingsPanelComponent.$watch("settings.currentLabelName", (eventData) => {
             this.labelNameChanged()
         })
 
@@ -300,7 +299,7 @@ export default {
 
         },
         labelNameChanged() {
-            let newCurrentLabelName = settingsPanel.settings.currentLabelName
+            let newCurrentLabelName = settingsPanelComponent.settings.currentLabelName
             currentLabel = null
             let filteredLabels = []
             let labelToggles = {}
