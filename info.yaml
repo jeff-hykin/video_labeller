@@ -1,9 +1,9 @@
-(using_atk_version): 1.0
+(using_atk_version): 1.1.0
 (project):
     name: Video Labeller
     description: An electron app designed to help people quickly label features on videos
     
-    commands: &commands # if you dont know what the & means, see https://blog.daemonl.com/2016/02/yaml.html
+    (commands):
         dev: npm run dev
         package: npm run build
         gco: git checkout video-image-labeler-stable
@@ -11,11 +11,9 @@
             puts 'placeholder text'
         (setup): ruby setup.rb
     
-    paths: &paths
+    (paths):
         root: ./
     
-    dependencies: &dependencies
-        atk: 0.0.1
     
     done:
         - clean up the code
@@ -92,30 +90,3 @@
         - ability to open a folder and recursively get all videos
         - have the ability to add a list of youtube videos to evaluate in order
         - add settings for graph-refresh rate (add listener to hot-change the setinterval)
-    
-    (advanced_setup):
-        (put_new_dependencies_under): [ '(project)', 'basic_info', 'dependencies' ]
-        # caveats for a specific OS
-        when(--os is 'mac'):
-            (project_commands):
-                <<: *commands
-            (dependencies):
-                <<: *dependencies
-            (paths):
-                <<: *paths
-                
-        when(--os is 'windows'):
-            (project_commands):
-                <<: *commands
-            (dependencies):
-                <<: *dependencies
-            (paths):
-                <<: *paths
-                
-        when(--os is 'linux'):
-            (project_commands):
-                <<: *commands
-            (dependencies):
-                <<: *dependencies
-            (paths):
-                <<: *paths
