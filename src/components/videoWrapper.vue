@@ -78,6 +78,7 @@ export default {
     mounted() {
         // whenever settings wants to open a video
         settingsPanelComponent.$on("say:openVideo", ({ videoPath })=> {
+            console.log(`opening video:`,this.currentVideoFilePath)
             // just change the path (when the path changes, it changes the video element)
             this.currentVideoFilePath = videoPath
         })
@@ -98,6 +99,8 @@ export default {
                 if (settingsPanelComponent.settings.videoSpeed > 0) {
                     this.$refs.video.playbackRate = settingsPanelComponent.settings.videoSpeed
                 }
+            } else {
+                console.error("it seems the video element doesn't exist (it should exist )")
             }
         }
     },

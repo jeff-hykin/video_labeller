@@ -54,6 +54,7 @@
             - have a hold-down option
         
     todo:
+        - FIX mp4 bug, if its encoded in a certain type it silently fails. Auto convert it on import
         - add a only-show active toggle feature
         - convert to a fullscreen (video only) or non-fullscreen (graph and settings panel viewable)
         
