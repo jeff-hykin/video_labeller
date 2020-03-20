@@ -21,3 +21,5 @@ npm run build
 
 ```
 
+#### Compiling
+electron-builder requires (for some reason) that the global python version be python 2

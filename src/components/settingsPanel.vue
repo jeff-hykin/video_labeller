@@ -236,8 +236,9 @@ export default {
 
 <style lang="scss" scoped>
 .panel {
+    --panel-width: 22rem;
     position: fixed;
-    min-width: 22rem;
+    min-width: var(--panel-width);
     transform: translateX(calc(-100% + var(--unhovered-panel-amount) + 3px));
     transition: all 500ms ease-out;
     background-color: whitesmoke;
@@ -249,9 +250,11 @@ export default {
     padding-right: calc(var(--unhovered-panel-amount) + 1rem);
     
     .settings-panel-name {
+        --height: 14pt;
         position: absolute;
-        transform: translateX(19.1rem) rotate(90deg) translateX(50%);
-        font-size: 14pt;
+        right: 0;
+        transform: translateX(calc(0.5 * calc(var(--unhovered-panel-amount) - var(--height)))) rotate(90deg) translateX(50%);
+        font-size: var(--height);
         color: var(--gray);
     }
 

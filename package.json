@@ -21,7 +21,7 @@
         "devPortNumber": 9080
     },
     "buildDependenciesFromSource": true,
-    "nodeGypRebuild": false,
+    "nodeGypRebuild": true,
     "npmRebuild": false,
     "build": {
         "productName": "video_labeler",
@@ -79,7 +79,7 @@
         "mini-css-extract-plugin": "^0.8.0",
         "moment": "^2.24.0",
         "multispinner": "^0.2.1",
-        "node-sass": "^4.13.0",
+        "node-sass": "^4.13.1",
         "npm": "^6.13.4",
         "url-loader": "^3.0.0",
         "vue": "^2.6.11",
