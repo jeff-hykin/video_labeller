@@ -249,15 +249,27 @@ export default {
     padding: 2rem 3rem;
     padding-right: calc(var(--unhovered-panel-amount) + 1rem);
     
+    --panel-name-height: 14pt;
+    
+    &:hover {
+        transform: translateX(0);
+        padding: 2rem 2rem;
+        
+        .settings-panel-name {
+            margin-right: calc(var(--panel-name-height) * -4);
+        }
+    }
+    
     .settings-panel-name {
-        --height: 14pt;
         position: absolute;
         right: 0;
-        transform: translateX(calc(0.5 * calc(var(--unhovered-panel-amount) - var(--height)))) rotate(90deg) translateX(50%);
-        font-size: var(--height);
+        transition: all 500ms ease-out;
+        margin-right: 0;
+        transform: translateX(calc(0.5 * calc(var(--unhovered-panel-amount) - var(--panel-name-height)))) rotate(90deg) translateX(50%);
+        font-size: var(--panel-name-height);
         color: var(--gray);
     }
-
+    
     .bubble {
         width: 100%;
         margin-top: 0.8rem;
@@ -299,9 +311,5 @@ export default {
 }
 .panel.init {
     transform: translateX(0);
-}
-.panel:hover {
-    transform: translateX(0);
-    padding: 2rem 2rem;
 }
 </style>
