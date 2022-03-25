@@ -98,7 +98,7 @@
         "ytdl-core": "^1.0.3"
     },
     "devDependencies": {
-        "electron": "^7.1.5",
+        "electron": "^13.6.6",
         "electron-builder": "^21.2.0",
         "electron-debug": "^3.0.1",
         "electron-default-menu": "^1.0.1",
